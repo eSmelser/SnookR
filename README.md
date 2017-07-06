@@ -1,66 +1,29 @@
 # SnookR
 An open source webapp facilitating communication amongst pool players built in Python using Django
 
-One Paragraph of project description goes here
+Work In Progress.
 
-## Getting Started
+## Project Progress
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+### Week 1
 
-### Prerequisites
+* Research and consider reasonable MVP
+* Watch pluralsight Python Videos
+* Create Trello board to keep track of current status of project
+* Held meetings with a few acquaintances for project and tool guidance 
 
-What things you need to install the software and how to install them
+### Week 2
 
-```
-Nothing Yet
-```
+* Work through Python Koans to help learn Python Basics
+* Watch pluralsight video on Django basics
 
-### Installing
+## KanBan Board
 
-A step by step series of examples that tell you have to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
+* [SnookR Tracking](https://trello.com/b/Rrb3Ud76) - A Trello Board containing the current status of work on SnookR
 
 ## Built With
 
 * [Django](https://www.djangoproject.com/) - The web framework used
-
 
 ## Contributing
 
@@ -68,13 +31,13 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/esmelser/SnookR/tags). 
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Evan Smelser** - *Initial work* - [SnookR](https://github.com/esmelser/SnookR)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/esmelser/SnookR/contributors) who participated in this project.
 
 ## License
 
@@ -82,7 +45,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
 
