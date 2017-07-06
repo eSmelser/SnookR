@@ -9,7 +9,7 @@ Work In Progress.
 
 * Research and consider reasonable MVP
 * Watch pluralsight Python Videos
-* Create Trello board to keep track of current status of project
+* Create [Trello](https://trello.com/b/Rrb3Ud76) board to keep track of current status of project
 * Held meetings with a few acquaintances for project and tool guidance 
 
 ### Week 2
@@ -24,10 +24,6 @@ Work In Progress.
 ## Built With
 
 * [Django](https://www.djangoproject.com/) - The web framework used
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
