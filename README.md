@@ -27,6 +27,10 @@ Work In Progress.
 * Worked through Django Pluralsight demo "Hello World" application to get a Django hello world app up
    and running, although that is not a part of this project.
 * Created slack channel for project collaboration
+* Set up Django App for sublists
+* Add Views for each of the various divisions for their respective sublists
+* Add HTML Templates for each of the sublists
+
 
 ## KanBan Board
 
