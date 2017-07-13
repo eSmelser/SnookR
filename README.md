@@ -16,6 +16,17 @@ Work In Progress.
 
 * Work through Python Koans to help learn Python Basics
 * Watch pluralsight video on Django basics
+* Met with friend David who runs local divisions of BCA Billiards league. He is interested in possible
+   sponsorship, working on using the project developed in this class as a demo for him and his
+   compatriots.
+
+### Week 3
+
+* Shared project idea with a friend and he agreed to assist/collaborate on project moving forward
+* Worked out VirtualEnv and installed Django in app
+* Worked through Django Pluralsight demo "Hello World" application to get a Django hello world app up
+   and running, although that is not a part of this project.
+* Created slack channel for project collaboration
 
 ## KanBan Board
 
