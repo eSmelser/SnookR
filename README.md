@@ -31,6 +31,41 @@ Work In Progress.
 * Add Views for each of the various divisions for their respective sublists
 * Add HTML Templates for each of the sublists
 
+## Project Setup
+
+SnookR was designed and written with Python 3.52, that will be specified in the creation of your
+virtual environment.
+
+### Clone the repo
+
+```
+git clone https://github.com/eSmelser/SnookR.git
+```
+
+### Create virtual env
+
+If you are using [Virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) (and you should be)
+
+```
+mkvirtualenv virtualenv_name
+```
+This will automatically activate your virtual environmtne `virtualenv_name`
+
+without virtualenvwrapper
+
+```
+virtualenv -p path/to/python3 virtualenv_name
+. virtualenv_name/bin/activate
+```
+
+### Use Pip to install Requirements
+
+You should, of course, have the correct version of pip installed corresponding to Python3
+
+```
+pip install -r SnookR/requirements.txt
+```
+
 
 ## KanBan Board
 
