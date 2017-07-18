@@ -1,4 +1,6 @@
 # SnookR
+Copyright &copy; 2017 Evan Smelser
+
 An open source webapp facilitating communication amongst pool players built in Python using Django
 
 Work In Progress.
