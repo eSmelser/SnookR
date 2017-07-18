@@ -13,45 +13,14 @@ class Player(models.Model):
 	username     = models.ForeignKey(User, related_name="players_username")
 	first_name   = models.CharField(max_length=50)
 	last_name    = models.CharField(max_length=50)
-	phone_number = models.IntegerField(required=False)
-	email        = models.CharField(max_length=200, required=False)
+	phone_number = models.IntegerField(blank=True)
+	email        = models.CharField(max_length=200, blank=True)
 
 	def __str__(self):
 		name = self.first_name + ' ' + self.last_name
 		return name
 
 	
-'''
-A team can contain many players but should only ever exist in one division
-Team -> Player   : 1 .. *
-Team -> Division : 1
-'''
-class Team(models.Model):
-	name          = models.CharField(max_length=200)
-	division      = models.ForeignKey(Division, related_name="team's division")
-	team_captain  = models.ForeignKey(Player, related_name="team captain")
-	other_players = models.ManyToManyField(Player, required=False)
-	
-	def __str__(self):
-		return self.name
-
-
-'''
-A division must have a name and a division rep and can contain 0 or more teams and 0 or more subs
-Division -> Player  : 1 .. *
-Division -> Team    : 0 .. *
-Division -> Session : 1 .. *
-'''
-class Division(models.Model):
-	name         = models.CharField(max_length=200)
-	division_rep = models.ForeignKey(Player, related_name='division representative')
-	teams        = models.ManyToManyField(Team, required=False, related_name="division's teams")
-	subs         = models.ManyToManyField(Sub, required=False, related_name="division's subs")
-
-	def __str__(self):
-		return self.name
-
-
 '''
 Subs are a "tuple-ish" construction tying a player and a date together to indicate what date they are
 willing to sub in a Division. 
@@ -67,6 +36,37 @@ class Sub(models.Model):
 
 	def __str__(self):
 		return self.player + ' is available ' + self.date
+
+
+'''
+A team can contain many players but should only ever exist in one division
+Team -> Player   : 1 .. *
+Team -> Division : 1
+'''
+class Team(models.Model):
+	name          = models.CharField(max_length=200)
+#	division      = models.ForeignKey(Division, related_name="team's division")
+	team_captain  = models.ForeignKey(Player, related_name="team_captain")
+	other_players = models.ManyToManyField(Player, blank=True)
+	
+	def __str__(self):
+		return self.name
+
+
+'''
+A division must have a name and a division rep and can contain 0 or more teams and 0 or more subs
+Division -> Player  : 1 .. *
+Division -> Team    : 0 .. *
+Division -> Session : 1 .. *
+'''
+class Division(models.Model):
+	name         = models.CharField(max_length=200)
+	division_rep = models.ForeignKey(Player, related_name='division_representative')
+	teams        = models.ManyToManyField(Team, blank=True, related_name="divisions_teams")
+	subs         = models.ManyToManyField(Sub, blank=True, related_name="divisions_subs")
+
+	def __str__(self):
+		return self.name
 
 
 '''
