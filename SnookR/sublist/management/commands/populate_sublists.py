@@ -6,7 +6,7 @@ class Command(BaseCommand):
     names = [
         'Fortune Star',
         'Local 66',
-        'McNulty and Barrys',
+        'McAnulty and Barrys',
         'Outer Eastside',
         'Pub 181',
         'River Roadhouse',
