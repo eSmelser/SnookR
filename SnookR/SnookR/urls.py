@@ -16,14 +16,8 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from sublist import views
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-	url(r'^wichita/', views.wichita),
-	url(r'^riverroadhouse/', views.river_roadhouse),
-	url(r'^mcanultyandbarrys/', views.mcanulty_and_barrys),
-	url(r'^local66/', views.local66),
-	url(r'^watertrough/', views.watertrough),
-	url(r'^fortunestar/', views.fortune_star),
-	url(r'^pub181/', views.pub181),
-	url(r'^outereastside/', views.outer_eastside),
+    url(r'^(?P<sublist>(\w|[\w-]+))/', views.SublistView.as_view(), name='sublist'),
 ]
