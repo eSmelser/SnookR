@@ -19,7 +19,7 @@ from sublist import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^sublist/(?P<sublist>[\w-]+)/', views.SublistView.as_view(), name='sublist'),
+    url(r'^(?P<sublist>(\w|[\w-]+))/', views.SublistView.as_view(), name='sublist'),
 	url(r'^wichita/', views.wichita),
 	url(r'^riverroadhouse/', views.river_roadhouse),
 	url(r'^mcanultyandbarrys/', views.mcanulty_and_barrys),

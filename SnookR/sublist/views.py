@@ -10,7 +10,9 @@ class SublistView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['sublist'] = get_object_or_404(Sublist, name=kwargs.get('name'))
+        print('kwargs', kwargs)
+        print('Sublist.objects.all()', Sublist.objects.all())
+        context['sublist'] = get_object_or_404(Sublist, slug=kwargs.get('sublist'))
         return context
 
 
