@@ -19,17 +19,18 @@ class SeleniumTestCase(LiveServerTestCase):
 
 class HomePageTestCase(SeleniumTestCase):
     def test_home_in_title(self):
+        """Passes if the home screen has 'Home' in the title."""
         self.browser.get(self.live_server_url + '/home/')
         self.assertIn('Home', self.browser.title)
 
     def test_login_link(self):
+        """Passes if the login link goes to a screen with 'Login' in the title."""
         self.browser.get(self.live_server_url + '/home/')
         self.browser.find_element_by_id('login-link').click()
         self.assertIn('Login', self.browser.title)
 
 
 class LoginPageTestCase(SeleniumTestCase):
-
     error_msg = 'Please enter a correct username and password'
 
     def test_login_fails_with_invalid_user(self):
@@ -76,6 +77,12 @@ class LoginPageTestCase(SeleniumTestCase):
 
 class SignupPageTestCase(SeleniumTestCase):
     def test_signup_adds_user(self):
+        """Passes if filling out the signup form creates a new user.
+
+        The user goes to the signup page and types in their username, password,
+        and confirmation password.  They click the submit button.  Their
+        gets stored in the user database.
+        """
         username = 'JohnDoe'
         password = 'mycoolpassword'
 
