@@ -46,6 +46,32 @@ class NavbarTestCase(SeleniumTestCase):
         self.assertNotIn('Signup', navbar.text)
 
 
+    def test_authenticated_navbar_shows_username(self):
+        """Passes if authenticated user shows username in navbar.
+
+        The user (username is JohnDoe) logs in as JohnDoe, he sees in the
+        navbar 'Signed in as JohnDoe'.
+        """
+        username = 'JohnDoe'
+        password = 'mycoolpassword'
+
+        # Setup DB with user model instance and login
+        user = User.objects.create_user(username=username, password=password)
+        self.browser.get(self.live_server_url + '/login/')
+        self.browser.find_element_by_id('id_username').send_keys(username)
+        self.browser.find_element_by_id('id_password').send_keys(password)
+        self.browser.find_element_by_id('id_submit_button').click()
+        self.browser.get(self.live_server_url + '/home/')
+
+        # Assert that the message is in the navbar
+        expected = 'Signed in as JohnDoe'
+        navbar = self.browser.find_element_by_class_name('navbar')
+        self.assertIn(expected, navbar.text)
+
+        # Clean up
+        user.delete()
+
+
 class HomePageTestCase(SeleniumTestCase):
     def test_home_in_title(self):
         """Passes if the home screen has 'Home' in the title."""
@@ -127,5 +153,7 @@ class SignupPageTestCase(SeleniumTestCase):
         self.browser.find_element_by_id('id_submit_button').click()
 
         # Check that the DB now has one user with username == username
-        user = User.objects.filter(username=username)
-        self.assertEqual(len(user), 1)
+        users = User.objects.filter(username=username)
+        user_count = len(users)
+        users.delete()
+        self.assertEqual(user_count, 1)
