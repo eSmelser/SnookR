@@ -32,14 +32,18 @@ class NavbarTestCase(SeleniumTestCase):
         # Setup DB with user model instance
         user = User.objects.create_user(username=username, password=password)
 
-        # Run test
+        # Login user
         self.browser.get(self.live_server_url + '/login/')
         self.browser.find_element_by_id('id_username').send_keys(username)
         self.browser.find_element_by_id('id_password').send_keys(password)
         self.browser.find_element_by_id('id_submit_button').click()
+
+        # Run Test
         self.browser.get(self.live_server_url + '/home/')
         navbar = self.browser.find_element_by_class_name('navbar')
         self.assertIn('Logout', navbar.text)
+        self.assertNotIn('Login', navbar.text)
+        self.assertNotIn('Signup', navbar.text)
 
 
 class HomePageTestCase(SeleniumTestCase):
