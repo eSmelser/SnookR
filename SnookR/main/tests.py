@@ -1,10 +1,12 @@
 import time
-from django.test import LiveServerTestCase
+from django.test import LiveServerTestCase, tag
 from django.contrib.auth.models import User
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 
+
+@tag('selenium')
 class SeleniumTestCase(LiveServerTestCase):
     def setUp(self):
         super().setUp()
@@ -27,23 +29,31 @@ class HomePageTestCase(SeleniumTestCase):
 
 
 class LoginPageTestCase(SeleniumTestCase):
+
+    error_msg = 'Please enter a correct username and password'
+
     def test_login_fails_with_invalid_user(self):
-        """Passes if invalid user login causes an 'errorlist' class to show"""
+        """Passes if an invalid user login displays an error prompt.
+
+        The user goes to the login screen and types in an invalid username
+        and password, and then clicks on the submit button.  The page shows an
+        error saying: 'Please enter a correct username and password'.
+        """
         self.browser.get(self.live_server_url + '/login/')
         self.browser.find_element_by_id('id_username').send_keys('John123')
         self.browser.find_element_by_id('id_password').send_keys('mypassword')
-        self.browser.find_element_by_id('id_login_submit_button').click()
+        self.browser.find_element_by_id('id_submit_button').click()
 
-        passed = True
-        try:
-            self.browser.find_element_by_class_name('errorlist')
-        except NoSuchElementException:
-            passed = False
-
-        self.assertTrue(passed)
+        elem = self.browser.find_element_by_class_name('errorlist')
+        self.assertIn(self.error_msg, elem.text)
 
     def test_login_passes_with_valid_user(self):
-        """Passes if valid user login doesn't cause an 'errorlist' class to show"""
+        """Passes if valid user login doesn't cause an error prompt to show.
+
+        The user goes to the login screen and types in a valid username
+        and password, and then clicks on the submit button.  The page redirects
+        successfully with on error.
+        """
         # Valid username and password
         username = 'valid_username'
         password = 'valid_password'
@@ -55,17 +65,31 @@ class LoginPageTestCase(SeleniumTestCase):
         self.browser.get(self.live_server_url + '/login/')
         self.browser.find_element_by_id('id_username').send_keys(username)
         self.browser.find_element_by_id('id_password').send_keys(password)
-        self.browser.find_element_by_id('id_login_submit_button').click()
+        self.browser.find_element_by_id('id_submit_button').click()
 
         # Delete user from test DB because not needed now
         user.delete()
 
         # Check and assert pass/fail
-        passed = False
-        try:
-            self.browser.find_element_by_class_name('errorlist')
-        except NoSuchElementException:
-            # If there is not an elem with errorlist class, this test passes
-            passed = True
+        self.assertNotIn(self.error_msg, self.browser.page_source)
 
-        self.assertTrue(passed)
+
+class SignupPageTestCase(SeleniumTestCase):
+    def test_signup_adds_user(self):
+        username = 'JohnDoe'
+        password = 'mycoolpassword'
+
+        # Check preconditions
+        user = User.objects.filter(username=username)
+        self.assertEqual(len(user), 0)
+
+        # Run test
+        self.browser.get(self.live_server_url + '/signup/')
+        self.browser.find_element_by_id('id_username').send_keys(username)
+        self.browser.find_element_by_id('id_password1').send_keys(password)
+        self.browser.find_element_by_id('id_password2').send_keys(password)
+        self.browser.find_element_by_id('id_submit_button').click()
+
+        # Check that the DB now has one user with username == username
+        user = User.objects.filter(username=username)
+        self.assertEqual(len(user), 1)
