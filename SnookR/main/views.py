@@ -21,3 +21,11 @@ def signup(request):
 
 class HomeView(TemplateView):
 	template_name = 'main/home.html'
+
+
+class LogoutSuccessView(TemplateView):
+	template_name = 'registration/logout_success.html'
+
+
+class ProfileView(TemplateView):
+    template_name = 'accounts/profile.html'
