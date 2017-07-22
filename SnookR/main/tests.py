@@ -17,6 +17,31 @@ class SeleniumTestCase(LiveServerTestCase):
         self.browser.quit()
 
 
+class NavbarTestCase(SeleniumTestCase):
+    def test_navbar_shows_login_if_user_not_authenticated(self):
+        """Passes if the navbar shows a login link for unauthenticated users"""
+        self.browser.get(self.live_server_url + '/home/')
+        self.assertIn('Login', self.browser.page_source)
+
+    def test_navbar_shows_logout_if_user_is_authenticated(self):
+        """Passes if the navbar shows a logout link for authenticated users"""
+        # Valid username and password
+        username = 'valid_username'
+        password = 'valid_password'
+
+        # Setup DB with user model instance
+        user = User.objects.create_user(username=username, password=password)
+
+        # Run test
+        self.browser.get(self.live_server_url + '/login/')
+        self.browser.find_element_by_id('id_username').send_keys(username)
+        self.browser.find_element_by_id('id_password').send_keys(password)
+        self.browser.find_element_by_id('id_submit_button').click()
+        self.browser.get(self.live_server_url + '/home/')
+        navbar = self.browser.find_element_by_class_name('navbar')
+        self.assertIn('Logout', navbar.text)
+
+
 class HomePageTestCase(SeleniumTestCase):
     def test_home_in_title(self):
         """Passes if the home screen has 'Home' in the title."""
@@ -26,7 +51,7 @@ class HomePageTestCase(SeleniumTestCase):
     def test_login_link(self):
         """Passes if the login link goes to a screen with 'Login' in the title."""
         self.browser.get(self.live_server_url + '/home/')
-        self.browser.find_element_by_id('login-link').click()
+        self.browser.find_element_by_id('id_login_link').click()
         self.assertIn('Login', self.browser.title)
 
 
