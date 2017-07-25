@@ -10,15 +10,13 @@ Player -> Division : 0 .. *
 Player -> Sub      : 
 '''
 class Player(models.Model):
-	username     = models.ForeignKey(User, related_name="players_username")
-	first_name   = models.CharField(max_length=50)
-	last_name    = models.CharField(max_length=50)
-	phone_number = models.IntegerField(blank=True)
-	email        = models.CharField(max_length=200, blank=True)
+	user         = models.OneToOneField(User, related_name="user")
+	phone_number = models.IntegerField(blank=True, null=True)
 
 	def __str__(self):
-		name = self.first_name + ' ' + self.last_name
-		return name
+# chose not to use this because fName and lName are not required on users yet.
+#		name = self.user.first_name + ' ' + self.user.last_name
+		return self.user.username
 
 	
 '''
@@ -35,7 +33,8 @@ class Sub(models.Model):
 	date   = models.DateTimeField('sub date')
 
 	def __str__(self):
-		return self.player + ' is available ' + self.date
+		availability = self.player.user.first_name + ' is available ' + str(self.date)
+		return availability
 
 
 '''
@@ -81,5 +80,6 @@ class Session(models.Model):
 	start_date = models.DateTimeField('start date')
 	end_date   = models.DateTimeField('end date')
 
-
+	def __str__(self):
+		return self.division.name + '_' + self.name + '_' + self.game
 
