@@ -157,3 +157,31 @@ class SignupPageTestCase(SeleniumTestCase):
         user_count = len(users)
         users.delete()
         self.assertEqual(user_count, 1)
+
+
+class PasswordChangeTestCase(SeleniumTestCase):
+    def test_signup_adds_user(self):
+        """Passes if the password change page successfully changes the user's
+        password."""
+        username = 'valid_username'
+        old_password = 'valid_password'
+        new_password = 'new_valid_password_2'
+
+        # Setup DB with user model instance
+        user = User.objects.create_user(username=username, password=old_password)
+        old_hashed_password = user.password
+
+        # Run test
+        self.browser.get(self.live_server_url + '/login/')
+        self.browser.find_element_by_id('id_username').send_keys(username)
+        self.browser.find_element_by_id('id_password').send_keys(old_password)
+        self.browser.find_element_by_id('id_submit_button').click()
+        self.browser.find_element_by_id('id_profile_link').click()
+        self.browser.find_element_by_id('id_change_password_link').click()
+        self.browser.find_element_by_id('id_old_password').send_keys(old_password)
+        self.browser.find_element_by_id('id_new_password1').send_keys(new_password)
+        self.browser.find_element_by_id('id_new_password2').send_keys(new_password)
+        self.browser.find_element_by_id('id_submit_button').click()
+
+        new_hashed_password = User.objects.get(username=username).password
+        self.assertNotEqual(new_hashed_password, old_hashed_password)
