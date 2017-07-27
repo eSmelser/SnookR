@@ -33,7 +33,7 @@ class Sub(models.Model):
 	date   = models.DateTimeField('sub date')
 
 	def __str__(self):
-		availability = self.player.user.first_name + ' is available ' + str(self.date)
+		availability = self.player.user.username + ' is available ' + str(self.date)
 		return availability
 
 
