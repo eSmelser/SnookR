@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -38,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
 	'sublist',
-    'django.contrib.admin', # Moved here so admin urls take less precedent than our auth urls
 ]
 
 MIDDLEWARE = [

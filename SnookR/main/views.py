@@ -16,7 +16,7 @@ def signup(request):
             return redirect('home')
     else:
         form = UserCreationForm()
-    return render(request, 'registration/signup.html', {'form': form})
+    return render(request, 'user/signup.html', {'form': form})
 
 
 class HomeView(TemplateView):
@@ -24,7 +24,7 @@ class HomeView(TemplateView):
 
 
 class LogoutSuccessView(TemplateView):
-	template_name = 'registration/logout_success.html'
+	template_name = 'user/logout_success.html'
 
 
 class ProfileView(TemplateView):
