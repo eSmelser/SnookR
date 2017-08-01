@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from sublist.models import Sublist
 
 '''
 A player can exist on many teams and in many divisions both as a division rep and/or as a sub, and these
@@ -10,14 +10,37 @@ Player -> Division : 0 .. *
 Player -> Sub      : 
 '''
 class Player(models.Model):
-	user         = models.OneToOneField(User, related_name="user")
+	user         = models.OneToOneField(
+		User,
+        on_delete=models.CASCADE,
+        primary_key=True,
+	)
 	phone_number = models.IntegerField(blank=True, null=True)
+
 
 	def __str__(self):
 # chose not to use this because fName and lName are not required on users yet.
 #		name = self.user.first_name + ' ' + self.user.last_name
 		return self.user.username
 
+	#function to return all of the sublists related to a player instance
+	def related_sublists(self):
+		sessions = None
+		sublists = None
+		subs = self.sub_set.all()
+		for sub in subs:
+			sessions += sub.sessions
+		for session in sessions:
+			sublists += session.sublist
+		return sublists
+'''
+		if self.sub:
+			sub = self.sub
+			related_sessions = sub.session_set.all()
+			for session in related_sessoins:
+				sublists += session.sublist
+			return sublists
+'''
 	
 '''
 Subs are a "tuple-ish" construction tying a player and a date together to indicate what date they are
@@ -35,6 +58,10 @@ class Sub(models.Model):
 	def __str__(self):
 		availability = self.player.user.username + ' is available ' + str(self.date)
 		return availability
+
+	def _get_sessions(self):
+		return self.session_set.all()
+	sessions = property(_get_sessions) 
 
 
 '''
@@ -79,7 +106,12 @@ class Session(models.Model):
 	start_date = models.DateTimeField('start date')
 	end_date   = models.DateTimeField('end date')
 	subs       = models.ManyToManyField(Sub, blank=True)
+	#sublist    = models.OneToOneField('sublist.Sublist', blank=True)
 
 	def __str__(self):
 		return self.division.name + '_' + self.name + '_' + self.game
+
+	def _get_sublist(self):
+		return self.sublist
+	sublist = property(_get_sublist)
 
