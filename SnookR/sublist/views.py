@@ -14,3 +14,7 @@ class SublistView(TemplateView):
         print('Sublist.objects.all()', Sublist.objects.all())
         context['sublist'] = get_object_or_404(Sublist, slug=kwargs.get('sublist'))
         return context
+
+class RegisterSubView(TemplateView):
+    '''A view for registering players to a sublist'''
+    template_name='sublist/register_sub.html'

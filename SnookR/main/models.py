@@ -11,10 +11,10 @@ Player -> Sub      :
 '''
 class Player(models.Model):
 	user         = models.OneToOneField(
-		User,
-        on_delete=models.CASCADE,
-        primary_key=True,
-	)
+	    User,
+            on_delete=models.CASCADE,
+            primary_key=True,
+	    )
 	phone_number = models.IntegerField(blank=True, null=True)
 
 
@@ -25,7 +25,10 @@ class Player(models.Model):
 
 	#function to return all of the sublists related to a player instance
 	def related_sublists(self):
-		sessions = None
+            return Sublist.objects.filter(session__subs__player=self)
+
+'''
+                sessions = None
 		sublists = None
 		subs = self.sub_set.all()
 		for sub in subs:
@@ -33,7 +36,6 @@ class Player(models.Model):
 		for session in sessions:
 			sublists += session.sublist
 		return sublists
-'''
 		if self.sub:
 			sub = self.sub
 			related_sessions = sub.session_set.all()

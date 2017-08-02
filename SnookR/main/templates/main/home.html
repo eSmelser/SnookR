@@ -7,9 +7,8 @@
     {% if user.is_authenticated %}
 	  <p>Hi, {{ user.username }}! </p>
 	  <h2>Your Related Sublists</h2>
-	  <p>	{{ user.player }} </p>
 	  {% for sublist in user.player.related_sublists %}
-		<p>hello</p>
+          <p>sublist/{{ sublist.slug }}</p>
 	  {% endfor %}
     {% else %}
       <p>Welcome to SnookR!</p>
