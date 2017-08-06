@@ -27,22 +27,6 @@ class Player(models.Model):
 	def related_sublists(self):
             return Sublist.objects.filter(session__subs__player=self)
 
-'''
-                sessions = None
-		sublists = None
-		subs = self.sub_set.all()
-		for sub in subs:
-			sessions += sub.sessions
-		for session in sessions:
-			sublists += session.sublist
-		return sublists
-		if self.sub:
-			sub = self.sub
-			related_sessions = sub.session_set.all()
-			for session in related_sessoins:
-				sublists += session.sublist
-			return sublists
-'''
 	
 '''
 Subs are a "tuple-ish" construction tying a player and a date together to indicate what date they are
