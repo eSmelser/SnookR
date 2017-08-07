@@ -1,8 +1,13 @@
 {% extends "main/base.html" %}
-{% block title %}{{ sublist.name }} registration page{% endblock %}
+{% block title %}Session page{% endblock %}
 {% block content %}
 
-<h3>Sublist {{ sublist }}, Session: {{ session }}</h3>
+<h3>Session: {{ session }}</h3>
+<div>
+    <h3>Locations</h3>
+    {% for location in locations %}
+        <a href="{{ location.get_absolute_url }}">{{ location }}</a>
+    {% endfor %}
+</div>
 
-<a href="{% url 'session_register' sublist=sublist session=session.name %}">Register Here!</a>
 {% endblock %}

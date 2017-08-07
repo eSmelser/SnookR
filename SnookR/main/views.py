@@ -2,7 +2,7 @@ from django.views.generic.base import TemplateView
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
-from main.models import Player
+from main.models import Player, Sub
 from main.forms import CustomUserForm
 
 
@@ -19,10 +19,7 @@ def signup(request):
             phone_number = form.cleaned_data.get('phone_number')
             user = authenticate(username=username, password=raw_password, email=email, first_name=first_name, last_name=last_name)
             login(request, user)
-            player = Player.objects.create(user=user, phone_number=phone_number)
-
-            print('user=', user)
-            print('player=', player)
+            _ = Player.objects.create(user=user, phone_number=phone_number)
             return redirect('home')
     else:
         form = CustomUserForm()
@@ -31,3 +28,8 @@ def signup(request):
 
 class HomeView(TemplateView):
     template_name = 'main/home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['events'] = Player.objects.get(user=self.request.user).related_events()
+        return context

@@ -1,0 +1,10 @@
+{% extends "main/base.html" %}
+{% block title %}{{ sublist.name }} registration page{% endblock %}
+{% block content %}
+<h3>Division {{ kwargs.division }}</h3>
+<ul>
+    {% for division in divisions %}
+        <li><a href="{{ division.get_absolute_url }}">{{ division }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "main/base.html" %}
+{% block title %}Division page{% endblock %}
+{% block content %}
+<h3>Sessions for Division: {{ division }}</h3>
+<ul>
+    {% for session in sessions %}
+        <li><a href="{{ session.get_absolute_url }}">{{ session }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

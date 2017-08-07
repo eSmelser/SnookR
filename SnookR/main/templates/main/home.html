@@ -7,9 +7,9 @@
     {% if user.is_authenticated %}
 	  <p>Hi, {{ user.username }}! </p>
 	  <h2>Your Related Sublists</h2>
-	  {% for sublist in user.player.related_sublists %}
-          <p>sublist/{{ sublist.slug }}</p>
-	  {% endfor %}
+	  {% for event in events %}
+        <a href="{{ event.get_absolute_url }}">{{ event }}</a>
+      {% endfor %}
     {% else %}
       <p>Welcome to SnookR!</p>
 	  <p style="margit-top: 1em">

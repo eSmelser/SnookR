@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView
 from sublist.models import Sublist
-from main.models import Session, Player, Sub
+from main.models import Session, Player, Sub, Division, Location
 
 
 class SublistView(TemplateView):
@@ -35,15 +35,13 @@ class SessionView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        name = kwargs.get('session')
-        context['session'] = Session.objects.get(
-            name=name,
-            sublist__slug=kwargs.get('sublist')
+        session = Session.objects.get(
+            slug=kwargs.get('session'),
+            division__slug=kwargs.get('division'),
         )
-        context['sublist'] = kwargs.get('sublist')
-
+        context['session'] = session
+        context['locations'] = Location.objects.filter(session=session)
         return context
-
 
 
 class SublistsView(TemplateView):
@@ -54,3 +52,62 @@ class SublistsView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['sublists'] = Sublist.objects.all()
         return context
+
+
+class DivisionView(TemplateView):
+    """A view for showing all sessions in a division"""
+    template_name = 'sublist/division.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['sessions'] = Division.objects.get(slug=kwargs.get('division')).session_set.all()
+        return context
+
+
+class DivisionListView(TemplateView):
+    """A view for showing all divisions"""
+    template_name = 'sublist/division_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['divisions'] = Division.objects.all()
+        return context
+
+
+class LocationView(TemplateView):
+    """A view for showing a location"""
+    template_name = 'sublist/location.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['location'] = Location.objects.get(
+            slug=kwargs.get('location'),
+            division__slug=kwargs.get('division'),
+            session__slug=kwargs.get('session'),
+        )
+        return context
+
+class LocationRegisterView(TemplateView):
+    """A view for showing a location"""
+    template_name = 'sublist/location_register.html'
+
+    def get(self, request, *args, **kwargs):
+        ret = super().get(request, *args, **kwargs)
+        location = self.get_location_instance(**kwargs)
+        player, _ = Player.objects.get_or_create(user=self.request.user)
+        sub, _ = Sub.objects.get_or_create(player=player)
+        location.subs.add(sub)
+        return ret
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['location'] = self.get_location_instance(**kwargs)
+        return context
+
+    def get_location_instance(self, **kwargs):
+        return Location.objects.get(
+            slug=kwargs.get('location'),
+            division__slug=kwargs.get('division'),
+            session__slug=kwargs.get('session'),
+        )

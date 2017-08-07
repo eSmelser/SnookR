@@ -1,0 +1,23 @@
+{% extends "main/base.html" %}
+{% block title %}Session page{% endblock %}
+{% block content %}
+
+<h3>Sublist for {{ location.name }}</h3>
+<div>
+    <h4>Subs</h4>
+    {% if not location.subs.all %}
+        No subs found
+    {% else %}
+    <ul>
+        {% for sub in location.subs.all %}
+            <li>{{ sub }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <p>
+        <a href="{{ location.get_register_url }}">Register!</a>
+    </p>
+</div>
+
+{% endblock %}

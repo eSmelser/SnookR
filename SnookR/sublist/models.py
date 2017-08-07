@@ -4,9 +4,7 @@ from django.urls import reverse
 
 
 class Sublist(models.Model):
-    name = models.CharField(blank=False, max_length=100)
-    slug = AutoSlugField(populate_from='name')
-#    session = models.OneToOneField('main.Session')
+    location = models.ForeignKey('main.Location')
 
     def __str__(self):
         return str(self.name)
