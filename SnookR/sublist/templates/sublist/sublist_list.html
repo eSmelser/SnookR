@@ -4,7 +4,12 @@
 <h1>Sublists</h1>
 <div>
     {% for sublist in sublists %}
-        <a href="{{ sublist.get_absolute_url }}">{{ sublist }}</a>
+    <div>
+        <h3>Sessions for sublist <a href="{{ sublist.get_absolute_url }}">{{ sublist }}</a></h3>
+        {% for session in sublist.session_set.all %}
+            <a href="{{ session.get_absolute_url }}">Session: {{ session }}</a>
+        {% endfor %}
+    </div>
     {% endfor %}
 </div>
 {% endblock %}

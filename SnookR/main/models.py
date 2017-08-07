@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from django.contrib.auth.models import User
 from sublist.models import Sublist
 
@@ -92,12 +93,12 @@ class Session(models.Model):
 	start_date = models.DateTimeField('start date')
 	end_date   = models.DateTimeField('end date')
 	subs       = models.ManyToManyField(Sub, blank=True)
-	#sublist    = models.OneToOneField('sublist.Sublist', blank=True)
+	sublist    = models.ForeignKey(Sublist, null=False)
 
 	def __str__(self):
 		return self.division.name + '_' + self.name + '_' + self.game
 
-	def _get_sublist(self):
-		return self.sublist
-	sublist = property(_get_sublist)
-
+	def get_absolute_url(self):
+		sublist = Sublist.objects.get(session=self)
+		# TODO: add slugfield and use it instead of name
+		return reverse('session', kwargs={'session': str(self.name), 'sublist': str(sublist.slug)})

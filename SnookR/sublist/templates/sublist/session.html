@@ -1,0 +1,8 @@
+{% extends "main/base.html" %}
+{% block title %}{{ sublist.name }} registration page{% endblock %}
+{% block content %}
+
+<h3>Sublist {{ sublist }}, Session: {{ session }}</h3>
+
+<a href="{% url 'session_register' sublist=sublist session=session.name %}">Register Here!</a>
+{% endblock %}

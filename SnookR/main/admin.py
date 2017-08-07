@@ -1,10 +1,5 @@
 from django.contrib import admin
-from .models import Player
-from .models import Sub
-from .models import Team
-from .models import Division
-from .models import Session
-
+from .models import Player, Sub, Team, Division, Session
 
 admin.site.register(Player)
 admin.site.register(Sub)
