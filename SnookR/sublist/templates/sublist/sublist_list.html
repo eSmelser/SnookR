@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "main/base.html" %}
+{% block title %}Sublists page{% endblock %}
+{% block content %}
+<h1>Sublists</h1>
+<div>
+    {% for sublist in sublists %}
+        <a href="{{ sublist.get_absolute_url }}">{{ sublist }}</a>
+    {% endfor %}
+</div>
+{% endblock %}
