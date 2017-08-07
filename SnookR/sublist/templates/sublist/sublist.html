@@ -1,21 +1,27 @@
-<!doctype html>
+{% extends "main/base.html" %}
+{% block title %}{{ sublist.name }}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="jumbotron">
+    <h1>{{ sublist.name }} sublist</h1>
+    <h3>
+      List of subs for {{ sublist.session.division }} 
+      <br>{{ sublist.session.name }} {{ sublist.session.game }}
+      <br>___________________________
+    </h3>
+    {% for sub in sublist.session.subs.all %}
+    	<li>{{ sub.player }}</li>
+    {% endfor %}
+  </div>
+</div>
 
-<html lang="en">
-<head>
-  <meta charset="utf-8">
+<div class="container">
+  <div class="jumbotron">
+    <p style="margit-top: lem">
+      <a href="register_sub">Click here to register for this sublist</a>
+    </p>    
+  </div>
+</div>
+{% endblock %}
 
-  <title>{{ sublist.name }}'s Sublist</title>
-  <meta name="description" content="{{ sublist.name }}'s Sublist">
 
- <!-- <link rel="stylesheet" href="css/styles.css?v=1.0"> -->
-  <!--[if lt IE 9]>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
-  <![endif]-->
-</head>
-
-<body>
-  <h3>{{ sublist.name }}</h3>
-  <p>Put sublist data here...</p>
-  <!-- <script src="js/scripts.js"></script> -->
-</body>
-</html>

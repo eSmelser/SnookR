@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from sublist.models import Sublist
 
 '''
 A player can exist on many teams and in many divisions both as a division rep and/or as a sub, and these
@@ -10,13 +10,22 @@ Player -> Division : 0 .. *
 Player -> Sub      : 
 '''
 class Player(models.Model):
-	user         = models.OneToOneField(User, related_name="user")
+	user         = models.OneToOneField(
+	    User,
+            on_delete=models.CASCADE,
+            primary_key=True,
+	    )
 	phone_number = models.IntegerField(blank=True, null=True)
+
 
 	def __str__(self):
 # chose not to use this because fName and lName are not required on users yet.
 #		name = self.user.first_name + ' ' + self.user.last_name
 		return self.user.username
+
+	#function to return all of the sublists related to a player instance
+	def related_sublists(self):
+            return Sublist.objects.filter(session__subs__player=self)
 
 	
 '''
@@ -33,8 +42,12 @@ class Sub(models.Model):
 	date   = models.DateTimeField('sub date')
 
 	def __str__(self):
-		availability = self.player.user.first_name + ' is available ' + str(self.date)
+		availability = self.player.user.username + ' is available ' + str(self.date)
 		return availability
+
+	def _get_sessions(self):
+		return self.session_set.all()
+	sessions = property(_get_sessions) 
 
 
 '''
@@ -62,7 +75,6 @@ class Division(models.Model):
 	name         = models.CharField(max_length=200)
 	division_rep = models.ForeignKey(Player, related_name='division_representative')
 	teams        = models.ManyToManyField(Team, blank=True, related_name="divisions_teams")
-	subs         = models.ManyToManyField(Sub, blank=True, related_name="divisions_subs")
 
 	def __str__(self):
 		return self.name
@@ -79,7 +91,13 @@ class Session(models.Model):
 	division   = models.ForeignKey(Division)
 	start_date = models.DateTimeField('start date')
 	end_date   = models.DateTimeField('end date')
+	subs       = models.ManyToManyField(Sub, blank=True)
+	#sublist    = models.OneToOneField('sublist.Sublist', blank=True)
 
 	def __str__(self):
 		return self.division.name + '_' + self.name + '_' + self.game
+
+	def _get_sublist(self):
+		return self.sublist
+	sublist = property(_get_sublist)
 

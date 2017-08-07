@@ -1,2 +1,24 @@
 {% extends 'main/base.html' %}
 {% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="jumbotron">
+    {% if user.is_authenticated %}
+	  <p>Hi, {{ user.username }}! </p>
+	  <h2>Your Related Sublists</h2>
+	  {% for sublist in user.player.related_sublists %}
+          <p>sublist/{{ sublist.slug }}</p>
+	  {% endfor %}
+    {% else %}
+      <p>Welcome to SnookR!</p>
+	  <p style="margit-top: 1em">
+	    <a href="login">Click here to login</a> or <a href="signup">Sign up</a>
+	  </p>
+    {% endif %}
+
+  </div>
+</div>
+
+
+{% endblock %}
