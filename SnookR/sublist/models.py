@@ -1,17 +1,11 @@
 from django.db import models
-from django.template.defaultfilters import slugify
-#from main.models import Session
+from autoslug import AutoSlugField
 
 
 class Sublist(models.Model):
-
-    name    = models.CharField(blank=False, max_length=100)
-    slug    = models.SlugField(blank=False, max_length=120)
+    name = models.CharField(blank=False, max_length=100)
+    slug = AutoSlugField(populate_from='name')
     session = models.OneToOneField('main.Session')
 
     def __str__(self):
-        return str(self.session)
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
-        super(Sublist, self).save(*args, **kwargs)
+        return str(self.name) + ': ' + str(self.session)
