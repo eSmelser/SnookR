@@ -45,7 +45,6 @@ pip install -r SnookR/requirements.txt
 ### Use Python and manage.py to make database migrations
 
 ```
-python manage.py makemigrations
 python manage.py migrate
 ```
 
@@ -55,7 +54,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-### Navigate to the specified URL by the runserver output
+Then simply navigate to the home page of the specified URL by the runserver output ex. `http://127.0.0.1:8000/home`
 
 
 
