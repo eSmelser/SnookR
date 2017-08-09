@@ -5,34 +5,6 @@ An open source webapp facilitating communication amongst pool players built in P
 
 Work In Progress.
 
-## Project Progress
-
-### Week 1
-
-* Research and consider reasonable MVP
-* Watch pluralsight Python Videos
-* Create [Trello](https://trello.com/b/Rrb3Ud76) board to keep track of current status of project
-* Held meetings with a few acquaintances for project and tool guidance 
-
-### Week 2
-
-* Work through Python Koans to help learn Python Basics
-* Watch pluralsight video on Django basics
-* Met with friend David who runs local divisions of BCA Billiards league. He is interested in possible
-   sponsorship, working on using the project developed in this class as a demo for him and his
-   compatriots.
-
-### Week 3
-
-* Shared project idea with a friend and he agreed to assist/collaborate on project moving forward
-* Worked out VirtualEnv and installed Django in app
-* Worked through Django Pluralsight demo "Hello World" application to get a Django hello world app up
-   and running, although that is not a part of this project.
-* Created slack channel for project collaboration
-* Set up Django App for sublists
-* Add Views for each of the various divisions for their respective sublists
-* Add HTML Templates for each of the sublists
-
 ## Project Setup
 
 SnookR was designed and written with Python 3.52, that will be specified in the creation of your
@@ -68,6 +40,24 @@ You should, of course, have the correct version of pip installed corresponding t
 pip install -r SnookR/requirements.txt
 ```
 
+## How to use
+
+### Use Python and manage.py to make database migrations
+
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+
+### Use Python and manage.py to locally serve SnookR
+
+```
+python manage.py runserver
+```
+
+### Navigate to the specified URL by the runserver output
+
+
 
 ## KanBan Board
 
@@ -80,13 +70,15 @@ pip install -r SnookR/requirements.txt
 ## Authors
 
 * **Evan Smelser** - *Initial work* - [SnookR](https://github.com/esmelser/SnookR)
-
-See also the list of [contributors](https://github.com/esmelser/SnookR/contributors) who participated in this project.
+* **Bobby Eshleman** - *Initial work* - [SnookR](https://github.com/esmelser/SnookR)
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
-## Acknowledgments
+## Limitations
+
+* Currently a work in progress - Not yet fully functional, Pilot: Version 1.0.0 goal October 1, 2017
+* Please see Github [Issues](https://github.com/esmelser/SnookR/issues) for a list of current issues
 
 
