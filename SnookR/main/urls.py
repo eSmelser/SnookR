@@ -7,4 +7,6 @@ urlpatterns = [
     url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^home/$', views.HomeView.as_view(), name='home'),
+    url(r'^division/$', views.DivisionView.as_view(), name='division'),
+    url(r'^division/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/$', views.SessionView.as_view(), name='session'),
 ]

@@ -1,0 +1,17 @@
+{% extends 'main/base.html' %}
+{% block title %}Subs{% endblock %}
+{% block content %}
+<div>
+    <h3>Subs for Session {{ kwargs.session }}</h3>
+    <hr>
+    <ul>
+    {% for sub in subs %}
+        <li>
+            {{ sub }}
+        </li>
+    {% endfor %}
+
+    </ul>
+
+</div>
+{% endblock %}
