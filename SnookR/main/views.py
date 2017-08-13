@@ -42,13 +42,30 @@ class DivisionView(TemplateView):
         return context
 
 
-class SessionView(TemplateView):
-    template_name = 'main/session.html'
-
+class SessionTemplateMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        session = Session.objects.get(slug=kwargs.get('session'), division__slug=kwargs.get('division'))
-        print(session)
+        session = self.get_session_instance(**kwargs)
+        context['session'] = session
+        context['session_url'] = session.get_register_url()
         context['subs'] = session.subs.all()
-        print(context)
         return context
+
+    def get_session_instance(self, **kwargs):
+        return Session.objects.get(slug=kwargs.get('session'), division__slug=kwargs.get('division'))
+
+
+class SessionView(SessionTemplateMixin, TemplateView):
+    template_name = 'main/session.html'
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+
+class SessionRegisterView(TemplateView, SessionTemplateMixin):
+    template_name = 'main/session_register.html'
+
+    def get(self, request, *args, **kwargs):
+        session = self.get_session_instance(**kwargs)
+        session.add_user_as_sub(self.request.user)
+        return super().get(request, *args, **kwargs)

@@ -45,17 +45,21 @@ in a division per year, but the sessions don't necessarily correspond across div
 
 class Sub(models.Model):
     player = models.ForeignKey(Player)
-    date = models.DateTimeField('sub date')
+    date = models.DateTimeField('sub date', auto_now=True)
 
     def __str__(self):
         availability = self.player.user.username + ' is available ' + str(self.date)
         return availability
 
-    def _get_sessions(self):
+    @property
+    def sessions(self):
         return self.session_set.all()
 
-    sessions = property(_get_sessions)
-
+    @staticmethod
+    def create_from_user(user):
+        player, _ = Player.objects.get_or_create(user=user)
+        sub, _ = Sub.objects.get_or_create(player=player)
+        return sub
 
 '''
 A team can contain many players but should only ever exist in one division
@@ -107,15 +111,17 @@ class Session(models.Model):
     start_date = models.DateTimeField('start date')
     end_date = models.DateTimeField('end date')
     subs = models.ManyToManyField(Sub, blank=True)
-    # sublist    = models.OneToOneField('sublist.Sublist', blank=True)
 
     def __str__(self):
         return self.division.name + '_' + self.name + '_' + self.game
 
-    def _get_sublist(self):
-        return self.sublist
-
-    sublist = property(_get_sublist)
-
     def get_absolute_url(self):
         return reverse('session', args=[str(self.division.slug), str(self.slug)])
+
+    def get_register_url(self):
+        return reverse('session_register', args=[str(self.division.slug), str(self.slug)])
+
+    def add_user_as_sub(self, user):
+        sub = Sub.create_from_user(user)
+        self.subs.add(sub)
+        return self

@@ -2,6 +2,7 @@
 {% block title %}Subs{% endblock %}
 {% block content %}
 <div>
+    <a href="{{ session.get_register_url }}">Register Here</a>
     <h3>Subs for Session {{ kwargs.session }}</h3>
     <hr>
     <ul>
@@ -10,8 +11,6 @@
             {{ sub }}
         </li>
     {% endfor %}
-
     </ul>
-
 </div>
 {% endblock %}
