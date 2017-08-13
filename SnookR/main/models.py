@@ -48,20 +48,24 @@ in a division per year, but the sessions don't necessarily correspond across div
 
 class Sub(models.Model):
     player = models.ForeignKey(Player)
-    date = models.DateTimeField('sub date', auto_now=True)
+    date = models.DateTimeField('sub date')
 
     def __str__(self):
         availability = self.player.user.username + ' is available ' + str(self.date)
         return availability
+
+
+    def get_unregister_url(self):
+        pass
 
     @property
     def sessions(self):
         return self.session_set.all()
 
     @staticmethod
-    def create_from_user(user):
+    def create_from_user(user, date):
         player, _ = Player.objects.get_or_create(user=user)
-        sub, _ = Sub.objects.get_or_create(player=player)
+        sub, _ = Sub.objects.get_or_create(player=player, date=date)
         return sub
 
 
@@ -108,6 +112,8 @@ Session -> Division : 1 .. 1
 
 
 class Session(models.Model):
+    date_format = '%Y-%m-%d'
+
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name')
     game = models.CharField(max_length=100)
@@ -125,19 +131,28 @@ class Session(models.Model):
     def get_register_url(self):
         return reverse('session_register', args=self.get_url_args())
 
-    def get_unregister_url(self):
-        return reverse('session_unregister', args=self.get_url_args())
+    def get_unregister_url(self, date):
+        return reverse('session_unregister', args=self.get_url_args() + [date])
 
     def get_url_args(self):
         return [str(self.division.slug), str(self.slug)]
 
-    def add_user_as_sub(self, user):
-        sub = Sub.create_from_user(user)
+    def get_subs_with_unregister_urls(self):
+        temp = []
+        for sub in self.subs.all():
+            datestring = sub.date.strftime(Session.date_format)
+            sub.unregister_url = self.get_unregister_url(date=datestring)
+            temp.append(sub)
+
+        return temp
+
+    def add_user_as_sub(self, user, date):
+        sub = Sub.create_from_user(user, date)
         self.subs.add(sub)
         return self
 
-    def remove_user_as_sub(self, user):
-        sub = Sub.objects.get(player__user=user)
+    def remove_user_as_sub(self, user, date):
+        sub = Sub.objects.get(player__user=user, date=date)
         self.subs.remove(sub)
         return self
 
