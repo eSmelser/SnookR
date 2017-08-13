@@ -31,6 +31,9 @@ class Player(models.Model):
     def related_sublists(self):
         return Sublist.objects.filter(session__subs__player=self)
 
+    def related_sessions(self):
+        return Session.objects.filter(subs__player=self)
+
 
 '''
 Subs are a "tuple-ish" construction tying a player and a date together to indicate what date they are
@@ -60,6 +63,7 @@ class Sub(models.Model):
         player, _ = Player.objects.get_or_create(user=user)
         sub, _ = Sub.objects.get_or_create(player=player)
         return sub
+
 
 '''
 A team can contain many players but should only ever exist in one division
@@ -116,12 +120,26 @@ class Session(models.Model):
         return self.division.name + '_' + self.name + '_' + self.game
 
     def get_absolute_url(self):
-        return reverse('session', args=[str(self.division.slug), str(self.slug)])
+        return reverse('session', args=self.get_url_args())
 
     def get_register_url(self):
-        return reverse('session_register', args=[str(self.division.slug), str(self.slug)])
+        return reverse('session_register', args=self.get_url_args())
+
+    def get_unregister_url(self):
+        return reverse('session_unregister', args=self.get_url_args())
+
+    def get_url_args(self):
+        return [str(self.division.slug), str(self.slug)]
 
     def add_user_as_sub(self, user):
         sub = Sub.create_from_user(user)
         self.subs.add(sub)
         return self
+
+    def remove_user_as_sub(self, user):
+        sub = Sub.objects.get(player__user=user)
+        self.subs.remove(sub)
+        return self
+
+    def user_is_registered(self, user):
+        return self.subs.filter(player__user=user).exists()

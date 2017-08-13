@@ -6,9 +6,9 @@
   <div class="jumbotron">
     {% if user.is_authenticated %}
 	  <p>Hi, {{ user.username }}! </p>
-	  <h2>Your Related Sublists</h2>
-	  {% for sublist in user.player.related_sublists %}
-          <p>sublist/{{ sublist.slug }}</p>
+	  <h2>Your Related Sessions</h2>
+	  {% for session in player.related_sessions %}
+          <a href="{{ session.get_absolute_url }}">{{ session }}</a>
 	  {% endfor %}
     {% else %}
       <p>Welcome to SnookR!</p>

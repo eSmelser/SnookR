@@ -10,4 +10,6 @@ urlpatterns = [
     url(r'^division/$', views.DivisionView.as_view(), name='division'),
     url(r'^division/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/$', views.SessionView.as_view(), name='session'),
     url(r'^division/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/register/$', views.SessionRegisterView.as_view(), name='session_register'),
+    url(r'^division/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/unregister/$', views.SessionUnregisterView.as_view(),
+        name='session_unregister'),
 ]

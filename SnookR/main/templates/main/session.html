@@ -2,7 +2,11 @@
 {% block title %}Subs{% endblock %}
 {% block content %}
 <div>
-    <a href="{{ session.get_register_url }}">Register Here</a>
+    {% if user_is_registered %}
+        <a href="{{ session.get_unregister_url }}">Unregister Here</a>
+    {% else %}
+        <a href="{{ session.get_register_url }}">Register Here</a>
+    {% endif %}
     <h3>Subs for Session {{ kwargs.session }}</h3>
     <hr>
     <ul>
