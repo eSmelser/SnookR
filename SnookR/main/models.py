@@ -98,7 +98,6 @@ class Division(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name')
     division_rep = models.ForeignKey(Player, related_name='division_representative')
-    teams = models.ManyToManyField(Team, blank=True, related_name="divisions_teams")
 
     def __str__(self):
         return self.name
@@ -121,6 +120,7 @@ class Session(models.Model):
     start_date = models.DateTimeField('start date')
     end_date = models.DateTimeField('end date')
     subs = models.ManyToManyField(Sub, blank=True)
+    teams = models.ManyToManyField(Team, blank=True, related_name="divisions_teams")
 
     def __str__(self):
         return self.division.name + '_' + self.name + '_' + self.game
