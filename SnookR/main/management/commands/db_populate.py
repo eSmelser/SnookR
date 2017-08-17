@@ -9,12 +9,68 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         users = [
                     {
-                        "username": 'evan',
-                        "password": 'evanpassword',
+                        "username"  : 'evan',
+                        "password"  : 'evanpassword',
                         "first_name": 'evan',
-                        "last_name": 'smelser',
-                        "email": "e@sme.com",
-                    }
+                        "last_name" : 'smelser',
+                        "email"     : 'e@sme.com',
+                    },
+                    {
+                        "username"  : 'darrin',
+                        "password"  : 'darrinpassword',
+                        "first_name": 'darrin',
+                        "last_name" : 'howard',
+                        "email"     : 'darrin@test.com',
+                    },
+                    {
+                        "username"  : 'jason',
+                        "password"  : 'jasonpassword',
+                        "first_name": 'jason',
+                        "last_name" : 'bennett',
+                        "email"     : 'jason@test.com',
+                    },
+                    {
+                        "username"  : 'andy',
+                        "password"  : 'andypassword',
+                        "first_name": 'andy',
+                        "last_name" : 'dalbey',
+                        "email"     : 'andy@test.com',
+                    },
+                    {
+                        "username"  : 'isaac',
+                        "password"  : 'isaacpassword',
+                        "first_name": 'isaac',
+                        "last_name" : 'norman',
+                        "email"     : 'isaac@test.com',
+                    },
+                    {
+                        "username"  : 'chris',
+                        "password"  : 'chrispassword',
+                        "first_name": 'chris',
+                        "last_name" : 'nieland',
+                        "email"     : 'chris@test.com',
+                    },
+                    {
+                        "username"  : 'sarah',
+                        "password"  : 'sarahpassword',
+                        "first_name": 'sarah',
+                        "last_name" : 'nieland',
+                        "email"     : 'sarah@test.com',
+                    },
+                    {
+                        "username"  : 'nick',
+                        "password"  : 'nickpassword',
+                        "first_name": 'nick',
+                        "last_name" : 'jordan',
+                        "email"     : 'nick@test.com',
+                    },
+                    {
+                        "username"  : 'pete',
+                        "password"  : 'petepassword',
+                        "first_name": 'pete',
+                        "last_name" : 'gates',
+                        "email"     : 'pete@test.com',
+                    },
                 ]
         users = [User.objects.create(**user) for user in users]
         
