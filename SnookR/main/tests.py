@@ -1,3 +1,6 @@
+# Copyright &copy; 2017 Evan Smelser
+# This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+
 import time
 from django.test import LiveServerTestCase, tag
 from django.contrib.auth.models import User

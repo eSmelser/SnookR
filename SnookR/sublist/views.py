@@ -1,3 +1,6 @@
+# Copyright &copy; 2017 Evan Smelser
+# This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.views.generic.base import TemplateView

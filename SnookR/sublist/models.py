@@ -1,3 +1,6 @@
+# Copyright &copy; 2017 Evan Smelser
+# This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+
 from django.db import models
 from django.template.defaultfilters import slugify
 #from main.models import Session
