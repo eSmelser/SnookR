@@ -112,7 +112,7 @@ Once you register to sub for a division during a particular session, you will be
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the MIT License - see the [COPYING](COPYING) file for details
 
 ## Limitations
 
