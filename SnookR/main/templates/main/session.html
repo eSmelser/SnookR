@@ -1,0 +1,20 @@
+{% extends 'main/base.html' %}
+{% block title %}Subs{% endblock %}
+{% block content %}
+<div>
+    <a href="{{ session.get_register_url }}">Register For A Date Here</a>
+    <h3>Subs for Session {{ kwargs.session }}</h3>
+    <hr>
+    <ul>
+    {% for sub in subs %}
+        <li>
+            {% if sub.player.user == user  %}
+                {{ sub }} <a href="{{ sub.unregister_url }}">unregister</a>
+            {% else %}
+                {{ sub }}
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}
