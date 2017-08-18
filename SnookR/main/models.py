@@ -96,7 +96,8 @@ Division -> Session : 1 .. *
 
 class Division(models.Model):
     name = models.CharField(max_length=200)
-    slug = AutoSlugField(populate_from='name', always_update=True)
+    slug = AutoSlugField(populate_from='name', always_update=True, default='')
+
     division_rep = models.ForeignKey(Player, related_name='division_representative')
     teams = models.ManyToManyField(Team, blank=True, related_name="divisions_teams")
 
@@ -115,7 +116,8 @@ class Session(models.Model):
     date_format = '%Y-%m-%d'
 
     name = models.CharField(max_length=200)
-    slug = AutoSlugField(populate_from='name', always_update=True)
+    slug = AutoSlugField(populate_from='name', always_update=True, default='')
+
     game = models.CharField(max_length=100)
     division = models.ForeignKey(Division)
     start_date = models.DateTimeField('start date')
