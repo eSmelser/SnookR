@@ -1,3 +1,6 @@
+# Copyright &copy; 2017 Evan Smelser
+# This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse

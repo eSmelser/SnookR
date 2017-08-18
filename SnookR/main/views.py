@@ -1,3 +1,6 @@
+# Copyright &copy; 2017 Evan Smelser
+# This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+
 from datetime import datetime
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
