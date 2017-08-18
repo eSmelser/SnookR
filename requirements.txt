@@ -1,0 +1,4 @@
+Django==1.11.3
+django-autoslug==1.9.3
+pytz==2017.2
+selenium==3.4.3

@@ -1,0 +1,32 @@
+<!-- 
+     Copyright &copy; 2017 Evan Smelser
+      This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+-->
+
+{% extends "main/base.html" %}
+{% block title %}{{ sublist.name }}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="jumbotron">
+    <h1>{{ sublist.name }} sublist</h1>
+    <h3>
+      List of subs for {{ sublist.session.division }} 
+      <br>{{ sublist.session.name }} {{ sublist.session.game }}
+      <br>___________________________
+    </h3>
+    {% for sub in sublist.session.subs.all %}
+    	<li>{{ sub.player }}</li>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="container">
+  <div class="jumbotron">
+    <p style="margit-top: lem">
+      <a href="register_sub">Click here to register for this sublist</a>
+    </p>    
+  </div>
+</div>
+{% endblock %}
+
+

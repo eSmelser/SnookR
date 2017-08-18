@@ -1,0 +1,20 @@
+<!-- 
+     Copyright &copy; 2017 Evan Smelser
+      This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+-->
+
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div>
+<form action="" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Register" />
+</form>
+</div>
+{% endblock %}
+{% block footer_scripts %}
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="{% static 'main/js/datepicker.js' %}"></script>
+{% endblock %}
