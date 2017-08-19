@@ -26,9 +26,6 @@ def signup(request):
                                 last_name=last_name)
             login(request, user)
             player = Player.objects.create(user=user, phone_number=phone_number)
-
-            print('user=', user)
-            print('player=', player)
             return redirect('home')
     else:
         form = CustomUserForm()
@@ -41,9 +38,12 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated():
-            player = Player.objects.get(user=self.request.user)
-            context['player'] = player
-            context['subs'] = Sub.objects.filter(player=player)
+            try:
+                player = Player.objects.get(user=self.request.user)
+                context['player'] = player
+                context['subs'] = Sub.objects.filter(player=player)
+            except Player.DoesNotExist:
+                pass
         return context
 
 

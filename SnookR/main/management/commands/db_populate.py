@@ -1,7 +1,8 @@
 # Copyright &copy; 2017 Evan Smelser
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 
-from datetime import datetime
+from django.utils import timezone
+
 from django.core.management.base import BaseCommand, CommandError
 from main import models
 from django.contrib.auth.models import User
@@ -75,8 +76,14 @@ class Command(BaseCommand):
                         "email"     : 'pete@test.com',
                     },
                 ]
-        users = [User.objects.create(**user) for user in users]
-        
+        users = [User.objects.create_user(**user) for user in users]
+
+
+        # Create admin
+        admin = User.objects.create_user(username='admin', password='adminpassword')
+        admin.is_superuser = True
+        admin.is_staff = True
+        admin.save()
         
         players = [
                     {
@@ -86,7 +93,7 @@ class Command(BaseCommand):
                 for user in users]
         players = [models.Player.objects.create(**player) for player in players]
 
-        subs = [models.Sub.objects.create(player=player, date=datetime.now()) for player in players]
+        subs = [models.Sub.objects.create(player=player, date=timezone.now()) for player in players]
 
         divisions = [
                         {
@@ -102,8 +109,8 @@ class Command(BaseCommand):
                     "name": 'session_'+str(i),
                     "game": str(i)+'ball',
                     "division": division,
-                    "start_date": datetime.now(),
-                    "end_date": datetime.now(),
+                    "start_date": timezone.now(),
+                    "end_date": timezone.now(),
                 }
                 for i, division in enumerate(divisions)]
 

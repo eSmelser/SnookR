@@ -9,21 +9,27 @@
 {% block content %}
 <div class="container">
     <div class="jumbotron">
-        {% if user.is_authenticated %}
+        {% if user.is_authenticated and player %}
         <p>Hi, {{ user.username }}! </p>
-        <h2>Your Related Sessions</h2>
 
+            {% if sub.sessions %}
+            <h2>Your Related Sessions</h2>
+                <ul>
+                    {% for sub in subs %}
+                        {% for session in sub.sessions %}
+                            <li>
+                                <a href="{{ session.get_absolute_url }}">{{ session }}</a> - {{ sub.date }}
+                            </li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <h3>No registered sessions found, go to <a href="{% url 'division' %}">Divisions</a> to register.</h3>
+            {% endif %}
 
-        <ul>
-            {% for sub in subs %}
-                {% for session in sub.sessions %}
-                    <li>
-
-                        <a href="{{ session.get_absolute_url }}">{{ session }}</a> - {{ sub.date }}
-                    </li>
-                {% endfor %}
-            {% endfor %}
-        </ul>
+        {% elif user.is_authenticated and not player %}
+        <p>Hi, {{ user.username }}! </p>
+        <p>You are not registered for any sessions</p>
 
         {% else %}
         <p>Welcome to SnookR!</p>
