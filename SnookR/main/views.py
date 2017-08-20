@@ -4,12 +4,12 @@
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView, RedirectView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, CreateView
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from main.models import UserProfile, Division, Session, CustomUser, Team
-from main.forms import CustomUserForm, SessionRegistrationForm
+from main.forms import CustomUserForm, SessionRegistrationForm, TeamForm
 
 
 def signup(request):
@@ -115,3 +115,21 @@ class TeamView(TemplateView, LoginRequiredMixin):
         context = super().get_context_data(**kwargs)
         context['teams'] = Team.get_all_related(self.request.user)
         return context
+
+
+class CreateTeamView(CreateView, LoginRequiredMixin):
+    template_name = 'main/create_team.html'
+    form_class = TeamForm
+    success_url = reverse_lazy('team')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+
+class DeleteTeamView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        team = Team.objects.get(slug=kwargs.get('team'), team_captain=self.request.user, id=kwargs.get('pk'))
+        team.delete()
+        return reverse('team')

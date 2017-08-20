@@ -9,11 +9,12 @@
 <div>
     <h3>Teams</h3>
     <hr>
+    <a href="{% url 'create_team' %}">Add team</a>
     {% if not teams %}
     <p>No teams!</p>
     {% endif %}
     {% for team in teams %}
-    <h4> {{ team.name }}</h4>
+    <h4> {{ team.name }} <a href="{{ team.get_delete_url }}"> delete this team</a></h4>
     <h5>Divisions</h5>
     <ul>
         {% for division in team.division_set.all %}

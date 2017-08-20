@@ -91,6 +91,7 @@ Team -> Division : 1
 
 class Team(models.Model):
     name = models.CharField(max_length=200)
+    slug = AutoSlugField(populate_from='name', always_update=True, default='')
     team_captain = models.ForeignKey(User, related_name="team_captain")
     players = models.ManyToManyField(User, blank=True)
 
@@ -101,6 +102,8 @@ class Team(models.Model):
     def get_all_related(user):
         return list(Team.objects.filter(team_captain=user)) + list(Team.objects.filter(players=user))
 
+    def get_delete_url(self):
+        return reverse('delete_team', args=[self.slug, self.id])
 
 '''
 A division must have a name and a division rep and can contain 0 or more teams and 0 or more subs
