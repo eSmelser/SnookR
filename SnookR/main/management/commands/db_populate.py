@@ -4,7 +4,7 @@
 from django.utils import timezone
 
 from django.core.management.base import BaseCommand, CommandError
-from main import models
+from main.models import Team, Session, Sub, Division, UserProfile
 from django.contrib.auth.models import User
 
 class Command(BaseCommand):
@@ -76,6 +76,8 @@ class Command(BaseCommand):
                         "email"     : 'pete@test.com',
                     },
                 ]
+
+        self.stdout.write('Creating users...')
         users = [User.objects.create_user(**user) for user in users]
 
 
@@ -91,18 +93,22 @@ class Command(BaseCommand):
                         "user": user
                     }
                 for user in users]
-        profiles = [models.UserProfile.objects.create(**profile) for profile in profiles]
 
-        subs = [models.Sub.objects.create(user=user, date=timezone.now()) for user in users]
+        self.stdout.write('Creating profiles...')
+        _ = [UserProfile.objects.create(**profile) for profile in profiles]
+
+        subs = [Sub.objects.create(user=user, date=timezone.now()) for user in users]
 
         divisions = [
                         {
                             "name": 'division_'+str(i),
                             "division_rep": user,
                         }
-                    for i, user in enumerate(users)]
+                    for i, user in enumerate(users)
+        ]
 
-        divisions = [models.Division.objects.create(**division) for division in divisions]
+        self.stdout.write('Creating divisions...')
+        divisions = [Division.objects.create(**division) for division in divisions]
 
         sessions = [
                 {
@@ -114,11 +120,40 @@ class Command(BaseCommand):
                 }
                 for i, division in enumerate(divisions)]
 
+        self.stdout.write('Creating sessions...')
         for session in sessions:
-            s = models.Session.objects.create(**session)
+            s = Session.objects.create(**session)
             for sub in subs:
                 s.subs.add(sub)
-            
 
+        temp_users = users.copy()
+        captain1 = temp_users.pop(0)
+        captain2 = temp_users.pop(0)
 
+        halfway = len(temp_users) // 2
+        teams = [
+            {
+                'name': 'team 1',
+                'team_captain': captain1,
+                'players': temp_users[halfway:]
+            },
 
+            {
+                'name': 'team 1',
+                'team_captain': captain2,
+                'players': temp_users[:halfway]
+            },
+        ]
+
+        self.stdout.write('Creating teams...')
+
+        temp = []
+        for team in teams:
+            players = team.pop('players')
+            team = Team.objects.create(**team)
+            team.players.add(*players)
+            temp.append(team)
+
+        teams = temp
+        divisions[0].teams.add(teams[0])
+        divisions[1].teams.add(teams[1])

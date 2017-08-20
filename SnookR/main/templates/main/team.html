@@ -1,0 +1,32 @@
+<!-- 
+     Copyright &copy; 2017 Evan Smelser
+      This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+-->
+
+{% extends 'main/base.html' %}
+{% block title %}Divisions{% endblock %}
+{% block content %}
+<div>
+    <h3>Teams</h3>
+    <hr>
+    {% if not teams %}
+    <p>No teams!</p>
+    {% endif %}
+    {% for team in teams %}
+    <h4> {{ team.name }}</h4>
+    <h5>Divisions</h5>
+    <ul>
+        {% for division in team.division_set.all %}
+            <li><a href="{{ division.get_absolute_url }}">{{ division }}</a></li>
+        {% endfor %}
+    </ul>
+    <h5>Captain: {{ team.team_captain }}</h5>
+    <h5>Players</h5>
+    <ul>
+        {% for player in team.players.all %}
+        <li>{{ player }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+</div>
+{% endblock %}

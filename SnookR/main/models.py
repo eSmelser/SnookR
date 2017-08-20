@@ -91,12 +91,15 @@ Team -> Division : 1
 
 class Team(models.Model):
     name = models.CharField(max_length=200)
-    #	division      = models.ForeignKey(Division, related_name="team's division")
     team_captain = models.ForeignKey(User, related_name="team_captain")
-    other_players = models.ManyToManyField(User, blank=True)
+    players = models.ManyToManyField(User, blank=True)
 
     def __str__(self):
         return self.name
+
+    @staticmethod
+    def get_all_related(user):
+        return list(Team.objects.filter(team_captain=user)) + list(Team.objects.filter(players=user))
 
 
 '''
@@ -112,10 +115,13 @@ class Division(models.Model):
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
 
     division_rep = models.ForeignKey(User, related_name='division_representative')
-    teams = models.ManyToManyField(Team, blank=True, related_name="divisions_teams")
+    teams = models.ManyToManyField(Team, blank=True)
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('division', args=[self.slug])
 
 
 '''

@@ -2,12 +2,13 @@
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 
 from datetime import datetime
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
-from main.models import UserProfile, Division, Sub, Session, CustomUser
+from main.models import UserProfile, Division, Session, CustomUser, Team
 from main.forms import CustomUserForm, SessionRegistrationForm
 
 
@@ -45,12 +46,21 @@ class HomeView(TemplateView):
         return context
 
 
+class DivisionListView(TemplateView):
+    template_name = 'main/divisions.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['divisions'] = Division.objects.all()
+        return context
+
+
 class DivisionView(TemplateView):
     template_name = 'main/division.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['divisions'] = Division.objects.all()
+        context['division'] = Division.objects.get(slug=kwargs.get('division'))
         return context
 
 
@@ -96,3 +106,12 @@ class SessionUnregisterView(RedirectView, SessionViewMixin):
         session = get_object_or_404(Session, slug=kwargs.get('session'), division__slug=kwargs.get('division'))
         session.remove_user_as_sub(self.request.user, date=date)
         return reverse('home')
+
+
+class TeamView(TemplateView, LoginRequiredMixin):
+    template_name = 'main/team.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['teams'] = Team.get_all_related(self.request.user)
+        return context
