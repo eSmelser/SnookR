@@ -24,7 +24,7 @@
                     {% endfor %}
                 </ul>
             {% else %}
-                <h3>No registered sessions found, go to <a href="{% url 'division' %}">Divisions</a> to register.</h3>
+                <h3>No registered sessions found, go to <a href="{% url 'divisions' %}">Divisions</a> to register.</h3>
             {% endif %}
 
         {% elif user.is_authenticated and not player %}

@@ -95,12 +95,18 @@ class Team(models.Model):
     team_captain = models.ForeignKey(User, related_name="team_captain")
     players = models.ManyToManyField(User, blank=True)
 
+    class Meta:
+        permissions = (
+            ('create_team', 'Can create a team'),
+        )
+
     def __str__(self):
         return self.name
 
     @staticmethod
     def get_all_related(user):
-        return list(Team.objects.filter(team_captain=user)) + list(Team.objects.filter(players=user))
+        combined = list(Team.objects.filter(team_captain=user)) + list(Team.objects.filter(players=user))
+        return sorted(list(set(combined)), key=lambda obj: obj.id)
 
     def get_delete_url(self):
         return reverse('delete_team', args=[self.slug, self.id])

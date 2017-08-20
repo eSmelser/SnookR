@@ -9,12 +9,21 @@
 <div>
     <h3>Teams</h3>
     <hr>
-    <a href="{% url 'create_team' %}">Add team</a>
+    {% if perms.main.add_team %}
+        <a href="{% url 'create_team' %}">Add team</a>
+    {% endif %}
     {% if not teams %}
     <p>No teams!</p>
     {% endif %}
+
+
     {% for team in teams %}
-    <h4> {{ team.name }} <a href="{{ team.get_delete_url }}"> delete this team</a></h4>
+    {% if team.team_captain is user %}
+        <h4> {{ team.name }} <a href="{{ team.get_delete_url }}"> delete this team</a></h4>
+    {% else %}
+        <h4> {{ team.name }}</h4>
+    {% endif %}
+
     <h5>Divisions</h5>
     <ul>
         {% for division in team.division_set.all %}
