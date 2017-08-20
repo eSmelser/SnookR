@@ -7,6 +7,25 @@ from django.urls import reverse
 from autoslug import AutoSlugField
 from sublist.models import Sublist
 
+
+class CustomUser(User):
+    """This is a proxy model for the User model.  Proxy models just give methods
+    to the base model, without creating any new tables"""
+    class Meta:
+        proxy = True
+
+    def related_sublists(self):
+        return Sublist.objects.filter(session__subs__user=self)
+
+    @property
+    def sessions(self):
+        return Session.objects.filter(subs__user=self)
+
+    @staticmethod
+    def from_user(user):
+        return CustomUser.objects.get(username=user.username)
+
+
 '''
 A player can exist on many teams and in many divisions both as a division rep and/or as a sub, and these
 are not mutually exlusive
@@ -15,8 +34,10 @@ Player -> Division : 0 .. *
 Player -> Sub      : 
 '''
 
-
-class Player(models.Model):
+class UserProfile(models.Model):
+    """User profiles are used to extend the User model with more fields, but not to change
+    the User model.  Sometimes altered user models conflict with other third-party apps, and
+    this is the most conflict-free way to extend the User model."""
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -27,15 +48,9 @@ class Player(models.Model):
     def __str__(self):
         # chose not to use this because fName and lName are not required on users yet.
         #		name = self.user.first_name + ' ' + self.user.last_name
-        return self.user.username
+        return self.user.username + "'s Profile"
 
         # function to return all of the sublists related to a player instance
-
-    def related_sublists(self):
-        return Sublist.objects.filter(session__subs__player=self)
-
-    def related_sessions(self):
-        return Session.objects.filter(subs__player=self)
 
 
 '''
@@ -50,16 +65,12 @@ in a division per year, but the sessions don't necessarily correspond across div
 
 
 class Sub(models.Model):
-    player = models.ForeignKey(Player)
+    user = models.ForeignKey(User)
     date = models.DateTimeField('sub date')
 
     def __str__(self):
-        availability = self.player.user.username + ' is available ' + str(self.date)
+        availability = self.user.username + ' is available ' + self.date.strftime(Session.pretty_date_format)
         return availability
-
-
-    def get_unregister_url(self):
-        pass
 
     @property
     def sessions(self):
@@ -67,8 +78,7 @@ class Sub(models.Model):
 
     @staticmethod
     def create_from_user(user, date):
-        player, _ = Player.objects.get_or_create(user=user)
-        sub, _ = Sub.objects.get_or_create(player=player, date=date)
+        sub, _ = Sub.objects.get_or_create(user=user, date=date)
         return sub
 
 
@@ -82,8 +92,8 @@ Team -> Division : 1
 class Team(models.Model):
     name = models.CharField(max_length=200)
     #	division      = models.ForeignKey(Division, related_name="team's division")
-    team_captain = models.ForeignKey(Player, related_name="team_captain")
-    other_players = models.ManyToManyField(Player, blank=True)
+    team_captain = models.ForeignKey(User, related_name="team_captain")
+    other_players = models.ManyToManyField(User, blank=True)
 
     def __str__(self):
         return self.name
@@ -101,7 +111,7 @@ class Division(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
 
-    division_rep = models.ForeignKey(Player, related_name='division_representative')
+    division_rep = models.ForeignKey(User, related_name='division_representative')
     teams = models.ManyToManyField(Team, blank=True, related_name="divisions_teams")
 
     def __str__(self):
@@ -116,7 +126,8 @@ Session -> Division : 1 .. 1
 
 
 class Session(models.Model):
-    date_format = '%Y-%m-%d'
+    date_format = '%Y-%m-%d_%H-%M'
+    pretty_date_format = '%x %H:%M'
 
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
@@ -157,9 +168,9 @@ class Session(models.Model):
         return self
 
     def remove_user_as_sub(self, user, date):
-        sub = Sub.objects.get(player__user=user, date=date)
+        sub = Sub.objects.get(user=user, date__date=date.date(), date__hour=date.hour, date__minute=date.minute)
         self.subs.remove(sub)
         return self
 
     def user_is_registered(self, user):
-        return self.subs.filter(player__user=user).exists()
+        return self.subs.filter(user=user).exists()

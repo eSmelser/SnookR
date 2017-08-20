@@ -13,7 +13,7 @@
     <ul>
     {% for sub in subs %}
         <li>
-            {% if sub.player.user == user  %}
+            {% if sub.user == user  %}
                 {{ sub }} <a href="{{ sub.unregister_url }}">unregister</a>
             {% else %}
                 {{ sub }}

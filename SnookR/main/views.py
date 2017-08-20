@@ -7,7 +7,7 @@ from django.views.generic.edit import FormView
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
-from main.models import Player, Division, Sub, Session
+from main.models import UserProfile, Division, Sub, Session, CustomUser
 from main.forms import CustomUserForm, SessionRegistrationForm
 
 
@@ -25,7 +25,7 @@ def signup(request):
             user = authenticate(username=username, password=raw_password, email=email, first_name=first_name,
                                 last_name=last_name)
             login(request, user)
-            player = Player.objects.create(user=user, phone_number=phone_number)
+            UserProfile.objects.create(user=user, phone_number=phone_number)
             return redirect('home')
     else:
         form = CustomUserForm()
@@ -39,10 +39,8 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated():
             try:
-                player = Player.objects.get(user=self.request.user)
-                context['player'] = player
-                context['subs'] = Sub.objects.filter(player=player)
-            except Player.DoesNotExist:
+                context['user'] = CustomUser.from_user(self.request.user)
+            except CustomUser.DoesNotExist:
                 pass
         return context
 

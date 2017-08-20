@@ -9,13 +9,13 @@
 {% block content %}
 <div class="container">
     <div class="jumbotron">
-        {% if user.is_authenticated and player %}
+        {% if user.is_authenticated  %}
         <p>Hi, {{ user.username }}! </p>
 
-            {% if sub.sessions %}
+            {% if user.sessions %}
             <h2>Your Related Sessions</h2>
                 <ul>
-                    {% for sub in subs %}
+                    {% for sub in user.sub_set.all %}
                         {% for session in sub.sessions %}
                             <li>
                                 <a href="{{ session.get_absolute_url }}">{{ session }}</a> - {{ sub.date }}

@@ -85,22 +85,22 @@ class Command(BaseCommand):
         admin.is_staff = True
         admin.save()
         
-        players = [
+        profiles = [
                     {
                         "phone_number": '123123123',
                         "user": user
                     }
                 for user in users]
-        players = [models.Player.objects.create(**player) for player in players]
+        profiles = [models.UserProfile.objects.create(**profile) for profile in profiles]
 
-        subs = [models.Sub.objects.create(player=player, date=timezone.now()) for player in players]
+        subs = [models.Sub.objects.create(user=user, date=timezone.now()) for user in users]
 
         divisions = [
                         {
                             "name": 'division_'+str(i),
-                            "division_rep": player,
+                            "division_rep": user,
                         }
-                    for i, player in enumerate(players)]
+                    for i, user in enumerate(users)]
 
         divisions = [models.Division.objects.create(**division) for division in divisions]
 
