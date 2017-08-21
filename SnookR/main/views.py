@@ -43,6 +43,8 @@ class HomeView(TemplateView):
                 context['user'] = CustomUser.from_user(self.request.user)
             except CustomUser.DoesNotExist:
                 pass
+
+        context['teams'] = Team.get_all_related(self.request.user)
         return context
 
 
