@@ -12,13 +12,14 @@
     {% if perms.main.add_team %}
         <a href="{% url 'create_team' %}">Add team</a>
     {% endif %}
+
     {% if not teams %}
-    <p>No teams!</p>
+        <p>No teams!</p>
     {% endif %}
 
 
     {% for team in teams %}
-    {% if team.team_captain is user %}
+    {% if team.team_captain == user %}
         <h4> {{ team.name }} <a href="{{ team.get_delete_url }}"> delete this team</a></h4>
     {% else %}
         <h4> {{ team.name }}</h4>
@@ -37,6 +38,14 @@
         <li>{{ player }}</li>
         {% endfor %}
     </ul>
+
+        <h5>SnookR Unregistered Players</h5>
+    <ul>
+        {% for player in team.nonuserplayer_set.all %}
+        <li>{{ player }}</li>
+        {% endfor %}
+    </ul>
+
     {% endfor %}
 </div>
 {% endblock %}

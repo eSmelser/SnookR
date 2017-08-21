@@ -111,6 +111,15 @@ class Team(models.Model):
     def get_delete_url(self):
         return reverse('delete_team', args=[self.slug, self.id])
 
+
+class NonUserPlayer(models.Model):
+    name = models.CharField(max_length=200)
+    slug = AutoSlugField(populate_from='name', always_update=True, default='')
+    team = models.ForeignKey(Team)
+
+    def __str__(self):
+        return self.name
+
 '''
 A division must have a name and a division rep and can contain 0 or more teams and 0 or more subs
 Division -> Player  : 1 .. *
