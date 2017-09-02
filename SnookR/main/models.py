@@ -105,8 +105,12 @@ class Team(models.Model):
 
     @staticmethod
     def get_all_related(user):
-        combined = list(Team.objects.filter(team_captain=user)) + list(Team.objects.filter(players=user))
-        return sorted(list(set(combined)), key=lambda obj: obj.id)
+        if user.is_authenticated():
+            combined = list(Team.objects.filter(team_captain=user))
+            combined += list(Team.objects.filter(players=user))
+            return sorted(list(set(combined)), key=lambda obj: obj.id)
+        else:
+            return []
 
     def get_delete_url(self):
         return reverse('delete_team', args=[self.slug, self.id])

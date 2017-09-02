@@ -1,4 +1,5 @@
 Django==1.11.3
 django-autoslug==1.9.3
+djangorestframework==3.6.4
 pytz==2017.2
 selenium==3.4.3

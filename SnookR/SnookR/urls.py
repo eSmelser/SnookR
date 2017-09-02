@@ -22,6 +22,7 @@ from sublist import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'api/', include('api.urls')),
     url(r'^', include('main.urls')),
     url(r'^sublist/', include('sublist.urls')),
 ]

@@ -9,11 +9,119 @@
 {% block content %}
 <div>
     <div id="forms">
-    <form action="" method="post">{% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Submit" />
-    </form>
+        <form action="" method="post">{% csrf_token %}
+            Division:
+            <br>
+            {{ form.division }}
+            <br>
+            Players:
+            <br>
+            <ul id="id_added_players">
+            </ul>
+            <input type="text" id="id_search_player" class="search_player" name="search"
+                   placeholder="Search for a player..">
+            <button type="button" id="id_add_button">Add</button>
+
+            <br>
+            <input type="submit" value="Submit"/>
+        </form>
 
     </div>
 </div>
+{% endblock %}
+
+{% block footer_scripts %}
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+<script>
+
+        let users;
+
+
+    $(document).ready(function() {
+
+      $("#id_add_button").on('click', function() {
+        var name = $("#id_search_player").val();
+
+        if (users.includes(name)) {
+            $removeButton = $('<button>').attr('data-name', name)
+                                                     .attr('type', 'button')
+                                                     .attr('class', 'remove_button')
+                                                     .append('Remove');
+
+            $removeButton.on('click', function() {
+                var name = $(this).attr('data-name');
+                users.push(name);
+                $(this).parent()
+                       .parent()
+                       .remove();
+            })
+
+            $userElem = $('<span>').append(name)
+                                   .append($removeButton);
+
+            $("#id_added_players").append($('<li>').append($userElem))
+
+
+                var index = users.findIndex((elem) => elem == name);
+                console.log('(before) users=', users);
+                users.splice(index, 1);
+                console.log('(after) users=', users);
+            }
+        })
+    })
+
+    $(document).ready(function() {
+
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    var csrftoken = getCookie('csrftoken');
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+
+
+        $.ajax({
+            dataType: "json",
+            url: '/api/users/',
+            data: {}
+        }).done(function (data) {
+
+            users = data;
+
+            $( "#id_search_player" ).autocomplete({
+                source: users
+            });
+        });
+
+
+    })
+
+</script>
 {% endblock %}
