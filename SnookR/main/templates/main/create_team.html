@@ -21,6 +21,12 @@
             <input type="text" id="id_search_player" class="search_player" name="search"
                    placeholder="Search for a player..">
             <button type="button" id="id_add_button">Add</button>
+            <br>
+            <input id="id_user_user_name" type="hidden">
+            <input id="id_user_first_name" type="hidden">
+            <input id="id_user_last_name" type="hidden">
+            <input id="id_user_id" type="hidden">
+
 
             <br>
             <input type="submit" value="Submit"/>
@@ -33,6 +39,7 @@
 {% block footer_scripts %}
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="{% static 'main/js/utils.js' %}"></script>
     <script src="{% static 'main/js/api.js' %}"></script>
     <script src="{% static 'main/js/teams.js' %}"></script>
 {% endblock %}

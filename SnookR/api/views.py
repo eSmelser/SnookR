@@ -8,4 +8,12 @@ class UserListView(ListAPIView):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        return Response([user.username for user in queryset])
+        data = [
+            {
+                'userName': user.username,
+                'firstName': user.first_name,
+                'lastName': user.last_name,
+                'id': user.id
+            } for user in queryset
+        ]
+        return Response(data)
