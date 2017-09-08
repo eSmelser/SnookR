@@ -2,6 +2,9 @@
 
 var api = (function() {
     /***** AJAX Setup *****/
+
+    var baseURL = 'http://127.0.0.1:8000';
+
     var getCookie = function(name) {
         var cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -25,7 +28,8 @@ var api = (function() {
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }
-        }
+        },
+        contentType: 'application/json'
     });
 
     var csrfSafeMethod = function(method) {
@@ -53,8 +57,21 @@ var api = (function() {
         });
     }
 
+
+    var postTeam = function(team, handler) {
+        team.players = team.players.map( p => p.asJSON() );
+        return $.post({
+            dataType: 'json',
+            url: '/api/users/',
+            data: JSON.stringify(team),
+            success: handler.success,
+            error: handler.error
+        });
+    }
     // Return public methods for API
     return {
-        requestUserList: requestUserList
+        baseURL: baseURL,
+        requestUserList: requestUserList,
+        postTeam: postTeam
     }
 })()

@@ -11,11 +11,20 @@ from sublist.models import Sublist
 class CustomUser(User):
     """This is a proxy model for the User model.  Proxy models just give methods
     to the base model, without creating any new tables"""
+
     class Meta:
         proxy = True
 
     def related_sublists(self):
         return Sublist.objects.filter(session__subs__user=self)
+
+    def as_json(self):
+        return {
+            'userName': self.username,
+            'firstName': self.first_name,
+            'lastName': self.last_name,
+            'id': self.id
+        }
 
     @property
     def sessions(self):
@@ -33,6 +42,7 @@ Player -> Team     : 0 .. *
 Player -> Division : 0 .. *
 Player -> Sub      : 
 '''
+
 
 class UserProfile(models.Model):
     """User profiles are used to extend the User model with more fields, but not to change
@@ -115,6 +125,10 @@ class Team(models.Model):
     def get_delete_url(self):
         return reverse('delete_team', args=[self.slug, self.id])
 
+    def add_unregistered_players(self, players):
+        for player in players:
+            NonUserPlayer.objects.create(name=player['name'], team=self)
+
 
 class NonUserPlayer(models.Model):
     name = models.CharField(max_length=200)
@@ -123,6 +137,7 @@ class NonUserPlayer(models.Model):
 
     def __str__(self):
         return self.name
+
 
 '''
 A division must have a name and a division rep and can contain 0 or more teams and 0 or more subs

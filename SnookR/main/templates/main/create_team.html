@@ -10,6 +10,10 @@
 <div>
     <div id="forms">
         <form action="" method="post">{% csrf_token %}
+            Team Name:
+            <br>
+            <input type="text" required id="id_team_name">
+            <br>
             Division:
             <br>
             {{ form.division }}
@@ -20,16 +24,17 @@
             </ul>
             <input type="text" id="id_search_player" class="search_player" name="search"
                    placeholder="Search for a player..">
+            <div id="id_search_error"></div>
             <button type="button" id="id_add_button">Add</button>
             <br>
-            <input id="id_user_user_name" type="hidden">
-            <input id="id_user_first_name" type="hidden">
-            <input id="id_user_last_name" type="hidden">
-            <input id="id_user_id" type="hidden">
-
-
+            Unregistered Players:
             <br>
-            <input type="submit" value="Submit"/>
+            <ul id="id_unregistered_players"></ul>
+            <input type="text" id="id_add_unregistered_player" placeholder="Add a player who isn't a SnookR member...">
+            <button type="button" id="id_add_unregistered_player_button">Add</button>
+            <br>
+            <input type="submit" id="id_submit_button" value="Submit"/>
+
         </form>
 
     </div>

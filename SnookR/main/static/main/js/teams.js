@@ -1,29 +1,58 @@
+function User(userName, firstName, lastName, id) {
+    this.userName = userName;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.id = id;
+
+    this.getFullName = function() {
+        return this.firstName + ' ' + this.lastName;
+    }
+
+    this.getListName = function() {
+       return this.userName + ': ' + this.getFullName();
+    }
+
+    this.asJSON = function() {
+        return {
+            userName: userName,
+            firstName: firstName,
+            lastName: lastName,
+            id: id
+        }
+    }
+}
+
+function userArrayIncludes(users, user) {
+    if ( users.length === 0 || !user ) {
+        return false;
+    }
+
+    return users.filter( elem => elem.id === user.id ).length > 0;
+}
+
 var teams = (function() {
-    var users = [];
-    var name = null;
-    var userName = null;
-    var firstName = null;
-    var lastName = null;
-    var chosenUsers = [];
+    var addedUsers = [];
     var userPool = [];
-    var user = null;
+    var unregisteredPlayers = [];
 
     var init = function() {
         request = api.requestUserList();
         request.done( data => {
-            userPool = data;
+            userPool = data.map( e => new User(e.userName, e.firstName, e.lastName, e.id) );
             updateAutoComplete()
         });
 
         addButtonClickListener();
+        addSubmitButtonClickListener();
+        addUnregisteredPlayerButtonListener();
     }
 
-    var getFullName = function(user) {
-        return user.firstName + ' ' + user.lastName;
-    }
-
-    var getListName = function(user) {
-       return user.userName + ': ' + getFullName(user);
+    var usersFilteredBySearchTerm = function(searchTerm) {
+        return userPool.filter( elem => {
+                  return elem.userName.includes(searchTerm) ||
+                         elem.firstName.includes(searchTerm) ||
+                         elem.lastName.includes(searchTerm)
+              });
     }
 
     var updateAutoComplete = function() {
@@ -31,75 +60,173 @@ var teams = (function() {
             minLength: 0,
 
             source: function( request, response ) {
-              var matchingUsers = userPool.filter( elem => {
-                  return elem.userName.includes(request.term) ||
-                         elem.firstName.includes(request.term) ||
-                         elem.lastName.includes(request.term)
-              });
-
-              response( matchingUsers );
+              response( usersFilteredBySearchTerm( request.term ) );
             },
 
             focus: function( event, ui ) {
-                $("#id_search_player").val( getListName(ui.item) );
+                $("#id_search_player").val( ui.item.userName );
                 return false;
             },
 
             select: function( event, ui ) {
-                user = ui.item;
+                $("#id_search_player").val( ui.item.userName );
                 return false;
             }
 
         }).autocomplete( "instance" )._renderItem = function( ul, item ) {
-              return $( "<li>" ).append( "<div> " + getListName(item) + "</div>" ).appendTo( ul )
+              return $( "<li>" ).append( "<div> " + item.getListName() + "</div>" ).appendTo( ul )
         };
     }
 
+    var displayErrorMessage = function(searchTerm) {
+        clearErrorMessage()
+        var alreadyAdded = addedUsers.filter( elem => elem.userName === searchTerm ).length !== 0;
+        if ( alreadyAdded ) {
+            errorMessage = "User " + searchTerm + " already chosen";
+        } else if ( getUserFromSearchTerm(searchTerm) === null ){
+            errorMessage = "User " + searchTerm + " doesn't exist";
+        } else {
+            console.log('Something is broken');
+        }
+
+        $( '#id_search_error' ).append( errorMessage );
+    }
+
+    var clearErrorMessage = function() {
+        $( '#id_search_error' ).empty();
+    }
+
+
     var addButtonClickListener = function() {
-        $("#id_add_button").on('click', function() {
-            if (user != null && arrayIncludes(userPool, user) && !arrayIncludes(chosenUsers, user)) {
-                chosenUsers.push( user );
-                var index = userPool.findIndex( elem => elem.userName === user.userName );
-                userPool.splice( index, 1 );
-                user = null;
+        $("#id_add_button").on( 'click', function() {
+            var searchTerm = $('#id_search_player').val();
+            var user = getUserFromSearchTerm(searchTerm);
+            if ( user ) {
+
+                addUser(user);
+                clearErrorMessage()
+            } else {
+                displayErrorMessage(searchTerm);
             }
-            updateUserList();
-            updateAutoComplete();
+
+            updateUI();
         })
     }
 
-    var createRemoveButton = function(userObj) {
-        return $('<button>').attr('data-user-name', userObj.userName)
-                            .attr('data-first-name', userObj.firstName)
-                            .attr('data-last-name', userObj.lastName)
-                            .attr('data-id', userObj.id)
-                            .attr('type', 'button')
-                            .attr('class', 'remove_button')
-                            .append('Remove');
+    var getUserFromSearchTerm = function(searchTerm) {
+        var filtered = userPool.filter( elem => elem.userName === searchTerm );
+        if ( filtered.length === 1 ) {
+            return filtered[0];
+        } else {
+            return null;
+        }
     }
 
-    var attachRemoveButtonListener = function($button) {
-        $button.on('click', function() {
-            var removeId = $(this).attr('data-id');
-            // Add the name back onto the users list and remove from chosenUsers
-            userPool.push();
-            var index = chosenUsers.findIndex( elem => elem.id === parseInt(removeId) );
-            userPool.push(chosenUsers[index]);
-            chosenUsers.splice( index, 1 );
-            updateUserList();
-            updateAutoComplete();
-        })
+    var addUser = function(user) {
+        addedUsers.push( user );
+        var index = userPool.findIndex( elem => elem.userName === user.userName );
+        userPool.splice( index, 1 );
+    }
+
+    var removeUserWithId = function(id) {
+        var index = addedUsers.findIndex( elem => elem.id === id );
+        var user = addedUsers[index];
+        userPool.push( user );
+        addedUsers.splice( index, 1 );
+    }
+
+    var updateUI = function() {
+        updateUnregisteredPlayerList();
+        updateUserList();
+        updateAutoComplete();
+    }
+
+    var updateUnregisteredPlayerList = function() {
+        var $list = $( '#id_unregistered_players' ).empty();
+        $.each( unregisteredPlayers, function( index, player ) {
+            $button =  $( '<button>' ).attr( 'class' , 'unregistered_player_remove_button' )
+                                      .attr( 'type' , 'button' )
+                                      .attr( 'data-name' , player.name )
+                                      .attr( 'data-id' , player.id )
+                                      .append( 'Remove' );
+
+            $button.click(function() {
+                unregisteredPlayers.splice( unregisteredPlayers.findIndex( elem => elem === player.name && elem.id === player.id ));
+                updateUI();
+            });
+
+            $span = $( '<span>' ).append( player.name )
+                                 .append( $button );
+
+            $li = $( '<li>' ).append( $span );
+            $list.append( $li );
+        });
     }
 
     var updateUserList = function() {
         var $playerList = $("#id_added_players").empty();
-        $.each(chosenUsers, function(index, userObj) {
+        $.each(addedUsers, function(index, userObj) {
             $removeButton = createRemoveButton(userObj);
             attachRemoveButtonListener($removeButton);
-            $span = $('<span>').append(getListName(userObj))
+            $span = $('<span>').append(userObj.getListName())
                                .append($removeButton);
             $playerList.append($('<li>').append($span))
         })
+    }
+
+    var createRemoveButton = function( userObj ) {
+        return $( '<button>' ).attr( 'data-user-name' , userObj.userName )
+                              .attr( 'data-first-name' , userObj.firstName )
+                              .attr( 'data-last-name', userObj.lastName )
+                              .attr( 'data-id' , userObj.id )
+                              .attr( 'type' , 'button' )
+                              .attr( 'class' , 'remove_button' )
+                              .append( 'Remove' );
+    }
+
+    var attachRemoveButtonListener = function($button) {
+        $button.on('click', function() {
+            var id = parseInt($(this).attr('data-id'));
+            removeUserWithId(id)
+            updateUI();
+        })
+    }
+
+    var addSubmitButtonClickListener = function() {
+        $('#id_submit_button').click(function(event) {
+            event.preventDefault();
+            console.log('submit')
+            var team = {
+                teamName: $('#id_team_name').val(),
+                players: addedUsers,
+                unregisteredPlayers: unregisteredPlayers
+            }
+
+            api.postTeam(team, {
+                success: function(data) {
+                    console.log('data', data);
+                    window.location.href = data['redirectURL'];
+                },
+
+                error: function(data) {
+                    console.log('ERROR!', data);
+                }
+            })
+        })
+    }
+
+    var addUnregisteredPlayerButtonListener = function() {
+        $( "#id_add_unregistered_player_button" ).on( 'click', function(event) {
+            event.preventDefault();
+            var playerName = $('#id_add_unregistered_player').val();
+            unregisteredPlayers.push({
+                name: playerName,
+                id: unregisteredPlayers.length
+            });
+
+            updateUI();
+        }
+        )
     }
 
     return {

@@ -27,7 +27,7 @@
         <h5>SnookR Unregistered Players</h5>
     <ul>
         {% for player in team.nonuserplayer_set.all %}
-        <li>{{ player }}</li>
+            <li>{{ player.name }}</li>
         {% endfor %}
     </ul>
 

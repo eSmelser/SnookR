@@ -1,4 +1,12 @@
 function isEquivalent(a, b) {
+    if ( a === null || b === null ) {
+        return a === b;
+    }
+
+    if ( (typeof a) == 'undefined' || (typeof b) == 'undefined' ) {
+        return a === b;
+    }
+
     // Create arrays of property names
     var aProps = Object.getOwnPropertyNames(a);
     var bProps = Object.getOwnPropertyNames(b);

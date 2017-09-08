@@ -45,6 +45,7 @@ class HomeView(TemplateView):
                 pass
 
         context['teams'] = Team.get_all_related(self.request.user)
+
         return context
 
 
