@@ -1,0 +1,30 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}Profile for {{ user.username }}{% endblock %}
+{% block content %}
+<div>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>{{ user.username }}</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <hr>
+            Username: {{ user.username }}
+            <br>
+            First Name: {{ user.first_name }}
+            <br>
+            Last Name: {{ user.last_name }}
+            <br>
+            Phone: {{ user.profile.phone_number }}
+            <br>
+            Email: {{ user.email }}
+            <br>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer_scripts %}
+{% endblock %}

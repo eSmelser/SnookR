@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^account_change', views.AccountChangeView.as_view(), name='account_change'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^home/$', views.HomeView.as_view(), name='home'),
+    url(r'^profile/(?P<username>.+)/$', views.ProfileView.as_view(), name='profile'),
     url(r'^team/$', views.TeamView.as_view(), name='team'),
     url(r'^create_team/$', views.CreateTeamView.as_view(), name='create_team'),
     url(r'^delete_team/(?P<team>[\w-]+)/(?P<pk>[\d]+)$', views.DeleteTeamView.as_view(), name='delete_team'),

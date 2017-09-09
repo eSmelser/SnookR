@@ -164,9 +164,11 @@ class AccountChangeView(FormView):
         for field in self.form_class.Meta.fields:
             value = form.cleaned_data.get(field, False)
             if value:
-                print('value!', value)
                 setattr(user, field, value)
 
         user.save()
         return super().form_valid(form)
 
+
+class ProfileView(TemplateView):
+    template_name = 'main/profile.html'
