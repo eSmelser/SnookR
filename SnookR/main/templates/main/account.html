@@ -1,0 +1,36 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}Your Account Settings{% endblock %}
+{% block content %}
+<div>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Account</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <hr>
+            Username: {{ user.username }}
+            <br>
+            First Name: {{ user.first_name }}
+            <br>
+            Last Name: {{ user.last_name }}
+            <br>
+            Phone: {{ user.profile.phone_number }}
+            <br>
+            Email: {{ user.email }}
+            <br>
+
+
+
+            Change account settings <a href="{% url 'account_change' %}">here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer_scripts %}
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+{% endblock %}

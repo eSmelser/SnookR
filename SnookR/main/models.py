@@ -3,6 +3,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.functional import cached_property
 from django.urls import reverse
 from autoslug import AutoSlugField
 from sublist.models import Sublist
@@ -26,13 +27,17 @@ class CustomUser(User):
             'id': self.id
         }
 
-    @property
+    @cached_property
+    def profile(self):
+        return UserProfile.objects.get(user=self)
+
+    @cached_property
     def sessions(self):
         return Session.objects.filter(subs__user=self)
 
     @staticmethod
     def from_user(user):
-        return CustomUser.objects.get(username=user.username)
+        return CustomUser.objects.get(id=user.id)
 
 
 '''
@@ -82,7 +87,7 @@ class Sub(models.Model):
         availability = self.user.username + ' is available ' + self.date.strftime(Session.pretty_date_format)
         return availability
 
-    @property
+    @cached_property
     def sessions(self):
         return self.session_set.all()
 

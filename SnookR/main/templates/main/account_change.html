@@ -1,0 +1,79 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}Your Account Settings{% endblock %}
+{% block content %}
+<div>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Account</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form action="{% url 'account_change' %}" method="post">
+                {% csrf_token %}
+                <hr>
+                Username: {{ user.username }}
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <ul>
+                        {% for error in form.username.errors %}
+                            <li><strong>{{ error }}</strong></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <br>
+                First Name: {{ user.first_name }}
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                    <ul>
+                        {% for error in form.first_name.errors %}
+                            <li><strong>{{ error }}</strong></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <br>
+                Last Name: {{ user.last_name }}
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                    <ul>
+                        {% for error in form.last_name.errors %}
+                            <li><strong>{{ error }}</strong></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <br>
+                Phone: {{ user.profile.phone_number }}
+                {{ form.phone_number }}
+                {% if form.phone_number.errors %}
+                    <ul>
+                        {% for error in form.phone_number.errors %}
+                            <li><strong>{{ error }}</strong></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <br>
+                Email: {{ user.email }}
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <ul>
+                        {% for error in form.email.errors %}
+                            <li><strong>{{ error }}</strong></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <br>
+                <input type="submit" value="Submit changes">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer_scripts %}
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+{% endblock %}

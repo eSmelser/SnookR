@@ -2,23 +2,46 @@
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User
 from django.core import validators
 from django.utils import timezone
-from .models import Team, Division, NonUserPlayer
+from .models import Team, Division, NonUserPlayer, CustomUser
 
 phone_regex = validators.RegexValidator(regex=r'^\d{9,15}$',
                                         message="Phone number must be entered in the format: '999999999'. Up to 15 digits allowed.")
+
+
+class CustomUserMeta:
+    model = CustomUser
+    fields = ['username', 'first_name', 'last_name', 'email', 'phone_number']
+
+
+class CustomUserChangeForm(UserChangeForm):
+    phone_number = forms.CharField(validators=[phone_regex], required=False)
+    email = forms.EmailField(required=False)
+
+    class Meta(CustomUserMeta):
+        fields = CustomUserMeta.fields + ['password']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # No fields are required
+        for key in self.fields:
+            self.fields[key].required = False
+
+    def clean_password(self):
+        return ''
 
 
 class CustomUserForm(UserCreationForm):
     phone_number = forms.CharField(validators=[phone_regex])
     email = forms.EmailField(required=True)
 
-    class Meta:
+    class Meta(CustomUserMeta):
         model = User
-        fields = ['username', 'password1', 'password2', 'first_name', 'last_name', 'email', 'phone_number']
+        fields = CustomUserMeta.fields + ['password1', 'password2']
 
 
 class SessionRegistrationForm(forms.Form):
@@ -64,4 +87,3 @@ class TeamForm(forms.ModelForm):
         # which doesn't do the ManyToMany save
         self.save_m2m()
         return obj
-

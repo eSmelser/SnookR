@@ -9,7 +9,7 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from main.models import UserProfile, Division, Session, CustomUser, Team
-from main.forms import CustomUserForm, SessionRegistrationForm, TeamForm
+from main.forms import CustomUserForm, SessionRegistrationForm, TeamForm, CustomUserChangeForm
 
 
 def signup(request):
@@ -136,3 +136,37 @@ class DeleteTeamView(RedirectView):
         team = Team.objects.get(slug=kwargs.get('team'), team_captain=self.request.user, id=kwargs.get('pk'))
         team.delete()
         return reverse('team')
+
+
+class AccountView(TemplateView):
+    template_name = 'main/account.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['user'] = CustomUser.from_user(self.request.user)
+        return context
+
+
+class AccountChangeView(FormView):
+    template_name = 'main/account_change.html'
+    form_class = CustomUserChangeForm
+    success_url = reverse_lazy('account')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['user'] = CustomUser.from_user(self.request.user)
+        return context
+
+    def form_valid(self, form):
+        user = CustomUser.from_user(self.request.user)
+
+        # Update user only with fields with non-empty values
+        for field in self.form_class.Meta.fields:
+            value = form.cleaned_data.get(field, False)
+            if value:
+                print('value!', value)
+                setattr(user, field, value)
+
+        user.save()
+        return super().form_valid(form)
+
