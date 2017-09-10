@@ -192,3 +192,7 @@ class DeleteThumbnail(RedirectView):
         profile.thumbnail = None
         profile.save()
         return reverse('account')
+
+
+class InviteListView(TemplateView):
+    template_name = 'main/invites.html'

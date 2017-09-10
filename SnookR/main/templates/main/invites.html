@@ -1,0 +1,34 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}Profile for {{ player.username }}{% endblock %}
+{% block content %}
+<div>
+    <div class="row">
+        <div class="col-md-12">
+            Pending:
+            <br>
+            <ul id="id_pending_invites_list">
+            {% for invite in user.pending_invites %}
+                <li>
+                  Team: {{ invite.team }}  Captain: {{ invite.team.team_captain }}
+                </li>
+            {% endfor %}
+            </ul>
+
+            Responded:
+            <ul id="id_responded_invites_list">
+            {% for invite in user.all_invites %}
+                {% if invite.responded %}
+                    <li>
+                        Team: {{ invite.team }}  Captain: {{ invite.team.team_captain }}
+                    </li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer_scripts %}
+{% endblock %}

@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^profile/(?P<username>.+)/$', views.ProfileView.as_view(), name='profile'),
     url(r'^delete_thumbnail/$', views.DeleteThumbnail.as_view(), name='delete_thumbnail'),
     url(r'^team/$', views.TeamView.as_view(), name='team'),
+    url(r'^invites/$', views.InviteListView.as_view(), name='invites'),
     url(r'^create_team/$', views.CreateTeamView.as_view(), name='create_team'),
     url(r'^delete_team/(?P<team>[\w-]+)/(?P<pk>[\d]+)$', views.DeleteTeamView.as_view(), name='delete_team'),
     url(r'^division/$', views.DivisionListView.as_view(), name='divisions'),
