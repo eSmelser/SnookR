@@ -1,7 +1,7 @@
 from django.urls import reverse
-from main.models import Team, NonUserPlayer, CustomUser
+from main.models import Team, NonUserPlayer, CustomUser, UserProfile
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 

@@ -1,8 +1,9 @@
-function User(userName, firstName, lastName, id) {
+function User(userName, firstName, lastName, id, url) {
     this.userName = userName;
     this.firstName = firstName;
     this.lastName = lastName;
     this.id = id;
+    this.url = url;
 
     this.getFullName = function() {
         return this.firstName + ' ' + this.lastName;
@@ -17,7 +18,8 @@ function User(userName, firstName, lastName, id) {
             userName: userName,
             firstName: firstName,
             lastName: lastName,
-            id: id
+            id: id,
+            url: url
         }
     }
 }
@@ -38,7 +40,7 @@ var teams = (function() {
     var init = function() {
         request = api.requestUserList();
         request.done( data => {
-            userPool = data.map( e => new User(e.userName, e.firstName, e.lastName, e.id) );
+            userPool = data.map( e => new User(e.userName, e.firstName, e.lastName, e.id, e.url) );
             updateAutoComplete()
         });
 
@@ -168,8 +170,12 @@ var teams = (function() {
         $.each(addedUsers, function(index, userObj) {
             $removeButton = createRemoveButton(userObj);
             attachRemoveButtonListener($removeButton);
-            $span = $('<span>').append(userObj.getListName())
+
+            console.log(userObj)
+            $profileLink = $( '<a>' ).attr( 'href', userObj.url ).append(userObj.getListName());
+            $span = $('<span>').append($profileLink)
                                .append($removeButton);
+
             $playerList.append($('<li>').append($span))
         })
     }

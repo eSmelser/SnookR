@@ -20,7 +20,7 @@
     <h5>Players</h5>
     <ul>
         {% for player in team.players.all %}
-        <li>{{ player }}</li>
+            <li><a href="{{ player.get_absolute_url }}">{{ player }}</a></li>
         {% endfor %}
     </ul>
 

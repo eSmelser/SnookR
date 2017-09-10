@@ -9,7 +9,11 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from main.models import UserProfile, Division, Session, CustomUser, Team
-from main.forms import CustomUserForm, SessionRegistrationForm, TeamForm, CustomUserChangeForm
+from main.forms import (
+    CustomUserForm, SessionRegistrationForm,
+    TeamForm, CustomUserChangeForm,
+    UploadThumbnailForm
+)
 
 
 def signup(request):
@@ -138,8 +142,16 @@ class DeleteTeamView(RedirectView):
         return reverse('team')
 
 
-class AccountView(TemplateView):
+class AccountView(FormView):
     template_name = 'main/account.html'
+    form_class = UploadThumbnailForm
+    success_url = reverse_lazy('account')
+
+    def form_valid(self, form):
+        profile = UserProfile.objects.get(user=self.request.user)
+        profile.thumbnail = self.request.FILES['thumbnail']
+        profile.save()
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -172,3 +184,16 @@ class AccountChangeView(FormView):
 
 class ProfileView(TemplateView):
     template_name = 'main/profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['player'] = get_object_or_404(CustomUser, username=kwargs.get('username'))
+        return context
+
+
+class DeleteThumbnail(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        profile = get_object_or_404(UserProfile, user=self.request.user)
+        profile.thumbnail = None
+        profile.save()
+        return reverse('account')

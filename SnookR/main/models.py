@@ -24,7 +24,8 @@ class CustomUser(User):
             'userName': self.username,
             'firstName': self.first_name,
             'lastName': self.last_name,
-            'id': self.id
+            'id': self.id,
+            'url': self.get_absolute_url,
         }
 
     @cached_property
@@ -39,6 +40,9 @@ class CustomUser(User):
     def from_user(user):
         return CustomUser.objects.get(id=user.id)
 
+    @property
+    def get_absolute_url(self):
+        return reverse('profile', kwargs={'username': self.username})
 
 '''
 A player can exist on many teams and in many divisions both as a division rep and/or as a sub, and these
@@ -47,6 +51,10 @@ Player -> Team     : 0 .. *
 Player -> Division : 0 .. *
 Player -> Sub      : 
 '''
+
+
+def thumbnail_path(instance, filename):
+    return 'uploads/user/{0}/{1}'.format(instance.user.username, filename)
 
 
 class UserProfile(models.Model):
@@ -59,6 +67,7 @@ class UserProfile(models.Model):
         primary_key=True,
     )
     phone_number = models.IntegerField(blank=True, null=True)
+    thumbnail = models.ImageField(upload_to=thumbnail_path, null=True)
 
     def __str__(self):
         # chose not to use this because fName and lName are not required on users yet.
@@ -107,8 +116,8 @@ Team -> Division : 1
 class Team(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
-    team_captain = models.ForeignKey(User, related_name="team_captain")
-    players = models.ManyToManyField(User, blank=True)
+    team_captain = models.ForeignKey(CustomUser, related_name="team_captain")
+    players = models.ManyToManyField(CustomUser, blank=True)
 
     class Meta:
         permissions = (

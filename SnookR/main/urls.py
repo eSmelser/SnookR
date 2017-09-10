@@ -2,6 +2,8 @@
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 
 from django.conf.urls import url
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from main import views
 
@@ -13,6 +15,7 @@ urlpatterns = [
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^home/$', views.HomeView.as_view(), name='home'),
     url(r'^profile/(?P<username>.+)/$', views.ProfileView.as_view(), name='profile'),
+    url(r'^delete_thumbnail/$', views.DeleteThumbnail.as_view(), name='delete_thumbnail'),
     url(r'^team/$', views.TeamView.as_view(), name='team'),
     url(r'^create_team/$', views.CreateTeamView.as_view(), name='create_team'),
     url(r'^delete_team/(?P<team>[\w-]+)/(?P<pk>[\d]+)$', views.DeleteTeamView.as_view(), name='delete_team'),
@@ -23,3 +26,7 @@ urlpatterns = [
     url(r'^division/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/date/(?P<date>\d{4}-\d{2}-\d{2}_\d{2}-\d{2})/unregister/$', views.SessionUnregisterView.as_view(),
         name='session_unregister'),
 ]
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

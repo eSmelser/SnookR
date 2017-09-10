@@ -48,6 +48,14 @@ class SessionRegistrationForm(forms.Form):
     day = forms.DateTimeField(initial=timezone.now)
 
 
+class UploadThumbnailForm(forms.Form):
+    thumbnail = forms.ImageField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['thumbnail'].label = 'Upload thumbnail'
+
+
 class TeamForm(forms.ModelForm):
     division = forms.ModelMultipleChoiceField(queryset=Division.objects.all())
     extra_player_1 = forms.CharField(max_length=200, required=False)

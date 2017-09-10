@@ -1,25 +1,32 @@
 {% extends 'main/base.html' %}
 {% load static %}
-{% block title %}Profile for {{ user.username }}{% endblock %}
+{% block title %}Profile for {{ player.username }}{% endblock %}
 {% block content %}
 <div>
     <div class="row">
-        <div class="col-md-12">
-            <h2>{{ user.username }}</h2>
+        <div class="col-md-2 pull-left">
+            {% if player.profile.thumbnail %}
+                <img class="img-thumbnail img-circle" width=75 height=75 src="{{ player.profile.thumbnail.url }}">
+            {% else %}
+                <img class="img-thumbnail img-circle" width=75 height=75 src="{% static 'main/images/default_profile.jpg' %}">
+            {% endif %}
+        </div>
+        <div class="col-md-10">
+            <h2>{{ player.username }}</h2>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12">
             <hr>
-            Username: {{ user.username }}
+            Username: {{ player.username }}
             <br>
-            First Name: {{ user.first_name }}
+            First Name: {{ player.first_name }}
             <br>
-            Last Name: {{ user.last_name }}
+            Last Name: {{ player.last_name }}
             <br>
-            Phone: {{ user.profile.phone_number }}
+            Phone: {{ player.profile.phone_number }}
             <br>
-            Email: {{ user.email }}
+            Email: {{ player.email }}
             <br>
         </div>
     </div>

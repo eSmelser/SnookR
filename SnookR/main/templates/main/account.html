@@ -10,6 +10,20 @@
     </div>
     <div class="row">
         <div class="col-md-12">
+
+            {% if user.profile.thumbnail %}
+                <img class="img-thumbnail img-circle" width=75 height=75 src="{{ user.profile.thumbnail.url }}">
+                <a href="{% url 'delete_thumbnail' %}">Delete thumbnail</a>
+            {% else %}
+                <img class="img-thumbnail img-circle" width=75 height=75 src="{% static 'main/images/default_profile.jpg' %}">
+                <br>
+                <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form }}
+                    <input type="submit" value="Upload">
+                </form>
+            {% endif %}
+
             <hr>
             Username: {{ user.username }}
             <br>
@@ -21,8 +35,6 @@
             <br>
             Email: {{ user.email }}
             <br>
-
-
 
             Change account settings <a href="{% url 'account_change' %}">here</a>
         </div>
