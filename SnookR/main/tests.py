@@ -53,7 +53,6 @@ class NavbarTestCase(SeleniumTestCase):
         self.assertNotIn('Login', navbar.text)
         self.assertNotIn('Signup', navbar.text)
 
-
     def test_authenticated_navbar_shows_username(self):
         """Passes if authenticated user shows username in navbar.
 
