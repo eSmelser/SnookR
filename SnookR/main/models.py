@@ -36,6 +36,14 @@ class CustomUser(User):
     def sessions(self):
         return Session.objects.filter(subs__user=self)
 
+    @cached_property
+    def pending_invites(self):
+        return TeamInvite.objects.filter(invitee=self, responded=False)
+
+    @cached_property
+    def all_invites(self):
+        return TeamInvite.objects.filter(invitee=self, responded=False)
+
     @staticmethod
     def from_user(user):
         return CustomUser.objects.get(id=user.id)
@@ -231,3 +239,13 @@ class Session(models.Model):
 
     def user_is_registered(self, user):
         return self.subs.filter(user=user).exists()
+
+
+class TeamInvite(models.Model):
+    invitee = models.ForeignKey(CustomUser)
+    team = models.ForeignKey(Team)
+    responded = models.BooleanField(default=False)
+    accepted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return 'Invite from {} to {}'.format(self.team, self.invitee)

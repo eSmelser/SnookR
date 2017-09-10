@@ -1,5 +1,5 @@
 from django.urls import reverse
-from main.models import Team, NonUserPlayer, CustomUser, UserProfile
+from main.models import Team, CustomUser, TeamInvite
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, CreateAPIView
 from rest_framework.response import Response
@@ -23,6 +23,7 @@ class UserListView(ListCreateAPIView):
         players = self.create_players()
         team.players.add(*players)
         team.add_unregistered_players(self.request.data['unregisteredPlayers'])
+        self.create_invites(team, players)
 
         # A hack for getting the absolute url, using the request object
         url = request.build_absolute_uri(reverse('home'))
@@ -30,3 +31,7 @@ class UserListView(ListCreateAPIView):
 
     def create_players(self):
         return [CustomUser.objects.get(id=p.get('id')) for p in self.request.data['players']]
+
+    def create_invites(self, team, players):
+        for player in players:
+            TeamInvite.objects.create(invitee=player, team=team)

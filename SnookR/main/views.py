@@ -8,7 +8,7 @@ from django.views.generic.edit import FormView, CreateView
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
-from main.models import UserProfile, Division, Session, CustomUser, Team
+from main.models import UserProfile, Division, Session, CustomUser, Team, TeamInvite
 from main.forms import (
     CustomUserForm, SessionRegistrationForm,
     TeamForm, CustomUserChangeForm,
@@ -128,11 +128,6 @@ class CreateTeamView(CreateView, LoginRequiredMixin):
     template_name = 'main/create_team.html'
     form_class = TeamForm
     success_url = reverse_lazy('team')
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
 
 
 class DeleteTeamView(RedirectView):

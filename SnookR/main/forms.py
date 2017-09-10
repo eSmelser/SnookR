@@ -58,40 +58,7 @@ class UploadThumbnailForm(forms.Form):
 
 class TeamForm(forms.ModelForm):
     division = forms.ModelMultipleChoiceField(queryset=Division.objects.all())
-    extra_player_1 = forms.CharField(max_length=200, required=False)
-    extra_player_2 = forms.CharField(max_length=200, required=False)
-    extra_player_3 = forms.CharField(max_length=200, required=False)
-    extra_player_4 = forms.CharField(max_length=200, required=False)
-    extra_player_5 = forms.CharField(max_length=200, required=False)
-    extra_player_6 = forms.CharField(max_length=200, required=False)
-    extra_player_7 = forms.CharField(max_length=200, required=False)
-    extra_player_8 = forms.CharField(max_length=200, required=False)
 
     class Meta:
         model = Team
-        fields = ['name', 'players']
-
-    def __init__(self, user, *args, **kwargs):
-        self.user = user
-        super().__init__(*args, **kwargs)
-
-    def save(self, commit=True):
-        obj = super().save(commit=False)
-        obj.team_captain = self.user
-
-        obj.save()
-        divisions = self.cleaned_data['division']
-        for division in divisions:
-            obj.division_set.add(division)
-
-        extra_player_count = 8
-        for i in range(extra_player_count):
-            field_name = 'extra_player_{}'.format(i + 1)
-            name = self.cleaned_data[field_name]
-            if name:
-                NonUserPlayer.objects.create(name=name, team=obj)
-
-        # We call save_m2m because we use commit = False in the super().save() method above
-        # which doesn't do the ManyToMany save
-        self.save_m2m()
-        return obj
+        fields = ['division']

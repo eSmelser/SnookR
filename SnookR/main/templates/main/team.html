@@ -10,7 +10,7 @@
     <h3>Teams</h3>
     <hr>
     {% if perms.main.add_team %}
-        <a href="{% url 'create_team' %}">Add team</a>
+        <a href="{% url 'create_team' %}" id="id_add_team_link">Add team</a>
     {% endif %}
 
 

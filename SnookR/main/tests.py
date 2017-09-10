@@ -2,15 +2,16 @@
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 
 import time
-from django.test import LiveServerTestCase, tag
-from django.contrib.auth.models import User
+from django.test import tag
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.contrib.auth.models import Permission, User
+from django.contrib.contenttypes.models import ContentType
+from main.models import CustomUser, Team, Division
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
 
 
 @tag('selenium')
-class SeleniumTestCase(LiveServerTestCase):
+class SeleniumTestCase(StaticLiveServerTestCase):
     def setUp(self):
         super().setUp()
         self.browser = webdriver.Chrome()
@@ -18,6 +19,13 @@ class SeleniumTestCase(LiveServerTestCase):
 
     def tearDown(self):
         self.browser.quit()
+
+    def login(self, username, password):
+        # Run test
+        self.browser.get(self.live_server_url + '/login/')
+        self.browser.find_element_by_id('id_username').send_keys(username)
+        self.browser.find_element_by_id('id_password').send_keys(password)
+        self.browser.find_element_by_id('id_submit_button').click()
 
 
 class NavbarTestCase(SeleniumTestCase):
@@ -36,10 +44,7 @@ class NavbarTestCase(SeleniumTestCase):
         user = User.objects.create_user(username=username, password=password)
 
         # Login user
-        self.browser.get(self.live_server_url + '/login/')
-        self.browser.find_element_by_id('id_username').send_keys(username)
-        self.browser.find_element_by_id('id_password').send_keys(password)
-        self.browser.find_element_by_id('id_submit_button').click()
+        self.login(username, password)
 
         # Run Test
         self.browser.get(self.live_server_url + '/home/')
@@ -61,9 +66,7 @@ class NavbarTestCase(SeleniumTestCase):
         # Setup DB with user model instance and login
         user = User.objects.create_user(username=username, password=password)
         self.browser.get(self.live_server_url + '/login/')
-        self.browser.find_element_by_id('id_username').send_keys(username)
-        self.browser.find_element_by_id('id_password').send_keys(password)
-        self.browser.find_element_by_id('id_submit_button').click()
+        self.login(username, password)
         self.browser.get(self.live_server_url + '/home/')
 
         # Assert that the message is in the navbar
@@ -98,10 +101,7 @@ class LoginPageTestCase(SeleniumTestCase):
         and password, and then clicks on the submit button.  The page shows an
         error saying: 'Please enter a correct username and password'.
         """
-        self.browser.get(self.live_server_url + '/login/')
-        self.browser.find_element_by_id('id_username').send_keys('John123')
-        self.browser.find_element_by_id('id_password').send_keys('mypassword')
-        self.browser.find_element_by_id('id_submit_button').click()
+        self.login(username='John123', password='mypassword')
 
         elem = self.browser.find_element_by_class_name('errorlist')
         self.assertIn(self.error_msg, elem.text)
@@ -121,10 +121,7 @@ class LoginPageTestCase(SeleniumTestCase):
         user = User.objects.create_user(username=username, password=password)
 
         # Run test
-        self.browser.get(self.live_server_url + '/login/')
-        self.browser.find_element_by_id('id_username').send_keys(username)
-        self.browser.find_element_by_id('id_password').send_keys(password)
-        self.browser.find_element_by_id('id_submit_button').click()
+        self.login(username, password)
 
         # Delete user from test DB because not needed now
         user.delete()
@@ -160,3 +157,64 @@ class SignupPageTestCase(SeleniumTestCase):
         user_count = len(users)
         users.delete()
         self.assertEqual(user_count, 1)
+
+
+class TeamInviteTestCase(SeleniumTestCase):
+    def setUp(self):
+        super().setUp()
+        """Setup the test db.
+
+        1. Populate the database with two players: one team captain and one regular player
+
+        """
+        self.data = {
+            'joe': {
+                'username': 'joe',
+                'first_name': 'joe',
+                'last_name': 'smith',
+                'password': 'joepassword'
+            },
+
+            'will': {
+                'username': 'will',
+                'first_name': 'will',
+                'last_name': 'bacci',
+                'password': 'willpassword',
+            }
+        }
+        joe = CustomUser.objects.create_user(**self.data['joe'])
+        content_type = ContentType.objects.get_for_model(Team)
+        permission = Permission.objects.get(
+            codename='add_team',
+            content_type=content_type,
+        )
+        joe.user_permissions.add(permission)
+        CustomUser.objects.create_user(**self.data['will'])
+
+        rep = CustomUser.objects.create_user(username='rep', password='reppassword')
+        Division.objects.create(name='division 1', division_rep=rep)
+
+    def test_create_team_causes_invite(self):
+        """Passes if a user can see a new request number on his navbar after being added on a team."""
+
+        # 1. The team captain, Joe, logs in.
+        self.login(username=self.data['joe']['username'], password=self.data['joe']['password'])
+
+        # 2. Joe creates a team with Will on it and then logs out.
+        self.browser.find_element_by_id('id_teams_link').click()
+        self.browser.find_element_by_id('id_add_team_link').click()
+        self.browser.find_element_by_id('id_team_name').send_keys('MyTeam')
+        self.browser.find_element_by_css_selector('#id_division > option:nth-child(1)').click()
+        self.browser.find_element_by_id('id_search_player').send_keys(self.data['will']['username'])
+        self.browser.find_element_by_id('id_add_button').click()
+        self.browser.find_element_by_id('id_submit_button').click()
+        time.sleep(.5)
+        self.browser.find_element_by_id('id_logout_link').click()
+
+        # 3. Will logs in and sees that his Invites navbar button now has a number 1 badge next to it
+        #    to indicate a new invite
+        self.login(username=self.data['will']['username'], password=self.data['will']['password'])
+
+        # Assertion: The invite text displays 1
+        text = self.browser.find_element_by_id('id_invites_badge').text
+        self.assertIn('1', text)
