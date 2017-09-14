@@ -57,21 +57,29 @@ var api = (function() {
         });
     }
 
-
-    var postTeam = function(team, handler) {
+    var postTeam = function(team) {
         team.players = team.players.map( p => p.asJSON() );
         return $.post({
             dataType: 'json',
-            url: '/api/users/',
+            url: '/api/team/',
             data: JSON.stringify(team),
-            success: handler.success,
-            error: handler.error
         });
     }
+
+    var requestInvitationList = function() {
+        return $.get({
+            dataType: 'json',
+            url: '/api/invites/',
+            data: {},
+    });
+}
+
+
     // Return public methods for API
     return {
         baseURL: baseURL,
         requestUserList: requestUserList,
-        postTeam: postTeam
+        postTeam: postTeam,
+        requestInvitationList: requestInvitationList
     }
 })()

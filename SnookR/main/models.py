@@ -38,11 +38,11 @@ class CustomUser(User):
 
     @cached_property
     def pending_invites(self):
-        return TeamInvite.objects.filter(invitee=self, responded=False)
+        return TeamInvite.objects.filter(invitee=self, status=TeamInvite.PENDING)
 
     @cached_property
     def all_invites(self):
-        return TeamInvite.objects.filter(invitee=self, responded=False)
+        return TeamInvite.objects.filter(invitee=self)
 
     @staticmethod
     def from_user(user):
@@ -51,6 +51,7 @@ class CustomUser(User):
     @property
     def get_absolute_url(self):
         return reverse('profile', kwargs={'username': self.username})
+
 
 '''
 A player can exist on many teams and in many divisions both as a division rep and/or as a sub, and these
@@ -242,10 +243,22 @@ class Session(models.Model):
 
 
 class TeamInvite(models.Model):
+    PENDING = 'P'
+    APPROVED = 'A'
+    DECLINED = 'D'
+    STATUS_CHOICES = (
+        (PENDING, 'Pending'),
+        (APPROVED, 'Approved'),
+        (DECLINED, 'Declined')
+    )
+
+    status = models.CharField(default=PENDING, max_length=1, choices=STATUS_CHOICES)
     invitee = models.ForeignKey(CustomUser)
     team = models.ForeignKey(Team)
-    responded = models.BooleanField(default=False)
-    accepted = models.BooleanField(default=False)
 
     def __str__(self):
         return 'Invite from {} to {}'.format(self.team, self.invitee)
+
+    @property
+    def is_closed(self):
+        return self.status != TeamInvite.PENDING

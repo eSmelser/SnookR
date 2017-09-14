@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User
 from django.core import validators
 from django.utils import timezone
-from .models import Team, Division, NonUserPlayer, CustomUser
+from .models import Team, Division, TeamInvite, CustomUser
 
 phone_regex = validators.RegexValidator(regex=r'^\d{9,15}$',
                                         message="Phone number must be entered in the format: '999999999'. Up to 15 digits allowed.")
@@ -36,7 +36,7 @@ class CustomUserChangeForm(UserChangeForm):
 
 
 class CustomUserForm(UserCreationForm):
-    phone_number = forms.CharField(validators=[phone_regex])
+    phone_number = forms.CharField(required=False, validators=[phone_regex])
     email = forms.EmailField(required=True)
 
     class Meta(CustomUserMeta):

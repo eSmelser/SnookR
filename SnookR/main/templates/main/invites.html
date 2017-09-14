@@ -5,22 +5,27 @@
 <div>
     <div class="row">
         <div class="col-md-12">
-            Pending:
+            Open Invites:
             <br>
-            <ul id="id_pending_invites_list">
+            <ul id="id_open_invites_list">
             {% for invite in user.pending_invites %}
                 <li>
-                  Team: {{ invite.team }}  Captain: {{ invite.team.team_captain }}
+                        Team: <span id="id_open_invite_{{ invite.id }}_team" data-id="{{ invite.id }}">{{ invite.team }}</span>
+                        Captain: <span id="id_open_invite_{{ invite.id }}_team_captain" data-id="{{ invite.id }}">{{ invite.team.team_captain }}</span>
+                        <button id="id_accept_button_{{ invite.id }}" class="accept_button" data-id="{{ invite.id }}">Accept</button>
+                        <button id="id_decline_button_{{ invite.id }}" class="decline_button" data-id="{{ invite.id }}">Decline</button>
                 </li>
             {% endfor %}
             </ul>
 
-            Responded:
-            <ul id="id_responded_invites_list">
+            Closed Invites:
+            <ul id="id_closed_invites_list">
             {% for invite in user.all_invites %}
-                {% if invite.responded %}
+                {% if invite.is_closed %}
                     <li>
-                        Team: {{ invite.team }}  Captain: {{ invite.team.team_captain }}
+                        Team: <span id="id_closed_invite_{{ invite.id }}_team">{{ invite.team }}</span>
+                        Captain: <span id="id_closed_invite_{{ invite.id }}_team_captain">{{ invite.team.team_captain }}</span>
+                        Accepted: <span id="id_closed_invite_{{ invite.id }}_accepted">{{ invite.team.team_accepted }}</span>
                     </li>
                 {% endif %}
             {% endfor %}
@@ -31,4 +36,7 @@
 {% endblock %}
 
 {% block footer_scripts %}
+    <script src="{% static 'main/js/utils.js' %}"></script>
+    <script src="{% static 'main/js/api.js' %}"></script>
+    <script src="{% static 'main/js/invites.js' %}"></script>
 {% endblock %}

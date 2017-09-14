@@ -208,16 +208,14 @@ var teams = (function() {
                 unregisteredPlayers: unregisteredPlayers
             }
 
-            api.postTeam(team, {
-                success: function(data) {
-                    console.log('data', data);
-                    window.location.href = data['redirectURL'];
-                },
-
-                error: function(data) {
-                    console.log('ERROR!', data);
-                }
-            })
+            var request = api.postTeam(team)
+            request.success(function(data) {
+                console.log('data', data);
+                window.location.href = data['redirectURL'];
+            }).error(function(data) {
+                console.log('ERROR!', data);
+            }
+            )
         })
     }
 

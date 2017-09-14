@@ -6,7 +6,7 @@ from django.test import tag
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
-from main.models import CustomUser, Team, Division
+from main.models import CustomUser, Team, Division, TeamInvite
 from selenium import webdriver
 
 
@@ -139,7 +139,7 @@ class SignupPageTestCase(SeleniumTestCase):
         """
         username = 'JohnDoe'
         password = 'mycoolpassword'
-
+        email = 'jd@gmail.com'
         # Check preconditions
         user = User.objects.filter(username=username)
         self.assertEqual(len(user), 0)
@@ -147,6 +147,8 @@ class SignupPageTestCase(SeleniumTestCase):
         # Run test
         self.browser.get(self.live_server_url + '/signup/')
         self.browser.find_element_by_id('id_username').send_keys(username)
+
+        self.browser.find_element_by_id('id_email').send_keys(email)
         self.browser.find_element_by_id('id_password1').send_keys(password)
         self.browser.find_element_by_id('id_password2').send_keys(password)
         self.browser.find_element_by_id('id_submit_button').click()
@@ -229,6 +231,16 @@ class TeamInviteTestCase(SeleniumTestCase):
         self.joe_invite_will()
         self.login(username=self.data['will']['username'], password=self.data['will']['password'])
         self.browser.find_element_by_id('id_invites_link').click()
-        text = self.browser.find_element_by_id('id_pending_invites_list').text
+        text = self.browser.find_element_by_id('id_open_invites_list').text
         self.assertIn(self.team_name, text)
         self.assertIn(self.data['joe']['username'], text)
+
+    def test_will_accepts_invite(self):
+        self.joe_invite_will()
+        self.login(username=self.data['will']['username'], password=self.data['will']['password'])
+        self.browser.find_element_by_id('id_invites_link').click()
+        id = TeamInvite.objects.all()[0].id
+        self.browser.find_element_by_id('id_accept_button_' + str(id)).click()
+        text = self.browser.find_element_by_id('id_closed_invites_list').text
+        self.assertIn('joe', text)
+        self.assertTrue(TeamInvite.objects.get(invitee__username='will', team__team_captain='joe').accepted)
