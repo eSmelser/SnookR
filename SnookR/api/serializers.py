@@ -1,31 +1,34 @@
 from rest_framework import serializers
-from main.models import Team, TeamInvite, NonUserPlayer
+from main.models import Team, TeamInvite, CustomUser, NonUserPlayer
+
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ('id', 'username', 'first_name', 'last_name')
 
 
 class TeamSerializer(serializers.ModelSerializer):
-    players = serializers.PrimaryKeyRelatedField(read_only=True, many=True)
-    team_captain = serializers.PrimaryKeyRelatedField(read_only=True)
+    players = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), many=True)
+    team_captain = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
+    id = serializers.IntegerField()
 
     class Meta:
         model = Team
-        fields = '__all__'
-
+        fields = ('id', 'name', 'players', 'team_captain')
 
 
 class TeamInviteSerializer(serializers.ModelSerializer):
-    team = TeamSerializer(read_only=True)
-    invitee = serializers.PrimaryKeyRelatedField(read_only=True)
+    team = TeamSerializer()
+    invitee = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
 
     class Meta:
         model = TeamInvite
         fields = ('id', 'status', 'invitee', 'team')
 
-    """def create(self, validated_data):
+    def create(self, validated_data):
         invitee = validated_data.pop('invitee')
-        invitee = CustomUser.objects.get(id=invitee)
-
-        team = validated_data.pop('team')
-        team = Team.objects.get(id=team)
-        
-        return TeamInvite.objects.create(team=team, invitee=invitee, **validated_data)
-    """
+        team_id = validated_data.pop('team').get('id')
+        team = Team.objects.get(id=team_id)
+        obj, _ = TeamInvite.objects.get_or_create(team=team, invitee=invitee)
+        return obj
