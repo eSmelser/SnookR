@@ -246,3 +246,20 @@ class TeamInviteTestCase(SeleniumTestCase):
         obj = TeamInvite.objects.get(invitee__username='will', team__team_captain__username='joe')
         self.assertEqual(obj.status, TeamInvite.APPROVED)
 
+
+class AccountTestCase(SeleniumTestCase):
+    def setUp(self):
+        super().setUp()
+        self.username = 'user'
+        self.password = 'userpassword'
+        self.email = 'user@gmail.com'
+
+        CustomUser.objects.create_user(username=self.username, password=self.password)
+        self.login(username=self.username, password=self.password)
+
+    def test_account_delete(self):
+        self.browser.find_element_by_id("id_account_link").click()
+        self.browser.find_element_by_id("id_delete_account_link").click()
+        self.browser.find_element_by_id("id_delete_account_confirm_link").click()
+        self.assertIn('Deleted', self.browser.find_element_by_id('id_confirmation_message').text)
+        self.assertTrue(not CustomUser.objects.all().exists())

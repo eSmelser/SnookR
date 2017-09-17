@@ -196,3 +196,17 @@ class DeleteThumbnail(RedirectView):
 
 class InviteListView(TemplateView):
     template_name = 'main/invites.html'
+
+
+class DeleteAccountView(TemplateView):
+    template_name = 'main/account_delete.html'
+
+
+class DeleteAccountRedirectView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        self.request.user.delete()
+        return reverse('account_delete_success')
+
+
+class DeleteAccountSuccessView(TemplateView):
+    template_name = 'main/account_delete_success.html'

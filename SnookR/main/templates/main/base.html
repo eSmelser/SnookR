@@ -44,10 +44,10 @@
 
                             <li><a><em>Signed in as</em> <strong>{{ user.username }}</strong></a></li>
                             <li><a id='id_logout_link' href="{% url 'logout' %}">Logout</a></li>
-                            <li><a href="{% url 'account' %}">My Account</a></li>
+                            <li><a id="id_account_link" href="{% url 'account' %}">My Account</a></li>
                         {% else %}
                         <li><a id='id_login_link' href="{% url 'login' %}">Login</a></li>
-                        <li><a href="{% url 'signup' %}">Signup</a></li>
+                        <li><a id="id_signup_link" href="{% url 'signup' %}">Signup</a></li>
                         {% endif %}
                     </ul>
                 </div><!-- /.navbar-collapse -->

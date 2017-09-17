@@ -1,0 +1,13 @@
+<!-- 
+     Copyright &copy; 2017 Evan Smelser
+      This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+-->
+
+{% extends 'main/base.html' %}
+{% block title %}Delete Account{% endblock %}
+{% block content %}
+<div>
+    Delete your account?
+    <a id="id_delete_account_confirm_link" href="{% url 'account_delete_redirect' %}">Yes</a>
+</div>
+{% endblock %}
