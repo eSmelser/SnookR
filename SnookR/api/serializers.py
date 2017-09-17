@@ -48,6 +48,7 @@ class TeamInviteSerializer(serializers.Serializer):
         invitee = CustomUser.objects.get(username=username)
         return TeamInvite.objects.create(team=team, invitee=invitee)
 
+
 class TeamInviteUpdateSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     status = serializers.CharField(required=True)
@@ -56,3 +57,17 @@ class TeamInviteUpdateSerializer(serializers.Serializer):
         instance.status = validated_data['status']
         instance.save()
         return instance
+
+
+class TeamReadOnlySerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=True)
+
+
+class NonUserPlayerSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    id = serializers.ReadOnlyField()
+    team = TeamReadOnlySerializer(required=True)
+
+    def create(self, validated_data):
+        obj = Team.objects.get(id=validated_data.get('team').get('id'))
+        return NonUserPlayer.objects.create(team=obj, name=validated_data.get('name'))

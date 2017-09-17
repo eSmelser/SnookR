@@ -193,3 +193,18 @@ class TeamInviteUpdateTestCase(APITestCase):
         self.client.patch(url, data={'id': self.invite1.id, 'status': 'A'})
         obj = TeamInvite.objects.get(id=self.invite1.id)
         self.assertEqual(obj.status, 'A')
+
+
+class UnregisteredPlayersTestCase(APITestCase):
+    def setUp(self):
+        self.captain = CustomUser.objects.create_user(username='captain', password='captainpassword')
+        permission = Permission.objects.get(codename='add_team')
+        self.captain.user_permissions.add(permission)
+        self.client.login(username='captain', password='captainpassword')
+        self.team = Team.objects.create(team_captain=self.captain, name='myteam')
+
+    def test_add_unregistered_player(self):
+        url = reverse('api:unregistered_players')
+        response = self.client.post(url, data={'name': 'jim', 'team': {'id': self.team.id}}, format='json')
+        players = Team.objects.get(id=self.team.id).nonuserplayer_set.filter(name='jim')
+        self.assertEquals(len(players), 1)

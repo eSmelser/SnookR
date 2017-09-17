@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^team/$', views.TeamView.as_view(), name='team'),
     url(r'^invites/$', views.TeamInviteListView.as_view(), name='invite_list'),
     url(r'^invites/(?P<pk>[0-9]+)/$', views.TeamInviteUpdateView.as_view(), name='invite'),
+    url(r'^unregistered_players/$', views.UnregisteredPlayersView.as_view(), name='unregistered_players'),
 ]
