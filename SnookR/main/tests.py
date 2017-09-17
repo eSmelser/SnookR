@@ -243,6 +243,6 @@ class TeamInviteTestCase(SeleniumTestCase):
         self.browser.find_element_by_id('id_accept_button_' + str(id)).click()
         text = self.browser.find_element_by_id('id_accepted_invites_list').text
         self.assertIn('joe', text)
-        obj =TeamInvite.objects.get(invitee__username='will', team__team_captain__username='joe')
+        obj = TeamInvite.objects.get(invitee__username='will', team__team_captain__username='joe')
         self.assertEqual(obj.status, TeamInvite.APPROVED)
 
