@@ -1,11 +1,19 @@
 from main.models import Team, TeamInvite, CustomUser
 import rest_framework_filters as filters
 
+character_filters = ['exact', 'contains', 'icontains']
+
 
 class UserFilter(filters.FilterSet):
     class Meta:
         model = CustomUser
-        fields = ['id', 'first_name', 'last_name', 'username']
+        fields = {
+            'id': ['exact'],
+            'first_name': character_filters,
+            'last_name': character_filters,
+            'username': character_filters,
+
+        }
 
 
 def players(request):
@@ -22,4 +30,10 @@ class TeamFilter(filters.FilterSet):
 
 
 class TeamInviteFilter(filters.FilterSet):
-    pass
+    invitee = filters.RelatedFilter(UserFilter, name='invitee', queryset=CustomUser.objects.all())
+    team = filters.RelatedFilter(TeamFilter, name='team', queryset=Team.objects.all())
+    status = filters.CharFilter(name='status')
+
+    class Meta:
+        model = TeamInvite
+        fields = ['invitee', 'team', 'status', 'id']

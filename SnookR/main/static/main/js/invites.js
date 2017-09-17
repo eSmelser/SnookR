@@ -118,7 +118,7 @@ var InvitationListView = function(controller) {
         $inviteList.append($inviteDOM);
     }
 
-    this.updateWithChild(childView) {
+    this.updateWithChild = function(childView) {
         this.childView = childView;
         this.update();
     }
@@ -135,7 +135,7 @@ var InvitationController = function(model) {
     })
 }
 
-var main() {
+var main = function() {
     var request = api.getInvites();
     request.done(function(data) {
         var invites = data.map( item => new Invite(item.team, item.invitee, item.status, item.id) );

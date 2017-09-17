@@ -39,47 +39,137 @@ var api = (function() {
 
     /**** SnookR API ****/
 
-    // Returns an AJAX request for the list of all users
-    //
-    //   Usage:
-    //       // Log all users to console
-    //       request = api.requestUserList()
-    //       request.done(function(data) {
-    //           for (var i=0; i<data.length; i++) {
-    //               console.log(data[i])
-    //           }
-    //       })
-    var requestUserList = function() {
+    /* getUserList(): Returns an AJAX request for the list of all users
+     *
+     *
+     * Arguments:
+     *     data: JSON file for filtering on the User model
+     *           Fields username, last_name, and first_name can be filtered
+     *           on using icontains, contains, and exact equalities.
+     *
+     *           For example, with a user named MyUser in the database queries with the following
+     *           data would return MyUser:
+     *
+     *           { 'username': 'MyUser' }            // exact match
+     *
+     *           { 'username__contains': 'yUser' }   // case-sensitive contains
+     *
+     *           { 'username__icontains': 'yuser' }  // case-insensitive contains
+     *
+     *
+     *
+     * Usage:
+     *       // Log all users to console
+     *       request = api.requestUserList()
+     *       request.done(function(data) {
+     *           for (var i=0; i<data.length; i++) {
+     *               console.log(data[i])
+     *           }
+     *       })
+     */
+    var getUserList = function(data) {
         return $.ajax({
             dataType: 'json',
             url: '/api/users/',
-            data: {}
+            data: JSON.stringify(data)
         });
     }
 
-    var postTeam = function(team) {
-        team.players = team.players.map( p => p.asJSON() );
+    /* postTeam() : Returns a POST request for creating a Team.
+     *
+     * Arguments:
+     *     data: An object describing the team to be created.
+     *           Required fields: name, team_captain.
+     *           Optional fields: players
+     *
+     * Permisions: User must have the 'main.add_team' permission to POST a team.
+     *
+     * Example data arg:
+     *       {
+     *           'name': MyTeam,
+     *           'team_captain': {
+     *              'username': 'evan'
+     *            },
+     *           'players': [
+     *               {'username': 'joe'},
+     *               {'username': 'john'}
+     *           ]
+     *       }
+     */
+    var postTeam = function(data) {
         return $.post({
             dataType: 'json',
             url: '/api/team/',
-            data: JSON.stringify(team),
+            data: JSON.stringify(data),
         });
     }
 
-    var requestInvitationList = function() {
+    /* getInvitationList(): Returns a response object containing a list of invitations.
+     *
+     * Arguments:
+     *    data: object
+     *          The query parameters for filtering invitations.
+     *          Should take the form:
+     *                  {
+     *                    'invitee': {  // user fields (see getUserList comments) // },
+     *                    'team': { // team fields (see postTeam()) // },
+     *                    'id': integer,
+     *                    'status': 'P' (pending) or 'D' (declined) or 'A' (accepted)
+     *
+     *
+     * Example:
+     *
+     *     // Print out every pending invite for joe
+     *     getInvitationList({
+     *         'invitee': {'username': 'joe'},
+     *         'status': 'P'
+     *     }).done(function(data) {
+     *         for (var i=0; i<data.length; i++) {
+     *            console.log(data[i]);
+     *         }
+     *     })
+     *
+     *
+     */
+    var getInvitationList = function(data) {
         return $.get({
             dataType: 'json',
             url: '/api/invites/',
-            data: {},
-    });
-}
+            data: JSON.stringify(data),
+        });
+    }
 
+    /* getLoggedInUser(): Returns a request with the data for the currently logged in user
+     *
+     * Arguments: None
+     */
+    var getLoggedInUser = function() {
+        return $.get({
+            dataType: 'json',
+            url: '/api/auth/user',
+            data: {},
+        })
+    }
+
+
+    /* postInvite(data): Returns a request for POSTing a single invite
+     *
+     */
+     var postInvite = function(data) {
+        return $.post({
+            dataType: 'json',
+            url: 'api/invites/',
+            data: JSON.stringify(data)
+        })
+     }
 
     // Return public methods for API
     return {
         baseURL: baseURL,
-        requestUserList: requestUserList,
+        getUserList: getUserList,
         postTeam: postTeam,
-        requestInvitationList: requestInvitationList
+        getInvitationList: getInvitationList,
+        getLoggedInUser: getLoggedInUser,
+        postInvite: postInvite
     }
 })()

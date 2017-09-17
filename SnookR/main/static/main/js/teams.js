@@ -15,11 +15,11 @@ function User(userName, firstName, lastName, id, url) {
 
     this.asJSON = function() {
         return {
-            userName: userName,
-            firstName: firstName,
-            lastName: lastName,
-            id: id,
-            url: url
+            username: this.userName,
+            first_name: this.firstName,
+            last_name: this.lastName,
+            id: this.id,
+            url: this.url
         }
     }
 }
@@ -33,16 +33,23 @@ function userArrayIncludes(users, user) {
 }
 
 var teams = (function() {
+    var loggedInUser = null;
     var addedUsers = [];
     var userPool = [];
     var unregisteredPlayers = [];
 
     var init = function() {
-        request = api.requestUserList();
+        request = api.getUserList();
         request.done( data => {
-            userPool = data.map( e => new User(e.userName, e.firstName, e.lastName, e.id, e.url) );
+            console.log(data)
+            userPool = data.map( e => new User(e.username, e.first_name, e.last_name, e.id, e.url) );
             updateAutoComplete()
         });
+
+        request = api.getLoggedInUser();
+        request.done(function(data) {
+            loggedInUser = new User(data.username, data.first_name, data.last_name, data.id, data.url);
+        })
 
         addButtonClickListener();
         addSubmitButtonClickListener();
@@ -104,7 +111,6 @@ var teams = (function() {
             var searchTerm = $('#id_search_player').val();
             var user = getUserFromSearchTerm(searchTerm);
             if ( user ) {
-
                 addUser(user);
                 clearErrorMessage()
             } else {
@@ -203,19 +209,29 @@ var teams = (function() {
             event.preventDefault();
             console.log('submit')
             var team = {
-                teamName: $('#id_team_name').val(),
-                players: addedUsers,
-                unregisteredPlayers: unregisteredPlayers
+                team_captain: loggedInUser.asJSON(),
+                name: $('#id_team_name').val(),
+                players: addedUsers.map( p => p.asJSON() ),
+//                unregisteredPlayers: unregisteredPlayers
             }
 
+            console.log('TEAM', team)
+
             var request = api.postTeam(team)
-            request.success(function(data) {
-                console.log('data', data);
-                window.location.href = data['redirectURL'];
-            }).error(function(data) {
+            request.done(function(data) {
+                var invites = addedUsers.map( p => {
+                    var inviteRequest = api.postInvite({
+                        team: data,
+                        invitee: p.asJSON()
+                    }).done( data => console.log('done:', data) )
+                      .fail( data => console.log('fail:', data) )
+                });
+
+                // Redirect to url
+                window.location.href = $( '#id_submit_button' ).attr('data-redirect-url');
+            }).fail(function(data) {
                 console.log('ERROR!', data);
-            }
-            )
+            })
         })
     }
 

@@ -244,3 +244,4 @@ class TeamInviteTestCase(SeleniumTestCase):
         text = self.browser.find_element_by_id('id_closed_invites_list').text
         self.assertIn('joe', text)
         self.assertTrue(TeamInvite.objects.get(invitee__username='will', team__team_captain='joe').accepted)
+
