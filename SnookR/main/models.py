@@ -98,12 +98,11 @@ in a division per year, but the sessions don't necessarily correspond across div
 
 
 class Sub(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(CustomUser)
     date = models.DateTimeField('sub date')
 
     def __str__(self):
-        availability = self.user.username + ' is available ' + self.date.strftime(Session.pretty_date_format)
-        return availability
+        return self.date.strftime(Session.pretty_date_format)
 
     @cached_property
     def sessions(self):

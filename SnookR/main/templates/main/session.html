@@ -14,9 +14,9 @@
     {% for sub in subs %}
         <li>
             {% if sub.user == user  %}
-                {{ sub }} <a href="{{ sub.unregister_url }}">unregister</a>
+                {{ sub.user }} at {{ sub }} <a href="{{ sub.unregister_url }}">unregister</a>
             {% else %}
-                {{ sub }}
+            <a href="{{ sub.user.get_absolute_url }}">{{ sub.user }}</a> at {{ sub }}
             {% endif %}
         </li>
     {% endfor %}
