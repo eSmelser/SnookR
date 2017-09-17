@@ -20,11 +20,10 @@ var Invitation = function(team, invitee, status, id) {
     }
 }
 
-var InvitationView = function(model, parentView) {
-    this.model = model;
+var InvitationView = function(controller, parentView) {
+    this.model = controller.model;
+    this.controller = controller;
     this.parentView = parentView;
-    this.idPrefix = this.getIDPrefix();
-
 
     this.getIDPrefix = function() {
         var idPrefix;
@@ -42,12 +41,12 @@ var InvitationView = function(model, parentView) {
 
     this.getDOM = function() {
         var idAttr = this.model.getHTMLId();
-        $li = $( '<li>' ).attr( 'id' ,  id_attr )
+        $li = $( '<li>' ).attr( 'id' ,  this.getIDPrefix() )
                  .append( 'Team: ' )
                  .append( this.getTeamDOM() )
-                 .append( 'Captain: ' )
+                 .append( '  Captain: ' )
                  .append( this.getCaptainDOM() )
-                 .append( 'Status: ' )
+                 .append( '  Status: ' )
                  .append( this.getStatusDOM() );
 
         if ( this.model.status === 'Pending' ) {
@@ -58,7 +57,7 @@ var InvitationView = function(model, parentView) {
         return $li;
     }
 
-    this.update() = function() {
+    this.update = function() {
         this.parentView.updateWithChild(this)
     }
 
@@ -81,16 +80,16 @@ var InvitationView = function(model, parentView) {
     }
 
     this.getStatusDOM = function() {
-        return $( '<span>' ).attr( 'id' , this.id_prefix + '_status').append( this.model.status );
+        return $( '<span>' ).attr( 'id' , this.getIDPrefix() + '_status').append( this.model.status );
     }
 
     this.getCaptainDOM = function() {
-        return $( '<span>' ).attr( 'id' , this.id_prefix + '_team_captain').append( this.model.team.team_captain );
+        return $( '<span>' ).attr( 'id' , this.getIDPrefix() + '_team_captain').append( this.model.team.team_captain.username );
     }
 
 
     this.getTeamDOM = function() {
-        return $( '<span>' ).attr( 'id' , this.id_prefix + '_team' ).append( this.model.team );
+        return $( '<span>' ).attr( 'id' , this.getIDPrefix() + '_team' ).append( this.model.team.name );
     }
 }
 
@@ -105,6 +104,7 @@ var InvitationListView = function(controller) {
         var id = this.model.getHTMLId();
         $( id ).remove();
 
+
         var $inviteList;
         if (this.model.status == 'Pending') {
             $inviteList = $( '#id_pending_invites_list' );
@@ -114,8 +114,10 @@ var InvitationListView = function(controller) {
             $inviteList = $( '#id_declined_invites_list' );
         }
 
+
         $inviteDOM = this.childView.getDOM();
         $inviteList.append($inviteDOM);
+
     }
 
     this.updateWithChild = function(childView) {
@@ -128,17 +130,43 @@ var InvitationListView = function(controller) {
 var InvitationController = function(model) {
     this.model = model;
 
-    $( '#id_accept_button_' + this.model.id ).click(function(event) {
+    var self = this;
+
+    $( '#id_accept_button_' + self.model.id ).click(function(event) {
         event.preventDefault();
-        this.model.status = 'Accepted';
-        this.model.notifyAll();
+        console.log('here')
+        api.patchInvitation({
+            status: 'A',
+            id: self.model.id
+        }).done( (data) => {
+        console.log('patch done')
+            self.model.status = 'Accepted';
+            self.model.notifyAll();
+        }).fail( (data) => {
+            console.log('patchInvitation() failed:', data);
+        })
     })
+
+    $( '#id_decline_button_' + self.model.id ).click(function(event) {
+        event.preventDefault();
+        api.patchInvitation({
+            status: 'D',
+            id: self.model.id
+        }).done( (data) => {
+            self.model.status = 'Declined';
+            self.model.notifyAll();
+        }).fail( (data) => {
+            console.log('patchInvitation() failed:', data);
+        })
+    })
+
 }
 
 var main = function() {
-    var request = api.getInvites();
+    console.log('main()')
+    var request = api.getInvitationList();
     request.done(function(data) {
-        var invites = data.map( item => new Invite(item.team, item.invitee, item.status, item.id) );
+        var invites = data.map( item => new Invitation(item.team, item.invitee, item.status, item.id) );
         for (var i=0; i<invites.length; i++) {
             var controller = new InvitationController(invites[i]);
             var invitationListView = new InvitationListView(controller);
@@ -146,3 +174,5 @@ var main = function() {
         }
     })
 }
+
+main();

@@ -82,7 +82,7 @@ class TeamInviteCreateTestCase(APITestCase):
 
         data = {
             'team': team_data,
-            'invitee': {'username': self.invitee.username },
+            'invitee': {'username': self.invitee.username},
         }
 
         url = reverse('api:invite_list')
@@ -154,7 +154,8 @@ class TeamPostTestCase(APITestCase):
 
         data = {
             'name': 'My Team',
-            'team_captain': {'id': self.captain.id, 'username': self.captain.username, 'first_name': self.captain.first_name, 'last_name': self.captain.last_name},
+            'team_captain': {'id': self.captain.id, 'username': self.captain.username,
+                             'first_name': self.captain.first_name, 'last_name': self.captain.last_name},
             'players': [],
         }
 
@@ -172,3 +173,23 @@ class GetCurrentUserTestCase(APITestCase):
         url = reverse('api:user')
         response = self.client.get(url)
         self.assertEqual(response.data['username'], 'user')
+
+
+class TeamInviteUpdateTestCase(APITestCase):
+    def setUp(self):
+        self.captain = CustomUser.objects.create_user(username='captain', password='captainpassword')
+        permission = Permission.objects.get(codename='add_team')
+        self.captain.user_permissions.add(permission)
+
+        self.invitee1 = CustomUser.objects.create_user(username='invitee1', password='invitee1password')
+
+        self.team = Team.objects.create(team_captain=self.captain, name='My Team')
+        self.invite1 = TeamInvite.objects.create(team=self.team, invitee=self.invitee1)
+        self.client.login(username='captain', password='captainpassword')
+
+    def test_invite_list(self):
+        self.client.login(username='invitee1', password='invitee1password')
+        url = reverse('api:invite', kwargs={'pk': self.invite1.id})
+        self.client.patch(url, data={'id': self.invite1.id, 'status': 'A'})
+        obj = TeamInvite.objects.get(id=self.invite1.id)
+        self.assertEqual(obj.status, 'A')

@@ -220,7 +220,7 @@ var teams = (function() {
             var request = api.postTeam(team)
             request.done(function(data) {
                 var invites = addedUsers.map( p => {
-                    var inviteRequest = api.postInvite({
+                    var inviteRequest = api.postInvitation({
                         team: data,
                         invitee: p.asJSON()
                     }).done( data => console.log('done:', data) )

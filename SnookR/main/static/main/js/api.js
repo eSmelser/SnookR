@@ -152,16 +152,29 @@ var api = (function() {
     }
 
 
-    /* postInvite(data): Returns a request for POSTing a single invite
-     *
+    /* postInvitation(data): Returns a request for POSTing a single invite
+     *f
      */
-     var postInvite = function(data) {
+     var postInvitation = function(data) {
         return $.post({
             dataType: 'json',
-            url: 'api/invites/',
+            url: '/api/invites/',
             data: JSON.stringify(data)
         })
      }
+
+    /* patchInvitation(data): Returns a request for POSTing a single invite
+     *
+     */
+     var patchInvitation = function(data) {
+        return $.ajax({
+            type: 'PATCH',
+            dataType: 'json',
+            url: '/api/invites/' + data.id + '/',
+            data: JSON.stringify(data)
+        })
+     }
+
 
     // Return public methods for API
     return {
@@ -170,6 +183,7 @@ var api = (function() {
         postTeam: postTeam,
         getInvitationList: getInvitationList,
         getLoggedInUser: getLoggedInUser,
-        postInvite: postInvite
+        postInvitation: postInvitation,
+        patchInvitation: patchInvitation
     }
 })()

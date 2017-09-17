@@ -231,7 +231,7 @@ class TeamInviteTestCase(SeleniumTestCase):
         self.joe_invite_will()
         self.login(username=self.data['will']['username'], password=self.data['will']['password'])
         self.browser.find_element_by_id('id_invites_link').click()
-        text = self.browser.find_element_by_id('id_open_invites_list').text
+        text = self.browser.find_element_by_id('id_pending_invites_list').text
         self.assertIn(self.team_name, text)
         self.assertIn(self.data['joe']['username'], text)
 
@@ -241,7 +241,8 @@ class TeamInviteTestCase(SeleniumTestCase):
         self.browser.find_element_by_id('id_invites_link').click()
         id = TeamInvite.objects.all()[0].id
         self.browser.find_element_by_id('id_accept_button_' + str(id)).click()
-        text = self.browser.find_element_by_id('id_closed_invites_list').text
+        text = self.browser.find_element_by_id('id_accepted_invites_list').text
         self.assertIn('joe', text)
-        self.assertTrue(TeamInvite.objects.get(invitee__username='will', team__team_captain='joe').accepted)
+        obj =TeamInvite.objects.get(invitee__username='will', team__team_captain__username='joe')
+        self.assertEqual(obj.status, TeamInvite.APPROVED)
 

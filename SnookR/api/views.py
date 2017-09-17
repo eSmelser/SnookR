@@ -1,10 +1,10 @@
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView, CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListCreateAPIView, UpdateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 from main.models import Team, CustomUser, TeamInvite
-from api.serializers import TeamInviteSerializer, TeamSerializer, CustomUserSerializer
+from api.serializers import TeamInviteSerializer, TeamInviteUpdateSerializer, TeamSerializer, CustomUserSerializer
 from api.permissions import TeamPermission, TeamInvitePermission
 from api.filters import TeamFilter, TeamInviteFilter, UserFilter
 
@@ -38,3 +38,8 @@ class TeamInviteListView(ListCreateAPIView):
     permission_classes = (TeamInvitePermission,)
     filter_class = TeamInviteFilter
     filter_fields = ('invitee', 'team', 'status', 'id')
+
+
+class TeamInviteUpdateView(UpdateAPIView):
+    queryset = TeamInvite.objects.all()
+    serializer_class = TeamInviteUpdateSerializer

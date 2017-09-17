@@ -47,3 +47,12 @@ class TeamInviteSerializer(serializers.Serializer):
         team = Team.objects.get(id=team_id)
         invitee = CustomUser.objects.get(username=username)
         return TeamInvite.objects.create(team=team, invitee=invitee)
+
+class TeamInviteUpdateSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    status = serializers.CharField(required=True)
+
+    def update(self, instance, validated_data):
+        instance.status = validated_data['status']
+        instance.save()
+        return instance
