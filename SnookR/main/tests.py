@@ -254,7 +254,8 @@ class AccountTestCase(SeleniumTestCase):
         self.password = 'userpassword'
         self.email = 'user@gmail.com'
 
-        CustomUser.objects.create_user(username=self.username, password=self.password)
+        user = CustomUser.objects.create_user(username=self.username, password=self.password)
+        self.old_hashed_pass = user.password
         self.login(username=self.username, password=self.password)
 
     def test_account_delete(self):
@@ -263,3 +264,19 @@ class AccountTestCase(SeleniumTestCase):
         self.browser.find_element_by_id("id_delete_account_confirm_link").click()
         self.assertIn('Deleted', self.browser.find_element_by_id('id_confirmation_message').text)
         self.assertTrue(not CustomUser.objects.all().exists())
+
+    def test_change_password(self):
+        self.browser.find_element_by_id("id_account_link").click()
+        self.browser.find_element_by_id("id_password_change_link").click()
+        new_password = 'mynewpassword'
+        self.browser.find_element_by_id("id_old_password").send_keys(self.password)
+        self.browser.find_element_by_id('id_new_password1').send_keys(new_password)
+        self.browser.find_element_by_id('id_new_password2').send_keys(new_password)
+        self.browser.find_element_by_id('id_submit_button').click()
+        self.browser.find_element_by_id('id_logout_link').click()
+
+        new_hashed_pass = CustomUser.objects.get(username=self.username).password
+        self.assertNotEqual(self.old_hashed_pass, new_hashed_pass)
+        self.login(username=self.username, password=new_password)
+        nav_text = self.browser.find_element_by_css_selector('nav').text
+        self.assertIn(self.username, nav_text)

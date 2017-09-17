@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView, CreateView
 from django.contrib.auth import login, authenticate
+import django.contrib.auth.views as auth_views
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from main.models import UserProfile, Division, Session, CustomUser, Team, TeamInvite
@@ -210,3 +211,8 @@ class DeleteAccountRedirectView(RedirectView):
 
 class DeleteAccountSuccessView(TemplateView):
     template_name = 'main/account_delete_success.html'
+
+
+class PasswordChangeView(auth_views.PasswordChangeView):
+    template_name = 'main/password_change.html'
+    success_url = reverse_lazy('account')
