@@ -258,6 +258,12 @@ class TeamInvite(models.Model):
     def __str__(self):
         return 'Invite from {} to {}'.format(self.team, self.invitee)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.status == TeamInvite.APPROVED and \
+                not self.team.players.filter(username=self.invitee.username).exists():
+            self.team.players.add(self.invitee)
+
     @property
     def is_closed(self):
         return self.status != TeamInvite.PENDING

@@ -2,7 +2,7 @@
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 
 import time
-from django.test import tag
+from django.test import tag, TestCase
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
@@ -280,3 +280,19 @@ class AccountTestCase(SeleniumTestCase):
         self.login(username=self.username, password=new_password)
         nav_text = self.browser.find_element_by_css_selector('nav').text
         self.assertIn(self.username, nav_text)
+
+
+class TeamInviteModelTestCase(TestCase):
+    def setUp(self):
+        self.captain = CustomUser.objects.create_user(username='captain', password='captainpassword')
+        self.invitee = CustomUser.objects.create_user(username='invitee', password='inviteepassword')
+        self.team = Team.objects.create(team_captain=self.captain, name='My Team')
+        self.team_invite = TeamInvite.objects.create(team=self.team, invitee=self.invitee)
+
+    def test_invite_status_change_adds_player_to_team(self):
+        self.team_invite.status = TeamInvite.APPROVED
+        self.team_invite.save()
+        self.assertEqual(len(self.team.players.all()), 1)
+
+    def test_pending_invite_does_not_add_player(self):
+        self.assertEqual(len(self.team.players.all()), 0)
