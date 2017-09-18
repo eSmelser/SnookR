@@ -205,6 +205,6 @@ class UnregisteredPlayersTestCase(APITestCase):
 
     def test_add_unregistered_player(self):
         url = reverse('api:unregistered_players')
-        response = self.client.post(url, data={'name': 'jim', 'team': {'id': self.team.id}}, format='json')
+        self.client.post(url, data={'name': 'jim', 'team': {'id': self.team.id}}, format='json')
         players = Team.objects.get(id=self.team.id).nonuserplayer_set.filter(name='jim')
         self.assertEquals(len(players), 1)

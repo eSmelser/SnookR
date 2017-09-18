@@ -47,6 +47,6 @@ class TeamInviteUpdateView(UpdateAPIView):
     serializer_class = TeamInviteUpdateSerializer
 
 
-class UnregisteredPlayersView(ListCreateAPIView):
+class NonUserPlayerListCreateView(ListCreateAPIView):
     queryset = NonUserPlayer.objects.all()
     serializer_class = NonUserPlayerSerializer

@@ -134,7 +134,6 @@ var InvitationController = function(model) {
 
     $( '#id_accept_button_' + self.model.id ).click(function(event) {
         event.preventDefault();
-        console.log('here')
         api.patchInvitation({
             status: 'A',
             id: self.model.id
