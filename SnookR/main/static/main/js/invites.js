@@ -162,7 +162,6 @@ var InvitationController = function(model) {
 }
 
 var main = function() {
-    console.log('main()')
     var request = api.getInvitationList();
     request.done(function(data) {
         var invites = data.map( item => new Invitation(item.team, item.invitee, item.status, item.id) );
