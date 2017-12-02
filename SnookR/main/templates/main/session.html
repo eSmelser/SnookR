@@ -2,8 +2,8 @@
      Copyright &copy; 2017 Evan Smelser
       This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 -->
-
 {% extends 'main/base.html' %}
+{% load static %}
 {% block title %}Subs{% endblock %}
 {% block content %}
 <div>
@@ -13,10 +13,18 @@
     <ul>
     {% for sub in subs %}
         <li>
+            <!-- Display the user's thumbnail or the default thumbnail -->
+            {% if sub.user.profile.thumbnail %}
+                <img class="img-thumbnail img-circle" width=40 height=40 src="{{ sub.user.profile.thumbnail.url }}">
+            {% else %}
+                <img class="img-thumbnail img-circle" width=40 height=40 src="{% static 'main/images/default_profile.jpg' %}">
+            {% endif %}
+
+            <!-- Display an 'unregister' option for the current user -->
             {% if sub.user == user  %}
                 {{ sub.user }} at {{ sub }} <a href="{{ sub.unregister_url }}">unregister</a>
             {% else %}
-            <a href="{{ sub.user.get_absolute_url }}">{{ sub.user }}</a> at {{ sub }}
+                <a href="{{ sub.user.get_absolute_url }}">{{ sub.user }}</a> at {{ sub }}
             {% endif %}
         </li>
     {% endfor %}
