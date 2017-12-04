@@ -2,7 +2,7 @@
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 
 from datetime import datetime
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView, CreateView
 from django.contrib.auth import login, authenticate
@@ -125,10 +125,12 @@ class TeamView(TemplateView, LoginRequiredMixin):
         return context
 
 
-class CreateTeamView(CreateView, LoginRequiredMixin):
+class CreateTeamView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     template_name = 'main/create_team.html'
     form_class = TeamForm
-    success_url = reverse_lazy('team')
+    success_url = reverse_lazy('home')
+    permission_required = 'main.add_team'
+    login_url = '/login/'
 
 
 class DeleteTeamView(RedirectView):
