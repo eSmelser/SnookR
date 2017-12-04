@@ -16,7 +16,6 @@ class UserView(RetrieveAPIView):
     queryset = CustomUser.objects.all()
 
     def get_object(self):
-        print("username", self.request.user.username, 'request', self.request, 'user', self.request.user)
         return CustomUser.objects.get(username=self.request.user.username)
 
 
