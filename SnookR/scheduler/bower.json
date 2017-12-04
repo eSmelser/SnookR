@@ -1,0 +1,7 @@
+{
+  "name": "snooker",
+  "version": "0.1.0",
+  "dependencies": {
+    "bootstrap-calendar": "^0.2.5"
+  }
+}
