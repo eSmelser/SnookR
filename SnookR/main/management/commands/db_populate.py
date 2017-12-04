@@ -4,8 +4,11 @@
 from django.utils import timezone
 
 from django.core.management.base import BaseCommand, CommandError
-from main.models import Team, Session, Sub, Division, UserProfile
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+
+from main.models import Team, Session, Sub, Division, UserProfile, CustomUser
+
 
 class Command(BaseCommand):
     help = 'Populates database with default (test) data'
@@ -78,11 +81,17 @@ class Command(BaseCommand):
                 ]
 
         self.stdout.write('Creating users...')
-        users = [User.objects.create_user(**user) for user in users]
+        users = [CustomUser.objects.create_user(**user) for user in users]
 
+        evan = users[0]
+        content_type = ContentType.objects.get_for_model(Team)
+        create_team_permission = Permission.objects.get(
+            codename='add_team',
+        )
+        evan.user_permissions.add(create_team_permission)
 
         # Create admin
-        admin = User.objects.create_user(username='admin', password='adminpassword')
+        admin = CustomUser.objects.create_user(username='admin', password='adminpassword')
         admin.is_superuser = True
         admin.is_staff = True
         admin.save()
