@@ -5,6 +5,8 @@ __pycache__/
 *$py.class
 
 bower_components
+node_modules
+
 *.log
 
 # C extensions
