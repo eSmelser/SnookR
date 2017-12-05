@@ -7,8 +7,18 @@ $(document).ready(function() {
         },
         defaultDate: '2017-11-12',
         navLinks: true, // can click day/week names to navigate views
-        editable: true,
+        editable: false,
         eventLimit: true, // allow "more" link when too many events
+        eventClick: function(calEvent, jsEvent, view) {
+            console.log('eventClick', calEvent);
+
+
+            // Expand the right column
+            $('#right-column').text(calEvent.title);
+
+            // change the border color just for fun
+            $(this).css('border-color', 'red');
+        },
         events: [
             {
                 title: 'All Day Event',
