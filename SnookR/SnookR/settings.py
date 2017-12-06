@@ -77,7 +77,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'rest_framework_filters',
-    'pipeline',
     'main',
     'sublist',
     'scheduler',
@@ -173,11 +172,9 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-# STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    #'pipeline.finders.PipelineFinder',
 )
 
 MEDIA_URL = '/media/'
@@ -185,30 +182,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # The url the user gets redirected to after logging in
 LOGIN_REDIRECT_URL = 'home'  # TODO:  Change this to something appropriate
-
-# django-pipeline settings
-PIPELINE = {
-    'libraries': {
-        'source_filenames': (
-            'bower_components/bootstrap/dist/css/bootstrap.css',
-        ),
-        # Compress passed libraries and have
-        # the output in`css/libs.min.css`.
-        'output_filename': 'css/libs.min.css',
-    }
-}
-
-PIPELINE = {
-    'PIPELINE_ENABLED': True,
-    'JAVASCRIPT': {
-        'scheduler': {
-            'source_filenames': (
-              'js/jquery.js',
-              'js/d3.js',
-              'js/collections/*.js',
-              'js/application.js',
-            ),
-            'output_filename': 'js/stats.js',
-        }
-    }
-}

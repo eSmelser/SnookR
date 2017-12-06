@@ -1,16 +1,16 @@
 // This module defines the JS API for SnookR
 
-var api = (function() {
+const api = (function() {
     /***** AJAX Setup *****/
 
-    var baseURL = 'http://127.0.0.1:8000';
+    const baseURL = 'http://127.0.0.1:8000';
 
-    var getCookie = function(name) {
-        var cookieValue = null;
+    const getCookie = function(name) {
+        let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
+            let cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = jQuery.trim(cookies[i]);
                 // Does this cookie string begin with the name we want?
                 if (cookie.substring(0, name.length + 1) === (name + '=')) {
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
@@ -19,9 +19,9 @@ var api = (function() {
             }
         }
         return cookieValue;
-    }
+    };
 
-    var csrftoken = getCookie('csrftoken');
+    const csrftoken = getCookie('csrftoken');
 
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
@@ -32,10 +32,10 @@ var api = (function() {
         contentType: 'application/json'
     });
 
-    var csrfSafeMethod = function(method) {
+    const csrfSafeMethod = function(method) {
         // these HTTP methods do not require CSRF protection
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
+    };
 
     /**** SnookR API ****/
 
@@ -50,7 +50,7 @@ var api = (function() {
      *           For example, with a user named MyUser in the database queries with the following
      *           data would return MyUser:
      *
-     *           { 'username': 'MyUser' }            // exact match
+     *           { 'username': 'MyUser' }           // exact match
      *
      *           { 'username__contains': 'yUser' }   // case-sensitive contains
      *
@@ -67,14 +67,13 @@ var api = (function() {
      *           }
      *       })
      */
-    var getUserList = function(data) {
+    const getUserList = function(data) {
         return $.ajax({
             dataType: 'json',
             url: '/api/users/',
             data: JSON.stringify(data)
         });
-    }
-
+    };
     /* postTeam() : Returns a POST request for creating a Team.
      *
      * Arguments:
@@ -96,14 +95,13 @@ var api = (function() {
      *           ]
      *       }
      */
-    var postTeam = function(data) {
+    const postTeam = function(data) {
         return $.post({
             dataType: 'json',
             url: '/api/team/',
             data: JSON.stringify(data),
         });
-    }
-
+    };
     /* getInvitationList(): Returns a response object containing a list of invitations.
      *
      * Arguments:
@@ -131,59 +129,64 @@ var api = (function() {
      *
      *
      */
-    var getInvitationList = function(data) {
+    const getInvitationList = function(data) {
         return $.get({
             dataType: 'json',
             url: '/api/invites/',
             data: JSON.stringify(data),
         });
-    }
-
+    };
     /* getLoggedInUser(): Returns a request with the data for the currently logged in user
      *
      * Arguments: None
      */
-    var getLoggedInUser = function() {
+    const getLoggedInUser = function() {
         return $.get({
             dataType: 'json',
             url: '/api/auth/user',
             data: {},
         })
-    }
-
+    };
 
     /* postInvitation(data): Returns a request for POSTing a single invite
      *f
      */
-     var postInvitation = function(data) {
+     const postInvitation = function(data) {
         return $.post({
             dataType: 'json',
             url: '/api/invites/',
             data: JSON.stringify(data)
         })
-     }
-
+     };
     /* patchInvitation(data): Returns a request for POSTing a single invite
      *
      */
-     var patchInvitation = function(data) {
+     const patchInvitation = function(data) {
         return $.ajax({
             type: 'PATCH',
             dataType: 'json',
             url: '/api/invites/' + data.id + '/',
             data: JSON.stringify(data)
         })
-     }
+     };
+     const getSessionList = function(data) {
+         return $.get({
+             dataType: 'json',
+             url: '/api/sessions',
+             data: data,
+         });
+     };
 
 
     // Return public methods for API
     return {
-        baseURL: baseURL,
-        getUserList: getUserList,
-        postTeam: postTeam,
-        getInvitationList: getInvitationList,
-        getLoggedInUser: getLoggedInUser,
-        postInvitation: postInvitation,
-        patchInvitation: patchInvitation
+        baseURL,
+        getUserList,
+        postTeam,
+        getInvitationList,
+        getLoggedInUser,
+        postInvitation,
+        patchInvitation,
+        getSessionList
     }
-})()
+})();

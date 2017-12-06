@@ -1,4 +1,14 @@
 $(document).ready(function() {
+    let division = $('#id_division').val();
+    console.log('divison=', division);
+
+    api.getSessionList()
+        .done(function(data) {
+            console.log('sessions=', data);
+        });
+
+
+
     $('#calendar').fullCalendar({
         header: {
             left: 'prev,next today',

@@ -1,6 +1,6 @@
 import json
 from rest_framework import serializers
-from main.models import Team, TeamInvite, CustomUser, NonUserPlayer
+from main.models import Team, TeamInvite, CustomUser, NonUserPlayer, Session
 
 
 def must_have_id(data):
@@ -71,3 +71,15 @@ class NonUserPlayerSerializer(serializers.Serializer):
     def create(self, validated_data):
         obj = Team.objects.get(id=validated_data.get('team').get('id'))
         return NonUserPlayer.objects.create(team=obj, name=validated_data.get('name'))
+
+
+class DivisionSerializer(serializers.Serializer):
+    name = serializers.CharField()
+
+
+class SessionSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    id = serializers.ReadOnlyField()
+    start_date = serializers.DateTimeField()
+    end_date = serializers.DateTimeField()
+    division = DivisionSerializer()
