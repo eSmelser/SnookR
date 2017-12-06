@@ -31,8 +31,8 @@ $(document).ready(function () {
                 console.log('eventClick', calEvent);
 
 
-                // Expand the right column
-                $('#right-column').text(calEvent.title);
+                // Fill the event content element with event data
+                $('#id_event_content').text(calEvent.title);
 
                 // change the border color just for fun
                 $(this).css('border-color', 'red');
