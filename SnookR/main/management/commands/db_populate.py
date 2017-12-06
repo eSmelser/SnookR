@@ -1,16 +1,20 @@
 # Copyright &copy; 2017 Evan Smelser
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+import os
 from datetime import datetime, timedelta
 
 from django.utils import timezone
-
+from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.db.models.fields.files import FieldFile
 
 from main.models import Team, Session, Sub, Division, UserProfile, CustomUser
 
 TZINFO = timezone.get_current_timezone()
+DATA_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
+
 
 class Command(BaseCommand):
     help = 'Populates database with default (test) data'
@@ -98,15 +102,16 @@ class Command(BaseCommand):
         admin.is_staff = True
         admin.save()
 
-        profiles = [
-            {
-                "phone_number": '123123123',
-                "user": user
-            }
-            for user in users]
-
         self.stdout.write('Creating profiles...')
-        _ = [UserProfile.objects.create(**profile) for profile in profiles]
+        profiles = []
+        for i, user in enumerate(users):
+            profile = UserProfile.objects.create(user=user, phone_number='1231231234')
+            name = 'profile_{}.jpeg'.format(i)
+            with open(os.path.join(DATA_DIR, name), 'rb') as f:
+                file = File(f)
+                profile.thumbnail.save(name, file, save=True)
+
+            profiles.append(profile)
 
         subs = [Sub.objects.create(user=user, date=timezone.now()) for user in users]
 
