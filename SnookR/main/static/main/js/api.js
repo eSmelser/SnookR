@@ -169,6 +169,7 @@ const api = (function() {
             data: JSON.stringify(data)
         })
      };
+
      const getSessionList = function(data) {
          return $.get({
              dataType: 'json',
