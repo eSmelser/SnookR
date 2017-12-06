@@ -110,16 +110,12 @@ class Command(BaseCommand):
 
         subs = [Sub.objects.create(user=user, date=timezone.now()) for user in users]
 
-        divisions = [
-            {
-                "name": 'division_' + str(i),
-                "division_rep": user,
-            }
-            for i, user in enumerate(users)
-        ]
-
         self.stdout.write('Creating divisions...')
-        divisions = [Division.objects.create(**division) for division in divisions]
+        darrin = users[1]
+        divisions = [
+            Division.objects.create(name='Division A', division_rep=evan),
+            Division.objects.create(name='Division B', division_rep=darrin)
+        ]
 
         self.stdout.write('Creating sessions...')
         sessions = self.create_sessions(divisions)
@@ -160,19 +156,22 @@ class Command(BaseCommand):
         divisions[1].teams.add(teams[1])
 
     def create_sessions(self, divisions):
-        self.stdout.write('Creating sessions...')
-
         session_names = ['wichita', '501 Bar', 'Location B', 'Rialto', 'SomeOtherSession', 'TheWhiteHouse', 'PSU',
                          'My House', 'Location Z']
         day = datetime(datetime.now().year, datetime.now().month, 1, tzinfo=TZINFO)
+        session_divisions = []
         start_dates = []
-        for _ in session_names:
+        for i, _ in enumerate(session_names):
             day = day + timedelta(days=1)
             start_dates.append(day)
+            if i < len(session_names) // 2:
+                session_divisions.append(divisions[0])
+            else:
+                session_divisions.append(divisions[1])
 
         end_dates = [date + timedelta(hours=4) for date in start_dates]
         sessions = []
-        for start, end, name, division in zip(start_dates, end_dates, session_names, divisions):
+        for start, end, name, division in zip(start_dates, end_dates, session_names, session_divisions):
             session = Session.objects.create(name=name, game='8ball', division=division, start_date=start, end_date=end)
             sessions.append(session)
 
