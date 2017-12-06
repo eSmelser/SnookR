@@ -1,8 +1,8 @@
 $(document).ready(function () {
 
-    // Filter the Session data set on the Division.name field of the Division foreign key.
+    // Filter the Session data set on the Division.slug field of the Division foreign key.
     let division = $('#id_division').val();
-    let data = division ? {division__name: division} : {};
+    let data = division ? {division__slug: division} : {};
 
     api.getSessionList(data).done(function (data) {
         let sessionList = [];

@@ -44,6 +44,7 @@ class DivisionFilter(filters.FilterSet):
         model = Division
         fields = {
             'name': character_filters,
+            'slug': ['exact'],
         }
 
 
@@ -57,4 +58,5 @@ class SessionFilter(filters.FilterSet):
             'game': character_filters,
             'start_date': ['exact', 'gt', 'gte', 'lt', 'lte'],
             'end_date': ['exact', 'gt', 'gte', 'lt', 'lte'],
+            'slug': ['exact'],
         }
