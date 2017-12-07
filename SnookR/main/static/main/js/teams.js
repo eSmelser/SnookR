@@ -41,7 +41,6 @@ var teams = (function () {
     var init = function () {
         request = api.getUserList();
         request.done(data => {
-            console.log(data);
             userPool = data.map(e => new User(e.username, e.first_name, e.last_name, e.id, e.url));
             updateAutoComplete()
         });
@@ -259,6 +258,5 @@ var teams = (function () {
 
 
 $(document).ready(function () {
-    console.log('here');
     teams.init()
 });
