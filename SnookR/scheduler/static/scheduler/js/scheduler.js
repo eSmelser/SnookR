@@ -1,3 +1,23 @@
+const createSessionPanel = function (sessionData) {
+    let subs = sessionData['subs']
+        .map(elem => `<li>${elem.user.username}</li>`)
+        .reduce((a, b) => a + b, ``);
+
+    $content = $('<div>').html(`
+        <div>
+            <h2>${sessionData['name']}</h2>
+            <h3>Subs</h3>
+            <ul>
+                ${subs}
+            </ul>
+        </div>
+    `);
+
+    $column = $('<div>').attr('class', 'col-md-12').append($content);
+    $row = $('<div>').attr('class', 'row').append($column);
+    return $row;
+};
+
 $(document).ready(function () {
 
     // Filter the Session data set on the Division.slug field of the Division foreign key.
@@ -30,9 +50,10 @@ $(document).ready(function () {
             eventClick: function (calEvent, jsEvent, view) {
                 console.log('eventClick', calEvent);
 
+                let session = data.find( elem => elem.name === calEvent.title );
 
                 // Fill the event content element with event data
-                $('#id_event_content').text(calEvent.title);
+                $('#id_event_content').empty().append(createSessionPanel(session));
 
                 // change the border color just for fun
                 $(this).css('border-color', 'red');

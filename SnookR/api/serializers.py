@@ -1,4 +1,3 @@
-import json
 from rest_framework import serializers
 from main.models import Team, TeamInvite, CustomUser, NonUserPlayer, Session
 
@@ -77,14 +76,15 @@ class DivisionSerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
+class SubSerializer(serializers.Serializer):
+    user = CustomUserSerializer()
+    date = serializers.DateTimeField()
+
+
 class SessionSerializer(serializers.Serializer):
     name = serializers.CharField()
     id = serializers.ReadOnlyField()
     start_date = serializers.DateTimeField()
     end_date = serializers.DateTimeField()
     division = DivisionSerializer()
-
-
-class SubSerializer(serializers.Serializer):
-    user = CustomUserSerializer()
-    date = serializers.DateTimeField()
+    subs = SubSerializer(many=True)
