@@ -1,11 +1,11 @@
 // This module defines the JS API for SnookR
 
-const api = (function() {
+const api = (function () {
     /***** AJAX Setup *****/
 
     const baseURL = 'http://127.0.0.1:8000';
 
-    const getCookie = function(name) {
+    const getCookie = function (name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
             let cookies = document.cookie.split(';');
@@ -24,7 +24,7 @@ const api = (function() {
     const csrftoken = getCookie('csrftoken');
 
     $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
+        beforeSend: function (xhr, settings) {
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }
@@ -32,7 +32,7 @@ const api = (function() {
         contentType: 'application/json'
     });
 
-    const csrfSafeMethod = function(method) {
+    const csrfSafeMethod = function (method) {
         // these HTTP methods do not require CSRF protection
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
     };
@@ -67,7 +67,7 @@ const api = (function() {
      *           }
      *       })
      */
-    const getUserList = function(data) {
+    const getUserList = function (data) {
         return $.ajax({
             dataType: 'json',
             url: '/api/users/',
@@ -95,7 +95,7 @@ const api = (function() {
      *           ]
      *       }
      */
-    const postTeam = function(data) {
+    const postTeam = function (data) {
         return $.post({
             dataType: 'json',
             url: '/api/team/',
@@ -129,7 +129,7 @@ const api = (function() {
      *
      *
      */
-    const getInvitationList = function(data) {
+    const getInvitationList = function (data) {
         return $.get({
             dataType: 'json',
             url: '/api/invites/',
@@ -140,7 +140,7 @@ const api = (function() {
      *
      * Arguments: None
      */
-    const getLoggedInUser = function() {
+    const getLoggedInUser = function () {
         return $.get({
             dataType: 'json',
             url: '/api/auth/user',
@@ -151,33 +151,40 @@ const api = (function() {
     /* postInvitation(data): Returns a request for POSTing a single invite
      *f
      */
-     const postInvitation = function(data) {
+    const postInvitation = function (data) {
         return $.post({
             dataType: 'json',
             url: '/api/invites/',
             data: JSON.stringify(data)
         })
-     };
+    };
     /* patchInvitation(data): Returns a request for POSTing a single invite
      *
      */
-     const patchInvitation = function(data) {
+    const patchInvitation = function (data) {
         return $.ajax({
             type: 'PATCH',
             dataType: 'json',
             url: '/api/invites/' + data.id + '/',
             data: JSON.stringify(data)
         })
-     };
+    };
 
-     const getSessionList = function(data) {
-         return $.get({
-             dataType: 'json',
-             url: '/api/sessions',
-             data: data,
-         });
-     };
+    const getSessionList = function (data) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/sessions',
+            data: data,
+        });
+    };
 
+    const getSubList = function (data) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/subs',
+            data: data,
+        })
+    };
 
     // Return public methods for API
     return {
@@ -188,6 +195,7 @@ const api = (function() {
         getLoggedInUser,
         postInvitation,
         patchInvitation,
-        getSessionList
+        getSessionList,
+        getSubList
     }
 })();

@@ -9,5 +9,5 @@ urlpatterns = [
     url(r'^invites/(?P<pk>[0-9]+)/$', views.TeamInviteUpdateView.as_view(), name='invite'),
     url(r'^unregistered_players/$', views.NonUserPlayerListCreateView.as_view(), name='unregistered_players'),
     url(r'^sessions/$', views.SessionListView.as_view(), name='sessions'),
-
+    url(r'^subs/$', views.SubListView.as_view(), name='sub_list'),
 ]

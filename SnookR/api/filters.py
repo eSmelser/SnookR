@@ -1,4 +1,4 @@
-from main.models import Team, TeamInvite, CustomUser, Division, Session
+from main.models import Team, TeamInvite, CustomUser, Division, Session, Sub
 import rest_framework_filters as filters
 
 character_filters = ['exact', 'contains', 'icontains']
@@ -60,3 +60,12 @@ class SessionFilter(filters.FilterSet):
             'end_date': ['exact', 'gt', 'gte', 'lt', 'lte'],
             'slug': ['exact'],
         }
+
+
+class SubFilter(filters.FilterSet):
+    user = filters.RelatedFilter(UserFilter, name='user', queryset=CustomUser.objects.all())
+    date = filters.DateTimeFilter()
+
+    class Meta:
+        model = Sub
+        fields = ['user', 'date']

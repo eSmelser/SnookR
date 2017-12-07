@@ -1,8 +1,10 @@
 from django.urls import reverse
 from django.contrib.auth.models import Permission
+from django.utils import timezone
+
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, APITestCase
-from main.models import Team, TeamInvite, CustomUser
+from main.models import Team, TeamInvite, CustomUser, Division, Session, Sub
 
 
 class UserListTestCase(APITestCase):
@@ -208,3 +210,39 @@ class UnregisteredPlayersTestCase(APITestCase):
         self.client.post(url, data={'name': 'jim', 'team': {'id': self.team.id}}, format='json')
         players = Team.objects.get(id=self.team.id).nonuserplayer_set.filter(name='jim')
         self.assertEquals(len(players), 1)
+
+
+class SubListTestCase(APITestCase):
+    def setUp(self):
+        # Create divisions, sessions, users, and subs
+        self.username = 'joe'
+        self.password = 'joepassword'
+        user = CustomUser.objects.create_user(username=self.username, password=self.password)
+        division = Division.objects.create(name='Division A', division_rep=user)
+        self.session = Session.objects.create(name='Session A', division=division, game='8ball',
+                                              start_date=timezone.now(),
+                                              end_date=timezone.now())
+
+        self.add_user_to_session_as_sub(user)
+
+    def test_request(self):
+        self.client.login(username=self.username, password=self.password)
+        url = reverse('api:sub_list')
+        response = self.client.get(url)
+        json = response.json()
+        self.assertEqual(json[0]['user']['username'], 'joe')
+
+    def test_filter(self):
+        user = CustomUser.objects.create_user(username='totally not joe', password=self.password)
+        self.add_user_to_session_as_sub(user)
+
+        self.client.login(username=self.username, password=self.password)
+        url = reverse('api:sub_list')
+        response = self.client.get(url, data={'user__username': 'joe'})
+        json = response.json()
+        self.assertEqual(json[0]['user']['username'], 'joe')
+        self.assertEqual(len(json), 1)
+
+    def add_user_to_session_as_sub(self, user):
+        sub = Sub.objects.create(user=user, date=timezone.now())
+        self.session.subs.add(sub)
