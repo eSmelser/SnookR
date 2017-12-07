@@ -28,7 +28,7 @@ SECRET_KEY = 'c@m7v*xvl6gq+c9qga_n4(_1h!6n(nlkz4a$d2f8rp++!6w%-j'
 DEBUG = True
 
 # If DEBUG is False then enable logging.
-if not DEBUG:
+if not DEBUG and os.environ.get('DJANGO_LOG', False):
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework_filters',
     'main',
+    'api',
     'sublist',
     'scheduler',
 ]
@@ -170,11 +171,6 @@ STATIC_ROOT = '/static/'
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
-)
-
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
 MEDIA_URL = '/media/'
