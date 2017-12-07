@@ -204,6 +204,7 @@ class TeamInviteTestCase(SeleniumTestCase):
         self.login(username=self.data['joe']['username'], password=self.data['joe']['password'])
         self.browser.find_element_by_id('id_teams_link').click()
         self.browser.find_element_by_id('id_add_team_link').click()
+        time.sleep(0.5)
         self.browser.find_element_by_id('id_team_name').send_keys(self.team_name)
         self.browser.find_element_by_css_selector('#id_division > option:nth-child(1)').click()
         self.browser.find_element_by_id('id_search_player').send_keys(self.data['will']['username'])
