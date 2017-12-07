@@ -8,7 +8,6 @@ from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.fields.files import FieldFile
 
 from main.models import Team, Session, Sub, Division, UserProfile, CustomUser
 
