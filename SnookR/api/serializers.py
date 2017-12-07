@@ -14,6 +14,12 @@ class CustomUserSerializer(serializers.Serializer):
     first_name = serializers.CharField(required=False, allow_blank=True)
     last_name = serializers.CharField(required=False, allow_blank=True)
 
+    def to_representation(self, instance):
+        """Add the instance's URL to the returned json."""
+        json = super().to_representation(instance)
+        json['url'] = instance.get_absolute_url
+        return json
+
 
 class TeamSerializer(serializers.Serializer):
     players = CustomUserSerializer(many=True)

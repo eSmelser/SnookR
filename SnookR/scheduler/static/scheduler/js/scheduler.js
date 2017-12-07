@@ -1,12 +1,15 @@
 const createSessionPanel = function (sessionData) {
     let subs = sessionData['subs']
-        .map(elem => `<li>${elem.user.username}</li>`)
+        .map(elem =>
+            `<li>
+                <a href=\"${api.baseURL + elem.user.url}\">${elem.user.username}</a>
+            </li>`)
         .reduce((a, b) => a + b, ``);
 
     $content = $('<div>').html(`
         <div>
             <h2>${sessionData['name']}</h2>
-            <h3>Subs</h3>
+            <h3>Available Subs</h3>
             <ul>
                 ${subs}
             </ul>
