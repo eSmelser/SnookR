@@ -4,24 +4,22 @@
 {% block content %}
 <div>
     <div class="row">
-        <div class="col-md-12">
-            <h2>Account</h2>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <h2>{{ user.username }}</h2>
+            <br>
             {% if user.profile.thumbnail %}
-                <img class="img-thumbnail img-circle" width=75 height=75 src="{{ user.profile.thumbnail.url }}">
-                <a href="{% url 'delete_thumbnail' %}">Delete thumbnail</a>
+            <img class="img-thumbnail img-circle" width=75 height=75 src="{{ user.profile.thumbnail.url }}">
+            <a href="{% url 'delete_thumbnail' %}">Delete thumbnail</a>
             {% else %}
-                <img class="img-thumbnail img-circle" width=75 height=75 src="{% static 'main/images/default_profile.jpg' %}">
-                <br>
-                <form action="" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form }}
-                    <input type="submit" value="Upload">
-                </form>
+            <img class="img-thumbnail img-circle" width=75 height=75
+                 src="{% static 'main/images/default_profile.jpg' %}">
+            <br>
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form }}
+                <input type="submit" value="Upload">
+            </form>
             {% endif %}
 
             <hr>
@@ -44,10 +42,12 @@
             <br>
         </div>
     </div>
+    <div class="col-md-2"></div>
+
 </div>
 {% endblock %}
 
 {% block footer_scripts %}
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 {% endblock %}

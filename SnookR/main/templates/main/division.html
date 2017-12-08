@@ -8,18 +8,18 @@
 {% block title %}Divisions{% endblock %}
 {% block content %}
 <div>
-    <h3>Division: {{ division }}</h3>
-    <hr>
-    <h3>Sessions</h3>
-    <ul>
-        {% for session in division.session_set.all %}
-        <li><a href="{{ session.get_absolute_url }}">{{ session.name }}</a></li>
-        {% endfor %}
-    </ul>
 
     <div class="row">
         <div class="col-md-2"></div>
         <div class="col-md-8">
+            <h3>Division: {{ division }}</h3>
+            <hr>
+            <h3>Sessions</h3>
+            <ul>
+                {% for session in division.session_set.all %}
+                <li><a href="{{ session.get_absolute_url }}">{{ session.name }}</a></li>
+                {% endfor %}
+            </ul>
             <h3>Calendar</h3>
             <div>
                 <div id="calendar"></div>
@@ -44,4 +44,6 @@
 <script src="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.js' %}"></script>
 <script src="{% static 'api/js/api.js' %}"></script>
 <script src="{% static 'scheduler/js/scheduler.js' %}"></script>
+<link href="{% static 'scheduler/css/scheduler.css' %}" rel='stylesheet'/>
+
 {% endblock %}
