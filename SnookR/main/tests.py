@@ -3,6 +3,8 @@
 
 import time
 from django.test import tag, TestCase
+from django.test.utils import override_settings
+
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
@@ -163,6 +165,7 @@ class SignupPageTestCase(SeleniumTestCase):
 class TeamInviteTestCase(SeleniumTestCase):
     def setUp(self):
         super().setUp()
+
         """Setup the test db.
 
         1. Populate the database with two players: one team captain and one regular player
@@ -199,17 +202,16 @@ class TeamInviteTestCase(SeleniumTestCase):
     def joe_invite_will(self):
         # 1. The team captain, Joe, logs in.
         self.login(username=self.data['joe']['username'], password=self.data['joe']['password'])
-
         self.browser.find_element_by_id('id_teams_link').click()
         self.browser.find_element_by_id('id_add_team_link').click()
+        time.sleep(0.5)
         self.browser.find_element_by_id('id_team_name').send_keys(self.team_name)
         self.browser.find_element_by_css_selector('#id_division > option:nth-child(1)').click()
         self.browser.find_element_by_id('id_search_player').send_keys(self.data['will']['username'])
         self.browser.find_element_by_id('id_add_button').click()
         self.browser.find_element_by_id('id_submit_button').click()
-
         # 2. Joe creates a team with Will on it and then logs out.
-        time.sleep(.5)
+        time.sleep(1)
         self.browser.find_element_by_id('id_logout_link').click()
 
     def test_create_team_causes_invite(self):

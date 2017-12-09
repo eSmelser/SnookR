@@ -1,130 +1,131 @@
 # Copyright &copy; 2017 Evan Smelser
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+import os
+from datetime import datetime, timedelta
 
 from django.utils import timezone
-
+from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
-from main.models import Team, Session, Sub, Division, UserProfile
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+
+from main.models import Team, Session, Sub, Division, UserProfile, CustomUser
+
+TZINFO = timezone.get_current_timezone()
+DATA_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
+
 
 class Command(BaseCommand):
     help = 'Populates database with default (test) data'
 
     def handle(self, *args, **options):
         users = [
-                    {
-                        "username"  : 'evan',
-                        "password"  : 'evanpassword',
-                        "first_name": 'evan',
-                        "last_name" : 'smelser',
-                        "email"     : 'e@sme.com',
-                    },
-                    {
-                        "username"  : 'darrin',
-                        "password"  : 'darrinpassword',
-                        "first_name": 'darrin',
-                        "last_name" : 'howard',
-                        "email"     : 'darrin@test.com',
-                    },
-                    {
-                        "username"  : 'jason',
-                        "password"  : 'jasonpassword',
-                        "first_name": 'jason',
-                        "last_name" : 'bennett',
-                        "email"     : 'jason@test.com',
-                    },
-                    {
-                        "username"  : 'andy',
-                        "password"  : 'andypassword',
-                        "first_name": 'andy',
-                        "last_name" : 'dalbey',
-                        "email"     : 'andy@test.com',
-                    },
-                    {
-                        "username"  : 'isaac',
-                        "password"  : 'isaacpassword',
-                        "first_name": 'isaac',
-                        "last_name" : 'norman',
-                        "email"     : 'isaac@test.com',
-                    },
-                    {
-                        "username"  : 'chris',
-                        "password"  : 'chrispassword',
-                        "first_name": 'chris',
-                        "last_name" : 'nieland',
-                        "email"     : 'chris@test.com',
-                    },
-                    {
-                        "username"  : 'sarah',
-                        "password"  : 'sarahpassword',
-                        "first_name": 'sarah',
-                        "last_name" : 'nieland',
-                        "email"     : 'sarah@test.com',
-                    },
-                    {
-                        "username"  : 'nick',
-                        "password"  : 'nickpassword',
-                        "first_name": 'nick',
-                        "last_name" : 'jordan',
-                        "email"     : 'nick@test.com',
-                    },
-                    {
-                        "username"  : 'pete',
-                        "password"  : 'petepassword',
-                        "first_name": 'pete',
-                        "last_name" : 'gates',
-                        "email"     : 'pete@test.com',
-                    },
-                ]
+            {
+                "username": 'evan',
+                "password": 'evanpassword',
+                "first_name": 'evan',
+                "last_name": 'smelser',
+                "email": 'e@sme.com',
+            },
+            {
+                "username": 'darrin',
+                "password": 'darrinpassword',
+                "first_name": 'darrin',
+                "last_name": 'howard',
+                "email": 'darrin@test.com',
+            },
+            {
+                "username": 'jason',
+                "password": 'jasonpassword',
+                "first_name": 'jason',
+                "last_name": 'bennett',
+                "email": 'jason@test.com',
+            },
+            {
+                "username": 'andy',
+                "password": 'andypassword',
+                "first_name": 'andy',
+                "last_name": 'dalbey',
+                "email": 'andy@test.com',
+            },
+            {
+                "username": 'isaac',
+                "password": 'isaacpassword',
+                "first_name": 'isaac',
+                "last_name": 'norman',
+                "email": 'isaac@test.com',
+            },
+            {
+                "username": 'chris',
+                "password": 'chrispassword',
+                "first_name": 'chris',
+                "last_name": 'nieland',
+                "email": 'chris@test.com',
+            },
+            {
+                "username": 'sarah',
+                "password": 'sarahpassword',
+                "first_name": 'sarah',
+                "last_name": 'nieland',
+                "email": 'sarah@test.com',
+            },
+            {
+                "username": 'nick',
+                "password": 'nickpassword',
+                "first_name": 'nick',
+                "last_name": 'jordan',
+                "email": 'nick@test.com',
+            },
+            {
+                "username": 'pete',
+                "password": 'petepassword',
+                "first_name": 'pete',
+                "last_name": 'gates',
+                "email": 'pete@test.com',
+            },
+        ]
 
         self.stdout.write('Creating users...')
-        users = [User.objects.create_user(**user) for user in users]
+        users = [CustomUser.objects.create_user(**user) for user in users]
 
+        evan = users[0]
+        content_type = ContentType.objects.get_for_model(Team)
+        create_team_permission = Permission.objects.get(
+            codename='add_team',
+        )
+        evan.user_permissions.add(create_team_permission)
 
         # Create admin
-        admin = User.objects.create_user(username='admin', password='adminpassword')
+        admin = CustomUser.objects.create_user(username='admin', password='adminpassword')
         admin.is_superuser = True
         admin.is_staff = True
         admin.save()
-        
-        profiles = [
-                    {
-                        "phone_number": '123123123',
-                        "user": user
-                    }
-                for user in users]
 
         self.stdout.write('Creating profiles...')
-        _ = [UserProfile.objects.create(**profile) for profile in profiles]
+        profiles = []
+        for i, user in enumerate(users):
+            profile = UserProfile.objects.create(user=user, phone_number='1231231234')
+            name = 'profile_{}.jpeg'.format(i)
+            with open(os.path.join(DATA_DIR, name), 'rb') as f:
+                file = File(f)
+                profile.thumbnail.save(name, file, save=True)
+
+            profiles.append(profile)
 
         subs = [Sub.objects.create(user=user, date=timezone.now()) for user in users]
 
+        self.stdout.write('Creating divisions...')
+        darrin = users[1]
         divisions = [
-                        {
-                            "name": 'division_'+str(i),
-                            "division_rep": user,
-                        }
-                    for i, user in enumerate(users)
+            Division.objects.create(name='Division A', division_rep=evan),
+            Division.objects.create(name='Division B', division_rep=darrin)
         ]
 
-        self.stdout.write('Creating divisions...')
-        divisions = [Division.objects.create(**division) for division in divisions]
-
-        sessions = [
-                {
-                    "name": 'session_'+str(i),
-                    "game": str(i)+'ball',
-                    "division": division,
-                    "start_date": timezone.now(),
-                    "end_date": timezone.now(),
-                }
-                for i, division in enumerate(divisions)]
-
         self.stdout.write('Creating sessions...')
+        sessions = self.create_sessions(divisions)
         for session in sessions:
-            s = Session.objects.create(**session)
             for sub in subs:
-                s.subs.add(sub)
+                session.subs.add(sub)
 
         temp_users = users.copy()
         captain1 = temp_users.pop(0)
@@ -157,3 +158,25 @@ class Command(BaseCommand):
         teams = temp
         divisions[0].teams.add(teams[0])
         divisions[1].teams.add(teams[1])
+
+    def create_sessions(self, divisions):
+        session_names = ['wichita', '501 Bar', 'Location B', 'Rialto', 'SomeOtherSession', 'TheWhiteHouse', 'PSU',
+                         'My House', 'Location Z']
+        day = datetime(datetime.now().year, datetime.now().month, 1, tzinfo=TZINFO)
+        session_divisions = []
+        start_dates = []
+        for i, _ in enumerate(session_names):
+            day = day + timedelta(days=1)
+            start_dates.append(day)
+            if i < len(session_names) // 2:
+                session_divisions.append(divisions[0])
+            else:
+                session_divisions.append(divisions[1])
+
+        end_dates = [date + timedelta(hours=4) for date in start_dates]
+        sessions = []
+        for start, end, name, division in zip(start_dates, end_dates, session_names, session_divisions):
+            session = Session.objects.create(name=name, game='8ball', division=division, start_date=start, end_date=end)
+            sessions.append(session)
+
+        return sessions

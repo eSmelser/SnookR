@@ -4,16 +4,46 @@
 -->
 
 {% extends 'main/base.html' %}
+{% load staticfiles %}
 {% block title %}Divisions{% endblock %}
 {% block content %}
 <div>
-    <h3>Division {{ division }}</h3>
-    <hr>
-    <h3>Sessions</h3>
-    <ul>
-        {% for session in division.session_set.all %}
-            <li><a href="{{ session.get_absolute_url }}">{{ session.name }}</a></li>
-        {% endfor %}
-    </ul>
+
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <h3>Division: {{ division }}</h3>
+            <hr>
+            <h3>Sessions</h3>
+            <ul>
+                {% for session in division.session_set.all %}
+                <li><a href="{{ session.get_absolute_url }}">{{ session.name }}</a></li>
+                {% endfor %}
+            </ul>
+            <h3>Calendar</h3>
+            <div>
+                <div id="calendar"></div>
+                <input type="hidden" id="id_division" value="{{ view.kwargs.division }}">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div id="id_event_content"></div>
+        </div>
+
+    </div>
 </div>
+{% endblock %}
+
+{% block footer_scripts %}
+<!-- Imports for calendar/scheduler -->
+<link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
+<link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.print.css'  %}" rel='stylesheet' media='print'/>
+<script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery.min.js' %}"></script>
+<script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery-ui.min.js' %}"></script>
+<script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/moment.min.js' %}"></script>
+<script src="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.js' %}"></script>
+<script src="{% static 'api/js/api.js' %}"></script>
+<script src="{% static 'scheduler/js/scheduler.js' %}"></script>
+<link href="{% static 'scheduler/css/scheduler.css' %}" rel='stylesheet'/>
+
 {% endblock %}

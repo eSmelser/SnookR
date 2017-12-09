@@ -27,7 +27,43 @@ SECRET_KEY = 'c@m7v*xvl6gq+c9qga_n4(_1h!6n(nlkz4a$d2f8rp++!6w%-j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# If DEBUG is False then enable logging.
+if not DEBUG and os.environ.get('DJANGO_LOG', False):
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'verbose': {
+                'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+                'datefmt' : "%d/%b/%Y %H:%M:%S"
+            },
+            'simple': {
+                'format': '%(levelname)s %(message)s'
+            },
+        },
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': 'mysite.log',
+                'formatter': 'verbose'
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers':['file'],
+                'propagate': True,
+                'level':'DEBUG',
+            },
+            'main': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+            },
+        }
+    }
+
+
+ALLOWED_HOSTS =  ['localhost', '127.0.0.1', '[::1]', '*']
 
 # Application definition
 
@@ -42,6 +78,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework_filters',
     'main',
+    'api',
     'sublist',
     'scheduler',
 ]
@@ -130,7 +167,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_DIRS = (
+STATIC_ROOT = '/static/'
+
+STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 

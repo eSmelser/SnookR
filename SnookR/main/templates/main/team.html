@@ -7,13 +7,16 @@
 {% block title %}Divisions{% endblock %}
 {% block content %}
 <div>
-    <h3>Teams</h3>
-    <hr>
-    {% if perms.main.add_team %}
-        <a href="{% url 'create_team' %}" id="id_add_team_link">Add team</a>
-    {% endif %}
-
-
-    {% include 'main/team_list.html' %}
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <h3>Teams</h3>
+            <hr>
+            {% if perms.main.add_team %}
+            <a href="{% url 'create_team' %}" id="id_add_team_link">Add team</a>
+            {% endif %}
+            {% include 'main/team_list.html' %}
+        </div>
+    </div>
 </div>
 {% endblock %}

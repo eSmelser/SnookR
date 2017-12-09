@@ -1,0 +1,28 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}Your Account Settings{% endblock %}
+{% block content %}
+    <div id="content" class="row">
+        <div id="calendar-column" class="col-md-8">
+                <div id="calendar"></div>
+        </div>
+        <div class="col-md-4">
+            <div id="id_event_content"></div>
+        </div>
+
+
+        <!-- Place the division here for jQuery to use -->
+        <input id="id_division" type="hidden" value="{{ view.kwargs.division }}">
+    </div>
+{% endblock %}
+
+{% block footer_scripts %}
+    <link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet' />
+    <link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.print.css'  %}" rel='stylesheet' media='print' />
+    <script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery.min.js' %}"></script>
+    <script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/moment.min.js' %}"></script>
+    <script src="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.js' %}"></script>
+    <script src="{% static 'test/js/api.js' %}"></script>
+    <script src="{% static 'scheduler/js/scheduler.js' %}"></script>
+{% endblock %}
