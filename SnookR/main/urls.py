@@ -27,11 +27,13 @@ urlpatterns = [
     url(r'^division/$', views.DivisionListView.as_view(), name='divisions'),
     url(r'^division/(?P<division>[\w-]+)/$', views.DivisionView.as_view(), name='division'),
     url(r'^division/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/$', views.SessionView.as_view(), name='session'),
-    url(r'^division/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/register/$', views.SessionRegisterView.as_view(), name='session_register'),
-    url(r'^division/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/date/(?P<date>\d{4}-\d{2}-\d{2}_\d{2}-\d{2})/unregister/$', views.SessionUnregisterView.as_view(),
+    url(r'^division/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/register/$', views.SessionRegisterView.as_view(),
+        name='session_register'),
+    url(r'^division/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/date/(?P<date>\d{4}-\d{2}-\d{2}_\d{2}-\d{2})/unregister/$',
+        views.SessionUnregisterView.as_view(),
         name='session_unregister'),
+    url(r'^search/(?P<search_type>[\w-]+)/$', views.SearchView.as_view(), name='search'),
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

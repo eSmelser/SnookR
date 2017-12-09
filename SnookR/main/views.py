@@ -218,3 +218,14 @@ class DeleteAccountSuccessView(TemplateView):
 class PasswordChangeView(auth_views.PasswordChangeView):
     template_name = 'main/password_change.html'
     success_url = reverse_lazy('account')
+
+
+class SearchView(TemplateView):
+    template_name = 'main/search.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        params = self.request.GET['query']
+        print(params)
+        return context
+
