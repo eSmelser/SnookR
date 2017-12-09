@@ -1,9 +1,16 @@
+{% extends 'main/base.html' %}
 {% load static %}
 {% block content %}
-    <div class="row">
-        <div class="col-md-12">
-            <h3>Search</h3>
-            {{ view.kargs }}
-        </div>
+<div class="row">
+    <div class="col-md-12">
+        <h3>Search</h3>
+        <ul>
+            {% for result in results %}
+            <li>
+                {{ result }}
+            </li>
+            {% endfor %}
+        </ul>
     </div>
+</div>
 {% endblock %}

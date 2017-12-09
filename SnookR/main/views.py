@@ -1,15 +1,19 @@
 # Copyright &copy; 2017 Evan Smelser
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 
+import operator
 from datetime import datetime
+from functools import reduce
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView, CreateView
 from django.contrib.auth import login, authenticate
 import django.contrib.auth.views as auth_views
+from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
-from main.models import UserProfile, Division, Session, CustomUser, Team, TeamInvite
+from django.db.models import Q
+from main.models import UserProfile, Division, Session, CustomUser, Team, Sub
 from main.forms import (
     CustomUserForm, SessionRegistrationForm,
     TeamForm, CustomUserChangeForm,
@@ -225,7 +229,26 @@ class SearchView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        params = self.request.GET['query']
-        print(params)
+        search = self.request.GET['query']
+        search_type = kwargs.get('search_type', None)
+
+        querysets = []
+        if search_type == 'session':
+            temp = Session.objects.all()
+            for term in search.split():
+                querysets.append(temp.filter(name__contains=term))
+        elif search_type == 'substitute':
+            temp = Sub.objects.all()
+            for term in search.split():
+                qs = temp.filter(
+                    Q(user__username__contains=term) |
+                    Q(user__first_name__contains=term) |
+                    Q(user__last_name__contains=term)
+                )
+                querysets.append(qs)
+        else:
+            raise Http404('Invalid URL kwargs: ' + str(kwargs))
+
+        context['results'] = reduce(operator.add, (list(qs) for qs in querysets), [])
         return context
 

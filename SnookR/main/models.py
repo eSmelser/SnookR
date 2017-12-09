@@ -102,7 +102,7 @@ class Sub(models.Model):
     date = models.DateTimeField('sub date')
 
     def __str__(self):
-        return self.date.strftime(Session.pretty_date_format)
+        return str(self.user)
 
     @cached_property
     def sessions(self):

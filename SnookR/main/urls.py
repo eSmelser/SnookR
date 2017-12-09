@@ -32,7 +32,7 @@ urlpatterns = [
     url(r'^division/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/date/(?P<date>\d{4}-\d{2}-\d{2}_\d{2}-\d{2})/unregister/$',
         views.SessionUnregisterView.as_view(),
         name='session_unregister'),
-    url(r'^search/(?P<search_type>[\w-]+)/$', views.SearchView.as_view(), name='search'),
+    url(r'^search/(?P<search_type>substitute|session)/$', views.SearchView.as_view(), name='search'),
 ]
 
 if settings.DEBUG:
