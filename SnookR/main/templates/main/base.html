@@ -34,17 +34,29 @@
                     <a class="navbar-brand" href="{% url 'home' %}">SnookR</a>
                 </div>
 
+                <!-- Search bar toggle menu -->
+                <ul class="nav navbar-nav navbar-left">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false" id="id_dropdown_toggle">Find substitutes<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" class="toggle-option" id="id_option_substitute">Find substitutes</a></li>
+                            <li><a href="#" class="toggle-option" id="id_option_session">Find your session</a></li>
+                        </ul>
+                    </li>
+                </ul>
 
+                <!-- Search text field -->
                 <form class="navbar-form navbar-left">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search">
+                        <input type="text" id="id_search_field" class="form-control" placeholder="Search">
+                        <input type="hidden" id="id_selected_option" value="substitute">
                     </div>
-                    <button type="submit" class="btn btn-default">Search</button>
+                    <button type="submit" id="id_submit_button" class="btn btn-default">Submit</button>
                 </form>
 
-
                 <!-- Collect the nav links, forms, and other content for toggling -->
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
                         {% if user.is_authenticated %}
                         <li><a href="{% url 'invites' %}" id="id_invites_link">Invites <span class="badge"
@@ -75,6 +87,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
             crossorigin="anonymous"></script>
-    {% block footer_scripts %}{% endblock %}
+    <script src="{% static 'main/js/base.js' %}"></script>
+
+    {% block footer_scripts %}
+    {% endblock %}
 </footer>
 </html>
