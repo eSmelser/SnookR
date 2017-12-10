@@ -60,10 +60,6 @@ class SessionListView(ListAPIView):
     filter_class = SessionFilter
     filter_fields = tuple(['division'] + list(SessionFilter.Meta.fields.keys()))
 
-    def list(self, request, *args, **kwargs):
-        import pdb;pdb.set_trace()
-        return super().list(request, *args, **kwargs)
-
 
 class SubListView(ListAPIView):
     serializer_class = SubSerializer

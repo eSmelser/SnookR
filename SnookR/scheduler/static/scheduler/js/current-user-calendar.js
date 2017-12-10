@@ -5,7 +5,6 @@ $(document).ready(function () {
         api.getSessionList({
             subs__user__username: username
         }).done(function (data) {
-            console.log(data);
             let sessionList = [];
             for (elem in data) {
                 if (data.hasOwnProperty(elem)) {
@@ -28,13 +27,6 @@ $(document).ready(function () {
                 editable: false,
                 eventLimit: true, // allow "more" link when too many events
                 eventClick: function (calEvent, jsEvent, view) {
-                    let session = data.find( elem => elem.name === calEvent.title );
-
-                    // Fill the event content element with event data
-                    $('#id_event_content').empty().append(createSessionPanel(session));
-
-                    // change the border color just for fun
-                    $(this).css('border-color', 'red');
                 },
                 events: eventList,
             });
