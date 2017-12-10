@@ -1,0 +1,47 @@
+.navbar-brand {
+  font-family: "Bungee", cursive;
+  font-size: 200%;
+  padding: 0; }
+
+#image_billiard {
+  height: 70px;
+  padding: 15px;
+  width: auto;
+  float: left; }
+
+.brand-text {
+  float: right;
+  padding-top: 25px;
+  padding-left: 10px; }
+
+.navbar-default {
+  height: 70px; }
+
+.navbar-default .navbar-nav > li > a {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  line-height: 30px; }
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus,
+.navbar-default .navbar-nav > .open > a,
+.navbar-default .navbar-nav > .open > a,
+.navbar-default .navbar-nav > .open > a:hover,
+.navbar-default .navbar-nav > .open > a:focus {
+  color: white;
+  background-color: transparent; }
+
+form#id_search_group {
+  margin-top: 16px; }
+
+.jumbotron {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+  margin-bottom: 0;
+  background-color: white; }
+
+.jumbotron .container {
+  max-width: 80rem; }
+
+#lower_container {
+  background-color: #f7f7f7; }
