@@ -28,30 +28,24 @@
         {% if user.is_authenticated %}
         <p>Hi, {{ user.username }}! </p>
 
-        {% if user.sessions %}
-        <h2>Your Related Sessions</h2>
-        <ul>
-            {% for sub in user.sub_set.all %}
-            {% for session in sub.sessions %}
-            <li>
-                <a href="{{ session.get_absolute_url }}">{{ session }}</a> - {{ sub.date }}
-            </li>
-            {% endfor %}
-            {% endfor %}
-        </ul>
-        {% else %}
-        <h3>No registered sessions found, go to <a href="{% url 'divisions' %}">Divisions</a> to register.</h3>
+            {% if user.sessions %}
+            <h2>Your Related Sessions</h2>
+            <ul>
+                {% for sub in user.sub_set.all %}
+                {% for session in sub.sessions %}
+                <li>
+                    <a href="{{ session.get_absolute_url }}">{{ session }}</a> - {{ sub.date }}
+                </li>
+                {% endfor %}
+                {% endfor %}
+            </ul>
+            {% else %}
+            <h3>No registered sessions found, go to <a href="{% url 'divisions' %}">Divisions</a> to register.</h3>
+            {% endif %}
         {% endif %}
-
-        {% elif user.is_authenticated and not player %}
+        {% if not player %}
         <p>Hi, {{ user.username }}! </p>
         <p>You are not registered for any sessions</p>
-
-        {% else %}
-        <p>Welcome to SnookR!</p>
-        <p style="margit-top: 1em">
-            <a href="{% url 'login' %}">Click here to login</a> or <a href="{% url 'signup' %}">Sign up</a>
-        </p>
         {% endif %}
 
         <br>
