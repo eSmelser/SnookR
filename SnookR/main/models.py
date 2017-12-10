@@ -85,6 +85,9 @@ class UserProfile(models.Model):
 
         # function to return all of the sublists related to a player instance
 
+    @property
+    def get_absolute_url(self):
+        return reverse('profile', kwargs={'username': self.user.username})
 
 '''
 Subs are a "tuple-ish" construction tying a player and a date together to indicate what date they are

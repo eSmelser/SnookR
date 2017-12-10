@@ -4,13 +4,17 @@
 <div class="row">
     <div class="col-md-12">
         <h3>Search</h3>
+        {% if results %}
         <ul>
             {% for result in results %}
             <li>
-                {{ result }}
+                <a href="{{ result.user.profile.get_absolute_url }}">{{ result.user.first_name }} {{ result.user.last_name }}</a>
             </li>
             {% endfor %}
         </ul>
+        {% else %}
+        <div>No results found</div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
