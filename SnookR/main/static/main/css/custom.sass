@@ -1,28 +1,31 @@
 $navbar-height: 70px
+$search-group-height: 33px
+
+.navbar-brand
+  font-family: 'Bungee', cursive
+  font-size: 200%
+  padding: 0
+
+
+#image_billiard
+  height: $navbar-height
+  padding: 15px
+  width: auto
+  float: left
+
+.brand-text
+  float: right
+  padding-top: 25px
+  padding-left: 10px
 
 .navbar-default
   height: $navbar-height
 
-.navbar-default .navbar-nav > li > a,
-.navbar-form > .form-group > button,
-.navbar-brand
+.navbar-default .navbar-nav > li > a
   padding-top: 20px
   padding-bottom: 20px
   line-height: 30px
 
-#id_search_field
-  height: 33px
-
-#id_submit_button
-  height: 33px
-  padding-bottom: 10px
-
-.navbar-brand
-  padding-left: 25%
-  font-size: 1.5em
-
-.navbar-form
-  margin-top: 22px
 
 .navbar-default .navbar-nav>li>a:hover,
 .navbar-default .navbar-nav>li>a:focus,
@@ -33,10 +36,17 @@ $navbar-height: 70px
   color: #ffffff
   background-color: transparent
 
-.navbar-nav>li>.dropdown-menu
-  margin-top: -2px
-
-.navbar-form
+form#id_search_group
   margin-top: 16px
-  line-height: 30px
 
+.jumbotron
+  padding-top: 6rem
+  padding-bottom: 6rem
+  margin-bottom: 0
+  background-color: #fff
+
+.jumbotron .container
+  max-width: 80rem
+
+#lower_container
+  background-color: #f7f7f7
