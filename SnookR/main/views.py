@@ -50,6 +50,13 @@ class HomeView(TemplateView):
         if self.request.user.is_authenticated():
             try:
                 context['user'] = CustomUser.from_user(self.request.user)
+                sessions = Session.objects.filter(subs__user=self.request.user)
+                divisions = set(Division.objects.filter(session__in=sessions))
+                context['divisions'] = [
+                    (division, sessions.filter(division=division))
+                    for division in divisions
+                ]
+
             except CustomUser.DoesNotExist:
                 pass
 

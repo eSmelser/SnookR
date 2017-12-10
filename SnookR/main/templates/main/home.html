@@ -2,8 +2,8 @@
      Copyright &copy; 2017 Evan Smelser
       This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 -->
-
 {% extends 'main/base.html' %}
+{% load staticfiles %}
 {% block title %}Home{% endblock %}
 
 {% block content %}
@@ -24,35 +24,65 @@
         </div>
     </div>
     {% else %}
-    <div>
-        {% if user.is_authenticated %}
-        <p>Hi, {{ user.username }}! </p>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                {% if user.is_authenticated %}
+                <p>Hi, {{ user.username }}! </p>
 
-            {% if user.sessions %}
-            <h2>Your Related Sessions</h2>
-            <ul>
-                {% for sub in user.sub_set.all %}
-                {% for session in sub.sessions %}
-                <li>
-                    <a href="{{ session.get_absolute_url }}">{{ session }}</a> - {{ sub.date }}
-                </li>
+
+                <h2>Your Available Sessions</h2>
+                {% for division, sessions in divisions %}
+                <h3><a href="{{ division.get_absolute_url }}">{{ division.name }}</a></h3>
+                <ul>
+                    {% for session in sessions %}
+                    <li>
+                        <a href="{{ session.get_absolute_url }}">{{ session.name }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
                 {% endfor %}
-                {% endfor %}
-            </ul>
-            {% else %}
-            <h3>No registered sessions found, go to <a href="{% url 'divisions' %}">Divisions</a> to register.</h3>
+
+                {% if not divisions %}
+                <h3>No registered sessions found, go to <a href="{% url 'divisions' %}">Divisions</a> to register.</h3>
+                {% endif %}
+
+                {% elif not player %}
+                <p>Hi, {{ user.username }}! </p>
+                <p>You are not registered for any sessions</p>
+
+
+                {% endif %}
+            </div>
             {% endif %}
-        {% endif %}
-        {% if not player %}
-        <p>Hi, {{ user.username }}! </p>
-        <p>You are not registered for any sessions</p>
-        {% endif %}
 
-        <br>
-        <h3>Teams</h3>
-        <hr>
-        {% include 'main/team_list.html' %}
-    </div>
-    {% endif %}
+            <div class="col-md-6">
+                <div id="calendar"></div>
+            </div>
+        </div> <!-- /.row -->
+        {% if user.is_authenticated %}
+        <div class="row">
+            <div class="col-md-12">
+                <br>
+                <hr>
+                <h3>Teams</h3>
+                {% include 'main/team_list.html' %}
+            </div> <!-- col-md-12 -->
+        </div> <!-- /.row -->
+        {% endif %}
+    </div> <!-- /.container -->
 </main>
+{% endblock %}
+
+{% block footer_scripts %}
+{% if user.is_authenticated %}
+<link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
+<link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.print.css'  %}" rel='stylesheet' media='print'/>
+<script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery.min.js' %}"></script>
+<script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery-ui.min.js' %}"></script>
+<script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/moment.min.js' %}"></script>
+<script src="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.js' %}"></script>
+<script src="{% static 'api/js/api.js' %}"></script>
+<script src="{% static 'scheduler/js/current-user-calendar.js' %}"></script>
+{% endif %}
 {% endblock %}

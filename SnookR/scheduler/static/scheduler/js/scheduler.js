@@ -22,7 +22,6 @@ const createSessionPanel = function (sessionData) {
 };
 
 $(document).ready(function () {
-
     // Filter the Session data set on the Division.slug field of the Division foreign key.
     let division = $('#id_division').val();
     let data = division ? {division__slug: division} : {};
@@ -39,7 +38,6 @@ $(document).ready(function () {
             return {title: elem.name, start: elem.start_date, end: elem.end_date}
         });
 
-
         $('#calendar').fullCalendar({
             header: {
                 left: 'prev,next today',
@@ -51,8 +49,6 @@ $(document).ready(function () {
             editable: false,
             eventLimit: true, // allow "more" link when too many events
             eventClick: function (calEvent, jsEvent, view) {
-                console.log('eventClick', calEvent);
-
                 let session = data.find( elem => elem.name === calEvent.title );
 
                 // Fill the event content element with event data
