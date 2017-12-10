@@ -59,6 +59,10 @@ class HomeView(TemplateView):
 
             except CustomUser.DoesNotExist:
                 pass
+        else:
+            context['sub_count'] = len(set(sub.user for sub in Sub.objects.all()))
+            context['sessions'] = Session.objects.all()
+            context['sessions_count'] = len(Session.objects.all())
 
         context['teams'] = Team.get_all_related(self.request.user)
 
