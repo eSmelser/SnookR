@@ -10,6 +10,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
 from main.models import Team, Session, Sub, Division, UserProfile, CustomUser
+import random
 
 TZINFO = timezone.get_current_timezone()
 DATA_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
@@ -125,7 +126,8 @@ class Command(BaseCommand):
         sessions = self.create_sessions(divisions)
         for session in sessions:
             for sub in subs:
-                session.subs.add(sub)
+                if random.random() < 0.5:
+                    session.subs.add(sub)
 
         temp_users = users.copy()
         captain1 = temp_users.pop(0)

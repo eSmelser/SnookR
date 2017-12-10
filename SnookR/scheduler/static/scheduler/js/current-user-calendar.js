@@ -1,6 +1,7 @@
 $(document).ready(function () {
     api.getLoggedInUser().done(function(data) {
         const username = data.username;
+        console.log(data.username)
         api.getSessionList({
             subs__user__username: username
         }).done(function (data) {
