@@ -1,8 +1,4 @@
 $(document).ready(function() {
-
-
-
-
     // Change text fields to reflect selected toggle option
     $('.toggle-option').on('click', function(event) {
         const optionDescriptionText = $(this).text();
