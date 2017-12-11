@@ -252,9 +252,8 @@ class SearchView(TemplateView):
             temp = Sub.objects.all()
             for term in search.split():
                 qs = temp.filter(
-                    Q(user__username__contains=term) |
-                    Q(user__first_name__contains=term) |
-                    Q(user__last_name__contains=term)
+                    Q(user__first_name__istartswith=term) |
+                    Q(user__last_name__istartswith=term)
                 )
                 querysets.append(qs)
         else:
