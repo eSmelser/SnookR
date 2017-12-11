@@ -25,65 +25,63 @@
         <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <!-- Brand and toggle get grouped for better mobile display -->
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="navbar-header">
-                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                                <span class="sr-only">Toggle navigation</span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                            </button>
-                            <!-- Image credit: Billiards by Jasmine Jones from the Noun Project -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                            data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <!-- Image credit: Billiards by Jasmine Jones from the Noun Project -->
 
-                            <a class="navbar-brand" href="{% url 'home' %}"><span class="brand-text"> SnookR </span></a>
-                        </div>
-
-                            <!-- Search bar toggle menu -->
-                            <ul class="nav navbar-nav navbar-left">
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                       aria-haspopup="true"
-                                       aria-expanded="false" id="id_dropdown_toggle">Find substitutes <span
-                                            class="caret"></span></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="#" class="toggle-option" id="id_option_substitute">Find substitutes</a></li>
-                                        <li><a href="#" class="toggle-option" id="id_option_session">Find your session</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-
-                            <!-- Search text field -->
-                            <form id="id_search_group" class="navbar-form navbar-left">
-                                <div class="form-group">
-                                    <input type="text" id="id_search_field" class="form-control"
-                                           placeholder="Find substitutes">
-                                    <input type="hidden" id="id_selected_option" value="substitute">
-                                </div>
-                                <button type="submit" id="id_submit_button" class="btn btn-default">Submit</button>
-                            </form>
-                    </div>
-                    <!-- Collect the nav links, forms, and other content for toggling -->
-                    <div class="collapse navbar-collapse">
-                        <ul class="nav navbar-nav navbar-right">
-                            {% if user.is_authenticated %}
-                            <li><a href="{% url 'invites' %}" id="id_invites_link">Invites <span class="badge"
-                                                                                                 id="id_invites_badge">{{ user.pending_invites.count }}</span></a>
-                            </li>
-                            <li><a href="{% url 'divisions' %}" id="id_divisions_link">Divisions</a></li>
-                            <li><a href="{% url 'team' %}" id="id_teams_link">Teams</a></li>
-
-                            <li><a><em>Signed in as</em> <strong>{{ user.username }}</strong></a></li>
-                            <li><a id='id_logout_link' href="{% url 'logout' %}">Logout</a></li>
-                            <li><a id="id_account_link" href="{% url 'account' %}">My Account</a></li>
-                            {% else %}
-                            <li><a id='id_login_link' href="{% url 'login' %}">Login</a></li>
-                            <li><a id="id_signup_link" href="{% url 'signup' %}">Signup</a></li>
-                            {% endif %}
-                        </ul>
-                    </div><!-- /.navbar-collapse -->
+                    <a class="navbar-brand" href="{% url 'home' %}"><span class="brand-text"> SnookR </span></a>
                 </div>
+
+                <!-- Search bar toggle menu -->
+                <ul class="nav navbar-nav navbar-left">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                           aria-haspopup="true"
+                           aria-expanded="false" id="id_dropdown_toggle">Find substitutes <span
+                                class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" class="toggle-option" id="id_option_substitute">Find substitutes</a></li>
+                            <li><a href="#" class="toggle-option" id="id_option_session">Find your session</a></li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <!-- Search text field -->
+                <form id="id_search_group" class="navbar-form navbar-left">
+                    <div class="form-group">
+                        <input type="text" id="id_search_field" class="form-control"
+                               placeholder="Find substitutes">
+                        <input type="hidden" id="id_selected_option" value="substitute">
+                    </div>
+                    <button type="submit" id="id_submit_button" class="btn btn-default">Submit</button>
+                </form>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'invites' %}" id="id_invites_link">Invites <span class="badge"
+                                                                                             id="id_invites_badge">{{ user.pending_invites.count }}</span></a>
+                        </li>
+                        <li><a href="{% url 'divisions' %}" id="id_divisions_link">Divisions</a></li>
+                        <li><a href="{% url 'team' %}" id="id_teams_link">Teams</a></li>
+
+                        <li><a><em>Signed in as</em> <strong>{{ user.username }}</strong></a></li>
+                        <li><a id='id_logout_link' href="{% url 'logout' %}">Logout</a></li>
+                        <li><a id="id_account_link" href="{% url 'account' %}">My Account</a></li>
+                        {% else %}
+                        <li><a id='id_login_link' href="{% url 'login' %}">Login</a></li>
+                        <li><a id="id_signup_link" href="{% url 'signup' %}">Signup</a></li>
+                        {% endif %}
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+
             </div><!-- /.container-fluid -->
         </nav>
     </div> <!-- /.col-md-12 -->

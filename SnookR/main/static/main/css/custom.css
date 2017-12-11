@@ -28,7 +28,7 @@
 .navbar-default .navbar-nav > .open > a,
 .navbar-default .navbar-nav > .open > a:hover,
 .navbar-default .navbar-nav > .open > a:focus {
-  color: #ffffff;
+  color: white;
   background-color: transparent; }
 
 form#id_search_group {
@@ -38,12 +38,10 @@ form#id_search_group {
   padding-top: 6rem;
   padding-bottom: 6rem;
   margin-bottom: 0;
-  background-color: #fff; }
+  background-color: white; }
 
 .jumbotron .container {
   max-width: 80rem; }
 
 #lower_container {
   background-color: #f7f7f7; }
-
-/*# sourceMappingURL=custom.css.map */

@@ -48,8 +48,18 @@ class DivisionFilter(filters.FilterSet):
         }
 
 
+class SubFilter(filters.FilterSet):
+    user = filters.RelatedFilter(UserFilter, name='user', queryset=CustomUser.objects.all())
+    date = filters.DateTimeFilter()
+
+    class Meta:
+        model = Sub
+        fields = ['user', 'date']
+
+
 class SessionFilter(filters.FilterSet):
     division = filters.RelatedFilter(DivisionFilter, name='division', queryset=Division.objects.all())
+    subs = filters.RelatedFilter(SubFilter, name='subs', queryset=Sub.objects.all())
 
     class Meta:
         model = Session
@@ -60,12 +70,3 @@ class SessionFilter(filters.FilterSet):
             'end_date': ['exact', 'gt', 'gte', 'lt', 'lte'],
             'slug': ['exact'],
         }
-
-
-class SubFilter(filters.FilterSet):
-    user = filters.RelatedFilter(UserFilter, name='user', queryset=CustomUser.objects.all())
-    date = filters.DateTimeFilter()
-
-    class Meta:
-        model = Sub
-        fields = ['user', 'date']
