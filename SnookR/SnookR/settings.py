@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'rest_framework_filters',
+    'crispy_forms',
     'main',
     'api',
     'sublist',
@@ -174,3 +175,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # The url the user gets redirected to after logging in
 LOGIN_REDIRECT_URL = 'home'  # TODO:  Change this to something appropriate
+
+# django-crispy-forms settings
+CRISPY_TEMPLATE_PACK = 'bootstrap'

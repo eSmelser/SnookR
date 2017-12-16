@@ -39,7 +39,7 @@ def signup(request):
             return redirect('home')
     else:
         form = CustomUserForm()
-    return render(request, 'registration/signup.html', {'form': form})
+    return render(request, 'user/signup.html', {'form': form})
 
 
 class HomeView(TemplateView):
@@ -261,4 +261,5 @@ class SearchView(TemplateView):
 
         context['results'] = reduce(operator.add, (list(qs) for qs in querysets), [])
         return context
+
 
