@@ -4,38 +4,99 @@
 -->
 {% extends 'main/base.html' %}
 {% load static %}
+
+{# snooker_extras uses the get_unregister_url tag #}
+{% load snooker_extras %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'main/css/session.css' %}">
+{% endblock %}
+
 {% block title %}Subs{% endblock %}
 {% block content %}
-<div class="container">
+    <div class="container">
     <div class="row">
         <div class="col-md-2"></div>
         <div class="col-md-8">
-            <a href="{{ session.get_register_url }}">Register For A Date Here</a>
-            <h3>Subs for Session {{ session }}</h3>
-            <hr>
-            <ul>
-                {% for sub in subs %}
-                <li>
-                    <!-- Display the user's thumbnail or the default thumbnail -->
-                    {% if sub.user.profile.thumbnail %}
-                    <img class="img-thumbnail img-circle" width=40 height=40 src="{{ sub.user.profile.thumbnail.url }}">
-                    {% else %}
-                    <img class="img-thumbnail img-circle" width=40 height=40
-                         src="{% static 'main/images/default_profile.jpg' %}">
-                    {% endif %}
+            {% if current_user_sub %}
+                <h2>You Are Available for {{ session|title }}</h2>
+                <div class="post-content">
+                    <div class="panel panel-default panel-info">
+                        <div class="panel-body">
+                            <div class="pull-left">
+                                <a href="{{ current_user_sub.user.get_absolute_url }}">
+                                    <img class="img-circle" width="50px" height="50px"
+                                         style="margin-right:8px; margin-top:-5px;"
+                                            {% if current_user_sub.user.profile.thumbnail %}
+                                         src="{{ current_user_sub.user.profile.thumbnail.url }}"
+                                            {% else %}
+                                         src="{% static 'main/images/default_profile.jpg' %}"
+                                            {% endif %}
+                                    >
+                                </a>
+                            </div>
 
-                    <!-- Display an 'unregister' option for the current user -->
-                    {% if sub.user == user %}
-                    {{ sub.user }}<a href="{{ sub.unregister_url }}">unregister</a>
-                    {% else %}
-                    <a href="{{ sub.user.get_absolute_url }}">{{ sub.user }}</a><a href="{{ sub.invite_url }}">Invite</a>
-                    {% endif %}
-                </li>
-                {% endfor %}
-            </ul>
+                            <div>
+                                <h4 class="pull-left"><a href="#"
+                                                         style="text-decoration:none;"><strong>{{ current_user_sub.user }}</strong></a>
+                                    –
+                                    <small>
+                                        <small><a href="#" style="text-decoration:none; color:grey;"><i><i
+                                                class="fa fa-clock-o"
+                                                aria-hidden="true"></i>
+                                            about 15 hours ago</i></a></small>
+                                    </small>
+                                </h4>
+                                <form class="pull-right session-button" action="{% get_unregister_url session current_user_sub %}">
+                                    <input type="submit" value="Unregister">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+            {% else %}
+                <form action="{{ session.get_register_url }}">
+                    <input class="btn btn-primary" type="submit" value="Sign up for {{ session|title }}'s sub list!">
+                </form>
+            {% endif %}
 
+
+            <h2>Subs Available for {{ session|title }}</h2>
+            {#  This layout is inspired by the snippet found her: https://bootsnipp.com/snippets/56ExR #}
+            {% for sub in subs %}
+                <div class="post-content">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="pull-left">
+                            <a href="{{ sub.user.get_absolute_url }}">
+                                <img class="img-circle" width="50px" height="50px"
+                                     style="margin-right:8px; margin-top:-5px;"
+                                        {% if sub.user.profile.thumbnail %}
+                                     src="{{ sub.user.profile.thumbnail.url }}"
+                                        {% else %}
+                                     src="{% static 'main/images/default_profile.jpg' %}"
+                                        {% endif %}
+                                >
+                            </a>
+                        </div>
+                        <h4 class="pull-left"><a href="#" style="text-decoration:none;"><strong>{{ sub.user }}</strong></a>
+                            –
+                            <small>
+                                <small><a href="#" style="text-decoration:none; color:grey;"><i><i
+                                        class="fa fa-clock-o"
+                                        aria-hidden="true"></i>
+                                    about 15 hours ago</i></a></small>
+                            </small>
+                        </h4>
+
+                        <button class="session-button pull-right" type="button" href="{{ sub.invite_url }}">Invite
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+            <div class="col-md-2"></div>
         </div>
-        <div class="col-md-2"></div>
     </div>
-</div>
 {% endblock %}

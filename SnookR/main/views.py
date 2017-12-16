@@ -98,10 +98,17 @@ class SessionViewMixin(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session = self.get_session_instance(**kwargs)
+        subs = session.get_subs_with_unregister_urls()
+
         context['session'] = session
-        context['subs'] = session.get_subs_with_unregister_urls()
         context['user_is_registered'] = session.user_is_registered(self.request.user)
-        print('session', session)
+        context['subs'] = subs.exclude(user=self.request.user)
+
+        try:
+            context['current_user_sub'] = subs.get(user=self.request.user)
+        except Sub.DoesNotExist:
+            pass
+
         return context
 
     def get_session_instance(self, **kwargs):
@@ -269,5 +276,3 @@ class SearchView(TemplateView):
 
         context['results'] = reduce(operator.add, (list(qs) for qs in querysets), [])
         return context
-
-

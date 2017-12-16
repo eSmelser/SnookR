@@ -219,20 +219,19 @@ class Session(models.Model):
     def get_register_url(self):
         return reverse('session_register', args=self.get_url_args())
 
-    def get_unregister_url(self, date):
-        return reverse('session_unregister', args=self.get_url_args() + [date])
+    def get_unregister_url(self, sub: Sub):
+        datestring = sub.date.strftime(Session.date_format)
+        return reverse('session_unregister', args=self.get_url_args() + [datestring])
 
     def get_url_args(self):
         return [str(self.division.slug), str(self.slug)]
 
     def get_subs_with_unregister_urls(self):
-        temp = []
-        for sub in self.subs.all():
-            datestring = sub.date.strftime(Session.date_format)
-            sub.unregister_url = self.get_unregister_url(date=datestring)
-            temp.append(sub)
+        subs = self.subs.all()
+        for sub in subs:
+            sub.unregister_url = self.get_unregister_url(sub=sub)
 
-        return temp
+        return subs
 
     def add_user_as_sub(self, user, date):
         sub = Sub.create_from_user(user, date)
