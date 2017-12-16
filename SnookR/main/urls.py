@@ -8,7 +8,7 @@ from django.contrib.auth import views as auth_views
 from main import views
 
 urlpatterns = [
-    url(r'^login/$', auth_views.login, name='login'),
+    url(r'^login/$', views.LoginView.as_view(), name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
     url(r'^account/$', views.AccountView.as_view(), name='account'),
     url(r'^account_change/$', views.AccountChangeView.as_view(), name='account_change'),

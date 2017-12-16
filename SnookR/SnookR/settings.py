@@ -178,3 +178,5 @@ LOGIN_REDIRECT_URL = 'home'  # TODO:  Change this to something appropriate
 
 # django-crispy-forms settings
 CRISPY_TEMPLATE_PACK = 'bootstrap'
+
+CHROME_DRIVER = os.environ.get('CHROME_DRIVER', None)

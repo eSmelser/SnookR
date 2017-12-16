@@ -10,13 +10,17 @@ from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from main.models import CustomUser, Team, Division, TeamInvite
 from selenium import webdriver
+from django.conf import settings
 
 
 @tag('selenium')
 class SeleniumTestCase(StaticLiveServerTestCase):
     def setUp(self):
         super().setUp()
-        self.browser = webdriver.Chrome()
+        if settings.CHROME_DRIVER:
+            self.browser = webdriver.Chrome(settings.CHROME_DRIVER)
+        else:
+            self.browser = webdriver.Chrome()
         self.browser.implicitly_wait(3)
 
     def tearDown(self):

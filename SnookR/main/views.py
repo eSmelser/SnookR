@@ -8,6 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView, CreateView
 from django.contrib.auth import login, authenticate
+
 import django.contrib.auth.views as auth_views
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
@@ -16,6 +17,7 @@ from django.db.models import Q
 from main.models import UserProfile, Division, Session, CustomUser, Team, Sub
 from main.forms import (
     CustomUserForm, SessionRegistrationForm,
+    CustomUserLoginForm,
     TeamForm, CustomUserChangeForm,
     UploadThumbnailForm
 )
@@ -40,6 +42,11 @@ def signup(request):
     else:
         form = CustomUserForm()
     return render(request, 'user/signup.html', {'form': form})
+
+
+class LoginView(auth_views.LoginView):
+    authentication_form = CustomUserLoginForm
+    template_name = 'user/login.html'
 
 
 class HomeView(TemplateView):
