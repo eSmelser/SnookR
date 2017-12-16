@@ -116,6 +116,10 @@ class Sub(models.Model):
         sub, _ = Sub.objects.get_or_create(user=user, date=date)
         return sub
 
+    @property
+    def invite_url(self):
+        return '/dummy-url/'
+
 
 '''
 A team can contain many players but should only ever exist in one division
@@ -207,7 +211,7 @@ class Session(models.Model):
     subs = models.ManyToManyField(Sub, blank=True)
 
     def __str__(self):
-        return self.division.name + '_' + self.name + '_' + self.game
+        return self.name
 
     def get_absolute_url(self):
         return reverse('session', args=self.get_url_args())

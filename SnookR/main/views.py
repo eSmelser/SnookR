@@ -101,6 +101,7 @@ class SessionViewMixin(TemplateView):
         context['session'] = session
         context['subs'] = session.get_subs_with_unregister_urls()
         context['user_is_registered'] = session.user_is_registered(self.request.user)
+        print('session', session)
         return context
 
     def get_session_instance(self, **kwargs):

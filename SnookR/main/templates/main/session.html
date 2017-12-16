@@ -6,28 +6,36 @@
 {% load static %}
 {% block title %}Subs{% endblock %}
 {% block content %}
-<div>
-    <a href="{{ session.get_register_url }}">Register For A Date Here</a>
-    <h3>Subs for Session {{ kwargs.session }}</h3>
-    <hr>
-    <ul>
-    {% for sub in subs %}
-        <li>
-            <!-- Display the user's thumbnail or the default thumbnail -->
-            {% if sub.user.profile.thumbnail %}
-                <img class="img-thumbnail img-circle" width=40 height=40 src="{{ sub.user.profile.thumbnail.url }}">
-            {% else %}
-                <img class="img-thumbnail img-circle" width=40 height=40 src="{% static 'main/images/default_profile.jpg' %}">
-            {% endif %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <a href="{{ session.get_register_url }}">Register For A Date Here</a>
+            <h3>Subs for Session {{ session }}</h3>
+            <hr>
+            <ul>
+                {% for sub in subs %}
+                <li>
+                    <!-- Display the user's thumbnail or the default thumbnail -->
+                    {% if sub.user.profile.thumbnail %}
+                    <img class="img-thumbnail img-circle" width=40 height=40 src="{{ sub.user.profile.thumbnail.url }}">
+                    {% else %}
+                    <img class="img-thumbnail img-circle" width=40 height=40
+                         src="{% static 'main/images/default_profile.jpg' %}">
+                    {% endif %}
 
-            <!-- Display an 'unregister' option for the current user -->
-            {% if sub.user == user  %}
-                {{ sub.user }} at {{ sub }} <a href="{{ sub.unregister_url }}">unregister</a>
-            {% else %}
-                <a href="{{ sub.user.get_absolute_url }}">{{ sub.user }}</a> at {{ sub }}
-            {% endif %}
-        </li>
-    {% endfor %}
-    </ul>
+                    <!-- Display an 'unregister' option for the current user -->
+                    {% if sub.user == user %}
+                    {{ sub.user }}<a href="{{ sub.unregister_url }}">unregister</a>
+                    {% else %}
+                    <a href="{{ sub.user.get_absolute_url }}">{{ sub.user }}</a><a href="{{ sub.invite_url }}">Invite</a>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+
+        </div>
+        <div class="col-md-2"></div>
+    </div>
 </div>
 {% endblock %}
