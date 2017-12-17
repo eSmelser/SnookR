@@ -1,7 +1,6 @@
 # Copyright &copy; 2017 Evan Smelser
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 
-import operator
 import itertools
 from datetime import datetime
 from functools import reduce
@@ -256,22 +255,22 @@ class SearchView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        search = self.request.GET['query']
+        terms = self.request.GET['query'].split()
         search_type = kwargs.get('search_type', None)
 
         if search_type == 'session':
             # Build a Q object that check if the name column contains any of the terms in search
-            q_object = reduce(operator.or_, (Q(name__contains=term) for term in search.split()), Q())
+            q_object = reduce(lambda q1, q2: q1 | q2, (Q(name__contains=term) for term in terms), Q())
 
             # Filter sessions on the previously built Q object
             context['results'] = Session.objects.filter(q_object)
         elif search_type == 'substitute':
-            # We build a Q object that filters for available substitutes that have last or first name that
+            # Build a Q object that filters for available substitutes that have last or first names that
             # starts with any of the search terms
 
             # 1.) Define all the Q objects
-            first_name_queries = (Q(user__first_name__istartswith=term) for term in search.split())
-            last_name_queries = (Q(user__last_name__istartswith=term) for term in search.split())
+            first_name_queries = (Q(user__first_name__istartswith=term) for term in terms)
+            last_name_queries = (Q(user__last_name__istartswith=term) for term in terms)
 
             # 2.) Reduce the Q objects into a single Q object by using the OR operator on each one together
             q_object = reduce(lambda q1, q2: q1 | q2, itertools.chain(last_name_queries, first_name_queries), Q())
@@ -283,4 +282,5 @@ class SearchView(TemplateView):
             context['results'] = CustomUser.objects.filter(id__in=distinct_ids)
         else:
             raise Http404('Invalid URL kwargs: ' + str(kwargs))
+
         return context
