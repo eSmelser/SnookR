@@ -8,7 +8,7 @@
         <ul>
             {% for result in results %}
             <li>
-                <a href="{{ result.user.profile.get_absolute_url }}">{{ result.user.first_name }} {{ result.user.last_name }}</a>
+                <a href="{{ result.profile.get_absolute_url }}">{{ result.first_name }} {{ result.last_name }}</a>
             </li>
             {% endfor %}
         </ul>

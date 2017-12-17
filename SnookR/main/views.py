@@ -2,6 +2,7 @@
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 
 import operator
+import itertools
 from datetime import datetime
 from functools import reduce
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -258,21 +259,28 @@ class SearchView(TemplateView):
         search = self.request.GET['query']
         search_type = kwargs.get('search_type', None)
 
-        querysets = []
         if search_type == 'session':
-            temp = Session.objects.all()
-            for term in search.split():
-                querysets.append(temp.filter(name__contains=term))
+            # Build a Q object that check if the name column contains any of the terms in search
+            q_object = reduce(operator.or_, (Q(name__contains=term) for term in search.split()), Q())
+
+            # Filter sessions on the previously built Q object
+            context['results'] = Session.objects.filter(q_object)
         elif search_type == 'substitute':
-            temp = Sub.objects.all()
-            for term in search.split():
-                qs = temp.filter(
-                    Q(user__first_name__istartswith=term) |
-                    Q(user__last_name__istartswith=term)
-                )
-                querysets.append(qs)
+            # We build a Q object that filters for available substitutes that have last or first name that
+            # starts with any of the search terms
+
+            # 1.) Define all the Q objects
+            first_name_queries = (Q(user__first_name__istartswith=term) for term in search.split())
+            last_name_queries = (Q(user__last_name__istartswith=term) for term in search.split())
+
+            # 2.) Reduce the Q objects into a single Q object by using the OR operator on each one together
+            q_object = reduce(lambda q1, q2: q1 | q2, itertools.chain(last_name_queries, first_name_queries), Q())
+
+            # 3.) Get the distinct IDs of each user to remove duplicates
+            distinct_ids = Sub.objects.filter(q_object).values('user').distinct()
+
+            # 4.) Filter on the distinct ids and set results
+            context['results'] = CustomUser.objects.filter(id__in=distinct_ids)
         else:
             raise Http404('Invalid URL kwargs: ' + str(kwargs))
-
-        context['results'] = reduce(operator.add, (list(qs) for qs in querysets), [])
         return context
