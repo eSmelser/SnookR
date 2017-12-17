@@ -65,3 +65,8 @@ class SubListView(ListAPIView):
     serializer_class = SubSerializer
     queryset = Sub.objects.all()
     filter_class = SubFilter
+
+    def get_queryset(self):
+        self.request.query_params.get('next')
+        return super().get_queryset()
+

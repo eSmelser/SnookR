@@ -100,3 +100,12 @@
         </div>
     </div>
 {% endblock %}
+{% block footer_scripts %}
+    <script type="text/javascript">
+        let DIVISION_NAME = "{{ session.division.slug|escapejs|safe }}";
+        let SESSION_NAME = "{{ session.slug|escapejs|safe }}";
+    </script>
+
+    <script src="{% static 'api/js/api.js' %}"></script>
+    <script src="{% static 'scheduler/js/session-calendar.js' %}"></script>
+{%  endblock %}

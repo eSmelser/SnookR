@@ -247,6 +247,14 @@ class Session(models.Model):
         return self.subs.filter(user=user).exists()
 
 
+class SessionEvent(models.Model):
+    start_time = models.TimeField()
+    date = models.DateField()
+    session = models.ForeignKey(Session)
+
+    def __str__(self):
+        return 'SessionEvent on {} for {}'.format(self.date, self.session)
+
 class TeamInvite(models.Model):
     PENDING = 'P'
     APPROVED = 'A'

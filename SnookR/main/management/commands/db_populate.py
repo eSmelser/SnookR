@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
-from main.models import Team, Session, Sub, Division, UserProfile, CustomUser
+from main.models import Team, Session, SessionEvent, Sub, Division, UserProfile, CustomUser
 import random
 
 TZINFO = timezone.get_current_timezone()
@@ -180,5 +180,16 @@ class Command(BaseCommand):
         for start, end, name, division in zip(start_dates, end_dates, session_names, session_divisions):
             session = Session.objects.create(name=name, game='8ball', division=division, start_date=start, end_date=end)
             sessions.append(session)
+
+        for session in sessions:
+            start = session.start_date
+            start_hour = random.choice([16, 17, 18]) # Starts at 4, 5, or 6
+            start_time = datetime(start.year, start.month, start.day, start_hour)
+
+            # Make 8 weeks worth of events per session
+            date = start.date()
+            for _ in range(8):
+                SessionEvent.objects.create(session=session, start_time=start_time, date=date)
+                date += timedelta(days=7)
 
         return sessions
