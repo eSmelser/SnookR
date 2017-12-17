@@ -1,5 +1,5 @@
 from rest_framework.generics import ListCreateAPIView, UpdateAPIView, ListAPIView, RetrieveAPIView
-from main.models import Team, CustomUser, TeamInvite, NonUserPlayer, Session, Sub
+from main.models import Team, CustomUser, TeamInvite, NonUserPlayer, Session, SessionEvent, Sub
 from api.serializers import (
     TeamInviteSerializer,
     TeamInviteUpdateSerializer,
@@ -7,10 +7,11 @@ from api.serializers import (
     CustomUserSerializer,
     NonUserPlayerSerializer,
     SessionSerializer,
+    SessionEventSerializer,
     SubSerializer,
 )
 from api.permissions import TeamPermission, TeamInvitePermission
-from api.filters import TeamFilter, TeamInviteFilter, UserFilter, SessionFilter, SubFilter
+from api.filters import TeamFilter, TeamInviteFilter, UserFilter, SessionFilter, SessionEventFilter, SubFilter
 
 
 class UserView(RetrieveAPIView):
@@ -70,3 +71,8 @@ class SubListView(ListAPIView):
         self.request.query_params.get('next')
         return super().get_queryset()
 
+
+class SessionEventListView(ListAPIView):
+    serializer_class = SessionEventSerializer
+    queryset = SessionEvent.objects.all()
+    filter_class = SessionEventFilter

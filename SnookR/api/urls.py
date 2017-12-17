@@ -7,7 +7,8 @@ urlpatterns = [
     url(r'^team/$', views.TeamView.as_view(), name='team'),
     url(r'^invites/$', views.TeamInviteListView.as_view(), name='invite_list'),
     url(r'^invites/(?P<pk>[0-9]+)/$', views.TeamInviteUpdateView.as_view(), name='invite'),
-    url(r'^unregistered_players/$', views.NonUserPlayerListCreateView.as_view(), name='unregistered_players'),
+    url(r'^unregistered-players/$', views.NonUserPlayerListCreateView.as_view(), name='unregistered_players'),
     url(r'^sessions/$', views.SessionListView.as_view(), name='sessions'),
+    url(r'^session-events/$', views.SessionEventListView.as_view(), name='session_events'),
     url(r'^subs/$', views.SubListView.as_view(), name='sub_list'),
 ]

@@ -94,3 +94,9 @@ class SessionSerializer(serializers.Serializer):
     end_date = serializers.DateTimeField()
     division = DivisionSerializer()
     subs = SubSerializer(many=True)
+
+
+class SessionEventSerializer(serializers.Serializer):
+    session = SessionSerializer()
+    date = serializers.DateField()
+    start_time = serializers.TimeField()

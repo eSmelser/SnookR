@@ -1,10 +1,11 @@
+from datetime import datetime
 from django.urls import reverse
 from django.contrib.auth.models import Permission
 from django.utils import timezone
 
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, APITestCase
-from main.models import Team, TeamInvite, CustomUser, Division, Session, Sub
+from main.models import Team, TeamInvite, CustomUser, Division, Session, SessionEvent, Sub
 
 
 class UserListTestCase(APITestCase):
@@ -246,3 +247,29 @@ class SubListTestCase(APITestCase):
     def add_user_to_session_as_sub(self, user):
         sub = Sub.objects.create(user=user, date=timezone.now())
         self.session.subs.add(sub)
+
+
+class SessionEventTestCase(APITestCase):
+    def setUp(self):
+        self.username = 'joe'
+        self.password = 'joepassword'
+        user = CustomUser.objects.create_user(username=self.username, password=self.password)
+        division = Division.objects.create(name='Division A', division_rep=user)
+
+        self.now = datetime.now()
+        start_time = datetime(self.now.year, self.now.month, self.now.day, self.now.hour)
+        self.session = Session.objects.create(name='Session A', division=division, game='8ball',
+                                              start_date=timezone.now(), end_date=timezone.now())
+        SessionEvent.objects.create(session=self.session, start_time=start_time, date=self.now.date())
+        SessionEvent.objects.create(session=self.session, start_time=start_time, date=self.now.date())
+
+    def test_filter(self):
+        url = reverse('api:session_events')
+        json = self.client.get(url, data={'session__slug': self.session.slug}).json()
+        self.assertEqual(json[0]['date'], str(self.now.date()))
+        self.assertEqual(len(json), 2)
+
+    def test_filter_empty(self):
+        url = reverse('api:session_events')
+        json = self.client.get(url, data={'session__slug': 'garbage'}).json()
+        self.assertEqual(len(json), 0)

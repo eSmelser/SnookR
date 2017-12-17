@@ -1,8 +1,8 @@
-from main.models import Team, TeamInvite, CustomUser, Division, Session, Sub
+from main.models import Team, TeamInvite, CustomUser, Division, Session, SessionEvent, Sub
 import rest_framework_filters as filters
 
 character_filters = ['exact', 'contains', 'icontains']
-
+time_filters = ['exact', 'gt', 'gte', 'lt', 'lte']
 
 class UserFilter(filters.FilterSet):
     class Meta:
@@ -66,7 +66,18 @@ class SessionFilter(filters.FilterSet):
         fields = {
             'name': character_filters,
             'game': character_filters,
-            'start_date': ['exact', 'gt', 'gte', 'lt', 'lte'],
-            'end_date': ['exact', 'gt', 'gte', 'lt', 'lte'],
+            'start_date': time_filters,
+            'end_date': time_filters,
             'slug': ['exact'],
+        }
+
+
+class SessionEventFilter(filters.FilterSet):
+    session = filters.RelatedFilter(SessionFilter, name='session', queryset=Session.objects.all())
+
+    class Meta:
+        model = SessionEvent
+        fields = {
+            'date': time_filters,
+            'start_time': time_filters,
         }

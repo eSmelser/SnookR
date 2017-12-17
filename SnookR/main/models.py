@@ -255,6 +255,7 @@ class SessionEvent(models.Model):
     def __str__(self):
         return 'SessionEvent on {} for {}'.format(self.date, self.session)
 
+
 class TeamInvite(models.Model):
     PENDING = 'P'
     APPROVED = 'A'
