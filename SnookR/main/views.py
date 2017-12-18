@@ -14,7 +14,7 @@ from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.db.models import Q
-from main.models import UserProfile, Division, Session, CustomUser, Team, Sub
+from main.models import UserProfile, Division, Session, SessionEvent, CustomUser, Team, Sub
 from main.forms import (
     CustomUserForm, SessionRegistrationForm,
     CustomUserLoginForm,
@@ -57,12 +57,10 @@ class HomeView(TemplateView):
         if self.request.user.is_authenticated():
             try:
                 context['user'] = CustomUser.from_user(self.request.user)
-                sessions = Session.objects.filter(subs__user=self.request.user)
-                divisions = set(Division.objects.filter(session__in=sessions))
-                context['divisions'] = [
-                    (division, sessions.filter(division=division))
-                    for division in divisions
-                ]
+                sessions = set(sub.session_event.session for sub in Sub.objects.select_related('session_event').filter(user=self.request.user))
+                divisions = Division.objects.filter(session__in=sessions)
+                context['divisions'] = set(divisions)
+                context['sessions'] = sorted(list(sessions), key=lambda obj: obj.name)
 
             except CustomUser.DoesNotExist:
                 pass

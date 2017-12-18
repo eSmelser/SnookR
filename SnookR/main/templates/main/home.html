@@ -7,95 +7,100 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<main role="main">
-    {% if not user.is_authenticated %}
+    <main role="main">
+        {% if not user.is_authenticated %}
 
-    <div class="jumbotron text-center">
-        <div class="container">
-            <h1 class="jumbotron-heading">Find a sub... blah blah marketing speech</h1>
-            <p class="lead text-muted">Something short about what SnookR is. Some more text here to fill up space.
-            </p>
-            <p>
-                <a href="{% url 'signup' %}" class="btn btn-primary">Signup!</a>
-            </p>
-            <p>
-                Currently <span style="color: red">{{ sub_count }}</span> subs available!
-            </p>
-        </div>
-    </div>
-    <div id="lower_container" class="container text-muted">
-        <div class="row">
-            <div class="col-md-6">
-                <h2>Find players your session</h2>
-                <table class="table">
-                    <tbody>
-                    {% for session in sessions %}
-                    {% endfor %}
-                    </tbody>
-                </table>
+            <div class="jumbotron text-center">
+                <div class="container">
+                    <h1 class="jumbotron-heading">Find a sub... blah blah marketing speech</h1>
+                    <p class="lead text-muted">Something short about what SnookR is. Some more text here to fill up
+                        space.
+                    </p>
+                    <p>
+                        <a href="{% url 'signup' %}" class="btn btn-primary">Signup!</a>
+                    </p>
+                    <p>
+                        Currently <span style="color: red">{{ sub_count }}</span> subs available!
+                    </p>
+                </div>
             </div>
-        </div>
-    </div>
-    {% else %}
-    <div class="container">
-        <div class="row">
+            <div id="lower_container" class="container text-muted">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2>Find players your session</h2>
+                        <table class="table">
+                            <tbody>
+                            {% for session in sessions %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="container">
+            <div class="row">
             <div class="col-md-6">
                 {% if user.is_authenticated %}
-                <p>Hi, {{ user.username }}! </p>
+                    <p>Hi, {{ user.username }}! </p>
 
 
-                <h2>Your Available Sessions</h2>
-                {% for division, sessions in divisions %}
-                <h3><a href="{{ division.get_absolute_url }}">{{ division.name }}</a></h3>
-                <ul>
-                    {% for session in sessions %}
-                    <li>
-                        <a href="{{ session.get_absolute_url }}">{{ session.name }}</a>
-                    </li>
+                    <h2>Your Available Sessions</h2>
+                    {% for division in divisions %}
+                        <h3><a href="{{ division.get_absolute_url }}">{{ division.name }}</a></h3>
+                        <ul>
+                            {% for session in sessions %}
+                                {% if session.division == division %}
+                                    <li>
+                                        <a href="{{ session.get_absolute_url }}">{{ session.name }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
                     {% endfor %}
-                </ul>
-                {% endfor %}
 
-                {% if not divisions %}
-                <h3>No registered sessions found, go to <a href="{% url 'divisions' %}">Divisions</a> to register.</h3>
-                {% endif %}
+                    {% if not divisions %}
+                        <h3>No registered sessions found, go to <a href="{% url 'divisions' %}">Divisions</a> to
+                            register.</h3>
+                    {% endif %}
 
                 {% elif not player %}
-                <p>Hi, {{ user.username }}! </p>
-                <p>You are not registered for any sessions</p>
+                    <p>Hi, {{ user.username }}! </p>
+                    <p>You are not registered for any sessions</p>
 
 
                 {% endif %}
             </div>
-            {% endif %}
+        {% endif %}
 
-            <div class="col-md-6">
-                <div id="calendar"></div>
-            </div>
+        <div class="col-md-6">
+            <div id="calendar"></div>
+        </div>
         </div> <!-- /.row -->
         {% if user.is_authenticated %}
-        <div class="row">
-            <div class="col-md-12">
-                <br>
-                <hr>
-                <h3>Teams</h3>
-                {% include 'main/team_list.html' %}
-            </div> <!-- col-md-12 -->
-        </div> <!-- /.row -->
+            <div class="row">
+                <div class="col-md-12">
+                    <br>
+                    <hr>
+                    <h3>Teams</h3>
+                    {% include 'main/team_list.html' %}
+                </div> <!-- col-md-12 -->
+            </div> <!-- /.row -->
         {% endif %}
-    </div> <!-- /.container -->
-</main>
+        </div> <!-- /.container -->
+    </main>
 {% endblock %}
 
 {% block footer_scripts %}
-{% if user.is_authenticated %}
-<link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
-<link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.print.css'  %}" rel='stylesheet' media='print'/>
-<script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery.min.js' %}"></script>
-<script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery-ui.min.js' %}"></script>
-<script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/moment.min.js' %}"></script>
-<script src="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.js' %}"></script>
-<script src="{% static 'api/js/api.js' %}"></script>
-<script src="{% static 'scheduler/js/current-user-calendar.js' %}"></script>
-{% endif %}
+    {% if user.is_authenticated %}
+        <link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
+        <link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.print.css' %}" rel='stylesheet'
+              media='print'/>
+        <script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery.min.js' %}"></script>
+        <script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery-ui.min.js' %}"></script>
+        <script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/moment.min.js' %}"></script>
+        <script src="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.js' %}"></script>
+        <script src="{% static 'api/js/api.js' %}"></script>
+        <script src="{% static 'scheduler/js/current-user-calendar.js' %}"></script>
+    {% endif %}
 {% endblock %}

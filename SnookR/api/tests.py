@@ -224,6 +224,12 @@ class SubListTestCase(APITestCase):
                                               start_date=timezone.now(),
                                               end_date=timezone.now())
 
+        self.session_event = SessionEvent.objects.create(
+            start_time=self.session.start_date.time(),
+            date=self.session.start_date.date(),
+            session=self.session
+        )
+
         self.add_user_to_session_as_sub(user)
 
     def test_request(self):
@@ -245,8 +251,7 @@ class SubListTestCase(APITestCase):
         self.assertEqual(len(json), 1)
 
     def add_user_to_session_as_sub(self, user):
-        sub = Sub.objects.create(user=user, date=timezone.now())
-        self.session.subs.add(sub)
+        sub = Sub.objects.create(user=user, date=timezone.now(), session_event=self.session_event)
 
 
 class SessionEventTestCase(APITestCase):

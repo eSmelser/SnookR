@@ -73,6 +73,6 @@ class SubListView(ListAPIView):
 
 
 class SessionEventListView(ListAPIView):
-    serializer_class = SessionEventSerializer
     queryset = SessionEvent.objects.all()
+    serializer_class = SessionEventSerializer
     filter_class = SessionEventFilter

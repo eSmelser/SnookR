@@ -78,8 +78,8 @@ class SessionEventFilter(filters.FilterSet):
 
 class SubFilter(filters.FilterSet):
     user = filters.RelatedFilter(UserFilter, name='user', queryset=CustomUser.objects.all())
-    session_event = filters.RelatedFilter(SessionEvent, name='session_event', queryset=SessionEvent.objects.all())
+    session_event = filters.RelatedFilter(SessionEventFilter, name='session_event', queryset=SessionEvent.objects.all())
 
     class Meta:
-        model = SessionEvent
+        model = Sub
         fields = ['user', 'session_event']
