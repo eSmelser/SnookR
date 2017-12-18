@@ -113,8 +113,6 @@ class Command(BaseCommand):
 
             profiles.append(profile)
 
-        subs = [Sub.objects.create(user=user, date=timezone.now()) for user in users]
-
         self.stdout.write('Creating divisions...')
         darrin = users[1]
         divisions = [
@@ -124,10 +122,14 @@ class Command(BaseCommand):
 
         self.stdout.write('Creating sessions...')
         sessions = self.create_sessions(divisions)
+        self.stdout.write('Creating session events...')
         for session in sessions:
-            for sub in subs:
-                if random.random() < 0.5:
-                    session.subs.add(sub)
+            session_events = SessionEvent.objects.filter(session=session)
+            for session_event in session_events:
+                for user in users:
+                    if random.random() < 0.5:
+                        Sub.objects.create(user=user, date=timezone.now(), session_event=session_event)
+
 
         temp_users = users.copy()
         captain1 = temp_users.pop(0)

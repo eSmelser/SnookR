@@ -4,6 +4,7 @@ import rest_framework_filters as filters
 character_filters = ['exact', 'contains', 'icontains']
 time_filters = ['exact', 'gt', 'gte', 'lt', 'lte']
 
+
 class UserFilter(filters.FilterSet):
     class Meta:
         model = CustomUser
@@ -48,18 +49,10 @@ class DivisionFilter(filters.FilterSet):
         }
 
 
-class SubFilter(filters.FilterSet):
-    user = filters.RelatedFilter(UserFilter, name='user', queryset=CustomUser.objects.all())
-    date = filters.DateTimeFilter()
-
-    class Meta:
-        model = Sub
-        fields = ['user', 'date']
-
-
 class SessionFilter(filters.FilterSet):
     division = filters.RelatedFilter(DivisionFilter, name='division', queryset=Division.objects.all())
-    subs = filters.RelatedFilter(SubFilter, name='subs', queryset=Sub.objects.all())
+
+    # subs = filters.RelatedFilter(SubFilter, name='subs', queryset=Sub.objects.all())
 
     class Meta:
         model = Session
@@ -81,3 +74,12 @@ class SessionEventFilter(filters.FilterSet):
             'date': time_filters,
             'start_time': time_filters,
         }
+
+
+class SubFilter(filters.FilterSet):
+    user = filters.RelatedFilter(UserFilter, name='user', queryset=CustomUser.objects.all())
+    session_event = filters.RelatedFilter(SessionEvent, name='session_event', queryset=SessionEvent.objects.all())
+
+    class Meta:
+        model = SessionEvent
+        fields = ['user', 'session_event']

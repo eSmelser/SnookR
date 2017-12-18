@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,eAAe;EACb,UAAU,EAAE,GAAG;EACf,aAAa,EAAE,GAAG;EAClB,YAAY,EAAE,GAAG;EACjB,OAAO,EAAE,GAAG",
+"sources": ["session.sass"],
+"names": [],
+"file": "session.css"
+}

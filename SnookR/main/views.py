@@ -101,13 +101,17 @@ class SessionViewMixin(TemplateView):
         subs = session.get_subs_with_unregister_urls()
 
         context['session'] = session
-        context['user_is_registered'] = session.user_is_registered(self.request.user)
-        context['subs'] = subs.exclude(user=self.request.user)
-
-        try:
-            context['current_user_sub'] = subs.get(user=self.request.user)
-        except Sub.DoesNotExist:
-            pass
+        if self.request.user.is_authenticated():
+            context['user_is_registered'] = session.user_is_registered(self.request.user)
+            context['subs'] = subs.exclude(user=self.request.user)
+            try:
+                context['current_user_sub'] = subs.get(user=self.request.user)
+            except Sub.DoesNotExist:
+                pass
+        else:
+            context['user_is_registered'] = False
+            context['subs'] = subs
+            context['current_user_sub'] = None
 
         return context
 

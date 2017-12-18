@@ -82,21 +82,20 @@ class DivisionSerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
-class SubSerializer(serializers.Serializer):
-    user = CustomUserSerializer()
-    date = serializers.DateTimeField()
-
-
 class SessionSerializer(serializers.Serializer):
     name = serializers.CharField()
     id = serializers.ReadOnlyField()
     start_date = serializers.DateTimeField()
     end_date = serializers.DateTimeField()
     division = DivisionSerializer()
-    subs = SubSerializer(many=True)
 
 
 class SessionEventSerializer(serializers.Serializer):
     session = SessionSerializer()
     date = serializers.DateField()
     start_time = serializers.TimeField()
+
+
+class SubSerializer(serializers.Serializer):
+    user = CustomUserSerializer()
+    session_event = SessionEventSerializer()

@@ -89,37 +89,6 @@ class UserProfile(models.Model):
     def get_absolute_url(self):
         return reverse('profile', kwargs={'username': self.user.username})
 
-'''
-Subs are a "tuple-ish" construction tying a player and a date together to indicate what date they are
-willing to sub in a Division. 
-
-Note: Eventually, I'd like players to be able to select a particular date that they could sub in a
-Division, OR, put themselves down for an entire session, in which case, we will likely need a model for
-session containing the dates of a particular session within a division. There are typically 3 sessions
-in a division per year, but the sessions don't necessarily correspond across divisions.
-'''
-
-
-class Sub(models.Model):
-    user = models.ForeignKey(CustomUser)
-    date = models.DateTimeField('sub date')
-
-    def __str__(self):
-        return str(self.user)
-
-    @cached_property
-    def sessions(self):
-        return self.session_set.all()
-
-    @staticmethod
-    def create_from_user(user, date):
-        sub, _ = Sub.objects.get_or_create(user=user, date=date)
-        return sub
-
-    @property
-    def invite_url(self):
-        return '/dummy-url/'
-
 
 '''
 A team can contain many players but should only ever exist in one division
@@ -208,7 +177,8 @@ class Session(models.Model):
     division = models.ForeignKey(Division)
     start_date = models.DateTimeField('start date')
     end_date = models.DateTimeField('end date')
-    subs = models.ManyToManyField(Sub, blank=True)
+
+    # subs = models.ManyToManyField(Sub, blank=True)
 
     def __str__(self):
         return self.name
@@ -219,7 +189,7 @@ class Session(models.Model):
     def get_register_url(self):
         return reverse('session_register', args=self.get_url_args())
 
-    def get_unregister_url(self, sub: Sub):
+    def get_unregister_url(self, sub):
         datestring = sub.date.strftime(Session.date_format)
         return reverse('session_unregister', args=self.get_url_args() + [datestring])
 
@@ -244,7 +214,7 @@ class Session(models.Model):
         return self
 
     def user_is_registered(self, user):
-        return self.subs.filter(user=user).exists()
+        return user.is_authenticated() and self.subs.filter(user=user).exists()
 
 
 class SessionEvent(models.Model):
@@ -254,6 +224,39 @@ class SessionEvent(models.Model):
 
     def __str__(self):
         return 'SessionEvent on {} for {}'.format(self.date, self.session)
+
+
+'''
+Subs are a "tuple-ish" construction tying a player and a date together to indicate what date they are
+willing to sub in a Division. 
+
+Note: Eventually, I'd like players to be able to select a particular date that they could sub in a
+Division, OR, put themselves down for an entire session, in which case, we will likely need a model for
+session containing the dates of a particular session within a division. There are typically 3 sessions
+in a division per year, but the sessions don't necessarily correspond across divisions.
+'''
+
+
+class Sub(models.Model):
+    user = models.ForeignKey(CustomUser)
+    date = models.DateTimeField('sub date')
+    session_event = models.ForeignKey(SessionEvent)
+
+    def __str__(self):
+        return str(self.user)
+
+    @cached_property
+    def session(self):
+        return self.session_event.session
+
+    @staticmethod
+    def create_from_user(user, date):
+        sub, _ = Sub.objects.get_or_create(user=user, date=date)
+        return sub
+
+    @property
+    def invite_url(self):
+        return '/dummy-url/'
 
 
 class TeamInvite(models.Model):

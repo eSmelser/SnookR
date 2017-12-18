@@ -186,6 +186,14 @@ const api = (function () {
         })
     };
 
+    const getSessionEventList = function (data) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/session-events',
+            data: data,
+        });
+    };
+
     // Return public methods for API
     return {
         baseURL,
@@ -196,6 +204,7 @@ const api = (function () {
         postInvitation,
         patchInvitation,
         getSessionList,
+        getSessionEventList,
         getSubList
     }
 })();
