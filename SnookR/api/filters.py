@@ -73,6 +73,7 @@ class SessionEventFilter(filters.FilterSet):
         fields = {
             'date': time_filters,
             'start_time': time_filters,
+            'id': ['exact'],
         }
 
 

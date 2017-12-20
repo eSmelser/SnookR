@@ -40,7 +40,7 @@ $(document).ready(function () {
         }
 
         let eventList = sessionEventList.map(elem => {
-            return {title: SESSION_NAME, start: elem.date + 'T' + elem.start_time, id: elem.id}
+            return {title: SESSION_NAME, start: elem.date + 'T' + elem.start_time, sessionEventId: elem.id}
         });
 
         $('#calendar').fullCalendar({
@@ -54,9 +54,18 @@ $(document).ready(function () {
             editable: false,
             eventLimit: true, // allow "more" link when too many events
             eventClick: function (calEvent, jsEvent, view) {
+                let sessionEventId = calEvent.sessionEventId;
+
+
                 api.getSubList({
+                    session_event__id: sessionEventId
                 }).done(function (data) {
-                    $('#sub-list').replaceWith(createUserPanel(userName, profileUrl, thumbnailUrl, inviteUrl));
+                    // TODO: implement these in API
+                    let thumbnailUrl = null;
+                    let inviteUrl = null;
+                    let $list = $('#sub-list').empty();
+
+                    data.map( elem => $list.append((createUserPanel(elem.user.username, elem.user.url, thumbnailUrl, inviteUrl))) );
                 });
             },
             events: eventList,

@@ -94,6 +94,7 @@ class SessionEventSerializer(serializers.Serializer):
     session = SessionSerializer()
     date = serializers.DateField()
     start_time = serializers.TimeField()
+    id = serializers.ReadOnlyField()
 
 
 class SubSerializer(serializers.Serializer):

@@ -96,8 +96,9 @@ class SessionViewMixin(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session = self.get_session_instance(**kwargs)
-        # subs = session.get_subs_with_unregister_urls()
-        subs = Sub.objects.filter(session_event__session=session, session_event__id=1)
+        now = datetime.now()
+        session_event = SessionEvent.objects.filter(session=session, date__month=now.month).order_by('date').first()
+        subs = Sub.objects.filter(session_event=session_event)
 
         context['session'] = session
         if self.request.user.is_authenticated():
