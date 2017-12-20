@@ -96,11 +96,12 @@ class SessionViewMixin(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session = self.get_session_instance(**kwargs)
-        subs = session.get_subs_with_unregister_urls()
+        # subs = session.get_subs_with_unregister_urls()
+        subs = Sub.objects.filter(session_event__session=session, session_event__id=1)
 
         context['session'] = session
         if self.request.user.is_authenticated():
-            context['user_is_registered'] = session.user_is_registered(self.request.user)
+            context['user_is_registered'] = subs.filter(user=self.request.user).exists()
             context['subs'] = subs.exclude(user=self.request.user)
             try:
                 context['current_user_sub'] = subs.get(user=self.request.user)

@@ -40,7 +40,7 @@ $(document).ready(function () {
         }
 
         let eventList = sessionEventList.map(elem => {
-            return {title: SESSION_NAME, start: elem.date + 'T' + elem.start_time}
+            return {title: SESSION_NAME, start: elem.date + 'T' + elem.start_time, id: elem.id}
         });
 
         $('#calendar').fullCalendar({

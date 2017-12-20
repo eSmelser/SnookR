@@ -213,9 +213,6 @@ class Session(models.Model):
         self.subs.remove(sub)
         return self
 
-    def user_is_registered(self, user):
-        return user.is_authenticated() and self.subs.filter(user=user).exists()
-
 
 class SessionEvent(models.Model):
     start_time = models.TimeField()
@@ -258,6 +255,9 @@ class Sub(models.Model):
     def invite_url(self):
         return '/dummy-url/'
 
+
+    def is_registered(self, session_event: SessionEvent):
+        return self.user.is_authenticated() and Sub.objects.filter(user=self.user, session_event=session_event).exists()
 
 class TeamInvite(models.Model):
     PENDING = 'P'
