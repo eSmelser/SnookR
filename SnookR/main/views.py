@@ -57,7 +57,8 @@ class HomeView(TemplateView):
         if self.request.user.is_authenticated():
             try:
                 context['user'] = CustomUser.from_user(self.request.user)
-                sessions = set(sub.session_event.session for sub in Sub.objects.select_related('session_event').filter(user=self.request.user))
+                sessions = set(sub.session_event.session for sub in
+                               Sub.objects.select_related('session_event').filter(user=self.request.user))
                 divisions = Division.objects.filter(session__in=sessions)
                 context['divisions'] = set(divisions)
                 context['sessions'] = sorted(list(sessions), key=lambda obj: obj.name)
@@ -101,6 +102,7 @@ class SessionViewMixin(TemplateView):
         subs = Sub.objects.filter(session_event=session_event)
 
         context['session'] = session
+        context['session_event'] = session_event
         if self.request.user.is_authenticated():
             context['user_is_registered'] = subs.filter(user=self.request.user).exists()
             context['subs'] = subs.exclude(user=self.request.user)
@@ -288,3 +290,26 @@ class SearchView(TemplateView):
             raise Http404('Invalid URL kwargs: ' + str(kwargs))
 
         return context
+
+
+class SessionEventRegisterView(LoginRequiredMixin, RedirectView):
+    def get(self, request, *args, **kwargs):
+        id = kwargs.get('pk')
+        Sub.objects.create(session_event=SessionEvent.objects.get(id=id), user=self.request.user)
+        return super().get(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('home')
+
+
+class SessionEventUnregisterView(LoginRequiredMixin, RedirectView):
+    def get(self, request, *args, **kwargs):
+        id = kwargs.get('pk')
+        qs = Sub.objects.filter(session_event=SessionEvent.objects.get(id=id), user=self.request.user)
+        if qs.exists():
+            qs.delete()
+
+        return super().get(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('home')

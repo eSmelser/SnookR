@@ -222,6 +222,13 @@ class SessionEvent(models.Model):
     def __str__(self):
         return 'SessionEvent on {} for {}'.format(self.date, self.session)
 
+    @property
+    def get_register_url(self):
+        return reverse('session_event_register', kwargs={'pk': self.id})
+
+    @property
+    def get_unregister_url(self):
+        return reverse('session_event_unregister', kwargs={'pk': self.id})
 
 '''
 Subs are a "tuple-ish" construction tying a player and a date together to indicate what date they are
@@ -236,7 +243,7 @@ in a division per year, but the sessions don't necessarily correspond across div
 
 class Sub(models.Model):
     user = models.ForeignKey(CustomUser)
-    date = models.DateTimeField('sub date')
+    date = models.DateTimeField('sub date', auto_now=True)
     session_event = models.ForeignKey(SessionEvent)
 
     def __str__(self):

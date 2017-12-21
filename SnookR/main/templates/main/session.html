@@ -21,38 +21,40 @@
             <div id="calendar"></div>
 
             {% if current_user_sub %}
-                <h2>You Are Available for {{ session|title }}</h2>
-                <div class="post-content">
-                    <div class="panel panel-default panel-info">
-                        <div class="panel-body">
-                            <div class="pull-left">
-                                <a href="{{ current_user_sub.user.get_absolute_url }}">
-                                    <img class="img-circle" width="50px" height="50px"
-                                         style="margin-right:8px; margin-top:-5px;"
-                                            {% if current_user_sub.user.profile.thumbnail %}
-                                         src="{{ current_user_sub.user.profile.thumbnail.url }}"
-                                            {% else %}
-                                         src="{% static 'main/images/default_profile.jpg' %}"
-                                            {% endif %}
-                                    >
-                                </a>
-                            </div>
+                <div id="current-user-panel">
+                    <h2>You Are Available for {{ session|title }}</h2>
+                    <div class="post-content">
+                        <div class="panel panel-default panel-info">
+                            <div class="panel-body">
+                                <div class="pull-left">
+                                    <a href="{{ current_user_sub.user.get_absolute_url }}">
+                                        <img class="img-circle" width="50px" height="50px"
+                                             style="margin-right:8px; margin-top:-5px;"
+                                                {% if current_user_sub.user.profile.thumbnail %}
+                                             src="{{ current_user_sub.user.profile.thumbnail.url }}"
+                                                {% else %}
+                                             src="{% static 'main/images/default_profile.jpg' %}"
+                                                {% endif %}
+                                        >
+                                    </a>
+                                </div>
 
-                            <div>
-                                <h4 class="pull-left"><a href="#"
-                                                         style="text-decoration:none;"><strong>{{ current_user_sub.user }}</strong></a>
-                                </h4>
-                                <form class="pull-right session-button"
-                                      action="{% get_unregister_url session current_user_sub %}">
-                                    <input type="submit" value="Unregister">
-                                </form>
+                                <div>
+                                    <h4 class="pull-left"><a href="{{ current_user_sub.user.get_absolute_url }}"
+                                                             style="text-decoration:none;"><strong>{{ current_user_sub.user }}</strong></a>
+                                    </h4>
+                                    <form class="pull-right session-button"
+                                          action="{{ session_event.get_unregister_url }}">
+                                        <input type="submit" value="Unregister">
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <hr>
                 </div>
-                <hr>
             {% else %}
-                <form action="{{ session.get_register_url }}">
+                <form action="{{ session_event.get_invite_url }}">
                     <input class="btn btn-primary" type="submit" value="Sign up for {{ session|title }}'s sub list!">
                 </form>
             {% endif %}
@@ -80,7 +82,7 @@
                                                      style="text-decoration:none;"><strong>{{ sub.user }}</strong></a>
                             </h4>
 
-                            <button class="session-button pull-right" type="button" href="{{ sub.invite_url }}">Invite
+                            <button class="session-button pull-right" type="button" href="">Invite
                             </button>
                         </div>
                     </div>
