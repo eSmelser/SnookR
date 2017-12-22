@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from main.models import Team, TeamInvite, CustomUser, NonUserPlayer, Session, SessionEvent
-
+#from main.models import Team, TeamInvite, CustomUser, NonUserPlayer, Session, SessionEvent
+from main import models
 
 def must_have_id(data):
     if 'id' not in data:
@@ -19,7 +19,7 @@ class CustomUserSerializer(serializers.Serializer):
         """Add the instance's URL to the returned json."""
         json = super().to_representation(instance)
         json['url'] = instance.get_absolute_url
-        json['thumbnail_url'] = instance.profile.thumbnail.url
+        json['thumbnail_url'] = instance.profile.thumbnail.url if instance.profile else None
         return json
 
 
@@ -98,12 +98,14 @@ class SessionEventSerializer(serializers.Serializer):
     start_time = serializers.TimeField()
     id = serializers.ReadOnlyField()
 
-    def to_representation(self, instance: SessionEvent):
+    def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['register_url'] = instance.get_register_url
+        rep['unregister_url'] = instance.get_unregister_url
+
         return rep
+
 
 class SubSerializer(serializers.Serializer):
     user = CustomUserSerializer()
     session_event = SessionEventSerializer()
-

@@ -4,16 +4,19 @@
 import itertools
 from datetime import datetime
 from functools import reduce
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.views.generic.base import TemplateView, RedirectView
-from django.views.generic.edit import FormView, CreateView
-from django.contrib.auth import login, authenticate
 
 import django.contrib.auth.views as auth_views
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.db.models import Q
+from django.contrib.auth import login, authenticate
+from django.views.generic.edit import FormView, CreateView
+from django.views.generic.base import TemplateView, RedirectView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+
+from rest_framework.renderers import JSONRenderer
+
 from main.models import UserProfile, Division, Session, SessionEvent, CustomUser, Team, Sub
 from main.forms import (
     CustomUserForm, SessionRegistrationForm,
@@ -21,6 +24,7 @@ from main.forms import (
     TeamForm, CustomUserChangeForm,
     UploadThumbnailForm
 )
+from api import serializers
 
 
 def signup(request):
@@ -96,35 +100,68 @@ class DivisionView(TemplateView):
 class SessionViewMixin(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        session = self.get_session_instance(**kwargs)
-        now = datetime.now()
-        session_event = SessionEvent.objects.filter(session=session, date__month=now.month).order_by('date').first()
-        subs = Sub.objects.filter(session_event=session_event)
+        user_registered = self.user_is_registered()
+        subs = self.get_all_subs()
+        context['session'] = self.get_session_instance()
+        context['session_event'] = self.get_session_event()
+        context['user_registered'] = user_registered
 
-        context['session'] = session
-        context['session_event'] = session_event
-        if self.request.user.is_authenticated():
-            context['user_is_registered'] = subs.filter(user=self.request.user).exists()
+        # Separate current user from the normal list of subs so they can be given a special display
+        if user_registered:
             context['subs'] = subs.exclude(user=self.request.user)
-            try:
-                context['current_user_sub'] = subs.get(user=self.request.user)
-            except Sub.DoesNotExist:
-                pass
+            context['current_user_sub'] = subs.get(user=self.request.user)
         else:
-            context['user_is_registered'] = False
             context['subs'] = subs
             context['current_user_sub'] = None
 
+        serializer = serializers.SubSerializer(subs, many=True)
+        context['subs_json'] = JSONRenderer().render(serializer.data)
         return context
 
-    def get_session_instance(self, **kwargs):
-        session_slug = kwargs.get('session')
-        division_slug = kwargs.get('division')
+    def get_session_event(self):
+        session = self.get_session_instance()
+        return SessionEvent.objects \
+            .filter(session=session, date__month=datetime.now().month) \
+            .order_by('date') \
+            .first()
+
+    def get_session_instance(self):
+        session_slug = self.kwargs.get('session')
+        division_slug = self.kwargs.get('division')
         return Session.objects.get(slug=session_slug, division__slug=division_slug)
+
+    def user_is_registered(self):
+        return self.get_all_subs().filter(user=self.request.user).exists()
+
+    def get_all_subs(self):
+        return Sub.objects.filter(session_event=self.get_session_event())
 
 
 class SessionView(SessionViewMixin, TemplateView):
     template_name = 'main/session.html'
+
+
+class SessionEventRegisterView(LoginRequiredMixin, RedirectView):
+    def get(self, request, *args, **kwargs):
+        id = kwargs.get('pk')
+        Sub.objects.create(session_event=SessionEvent.objects.get(id=id), user=self.request.user)
+        return super().get(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('home')
+
+
+class SessionEventUnregisterView(LoginRequiredMixin, RedirectView):
+    def get(self, request, *args, **kwargs):
+        id = kwargs.get('pk')
+        qs = Sub.objects.filter(session_event=SessionEvent.objects.get(id=id), user=self.request.user)
+        if qs.exists():
+            qs.delete()
+
+        return super().get(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('home')
 
 
 class SessionRegisterView(SessionViewMixin, FormView):
@@ -290,26 +327,3 @@ class SearchView(TemplateView):
             raise Http404('Invalid URL kwargs: ' + str(kwargs))
 
         return context
-
-
-class SessionEventRegisterView(LoginRequiredMixin, RedirectView):
-    def get(self, request, *args, **kwargs):
-        id = kwargs.get('pk')
-        Sub.objects.create(session_event=SessionEvent.objects.get(id=id), user=self.request.user)
-        return super().get(request, *args, **kwargs)
-
-    def get_redirect_url(self, *args, **kwargs):
-        return reverse('home')
-
-
-class SessionEventUnregisterView(LoginRequiredMixin, RedirectView):
-    def get(self, request, *args, **kwargs):
-        id = kwargs.get('pk')
-        qs = Sub.objects.filter(session_event=SessionEvent.objects.get(id=id), user=self.request.user)
-        if qs.exists():
-            qs.delete()
-
-        return super().get(request, *args, **kwargs)
-
-    def get_redirect_url(self, *args, **kwargs):
-        return reverse('home')

@@ -5,9 +5,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.functional import cached_property
 from django.urls import reverse
+from rest_framework.renderers import JSONRenderer
+
 from autoslug import AutoSlugField
 from sublist.models import Sublist
-
+from api import serializers
 
 class CustomUser(User):
     """This is a proxy model for the User model.  Proxy models just give methods
@@ -30,7 +32,10 @@ class CustomUser(User):
 
     @cached_property
     def profile(self):
-        return UserProfile.objects.get(user=self)
+        try:
+            return UserProfile.objects.get(user=self)
+        except UserProfile.DoesNotExist:
+            return None
 
     @cached_property
     def sessions(self):
@@ -229,6 +234,11 @@ class SessionEvent(models.Model):
     @property
     def get_unregister_url(self):
         return reverse('session_event_unregister', kwargs={'pk': self.id})
+
+    def as_json(self):
+        serializer = serializers.SessionEventSerializer(self)
+        return JSONRenderer().render(serializer.data)
+
 
 '''
 Subs are a "tuple-ish" construction tying a player and a date together to indicate what date they are
