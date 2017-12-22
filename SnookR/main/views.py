@@ -61,11 +61,33 @@ class HomeView(TemplateView):
         if self.request.user.is_authenticated():
             try:
                 context['user'] = CustomUser.from_user(self.request.user)
-                sessions = set(sub.session_event.session for sub in
-                               Sub.objects.select_related('session_event').filter(user=self.request.user))
-                divisions = Division.objects.filter(session__in=sessions)
-                context['divisions'] = set(divisions)
-                context['sessions'] = sorted(list(sessions), key=lambda obj: obj.name)
+
+                # Gets all foreign keys in a single query
+                # Note: ordering is required for itertools.groupby to work
+                subs = Sub.objects.select_related('session_event__session__division')\
+                    .filter(user=self.request.user) \
+                    .order_by('session_event__session__division', 'session_event__session',
+                              'session_event__date', 'session_event__start_time')
+
+                data = []
+                # Group by division
+                for division, subs_by_division in itertools.groupby(subs, lambda obj: obj.session_event.session.division):
+                    division_data = {'instance': division, 'sessions': []}
+
+                    # Further group by session
+                    for session, subs_by_session in itertools.groupby(subs_by_division, lambda obj: obj.session_event.session):
+                        session_data = {
+                            'instance': session,
+                            'session_events': [sub.session_event for sub in subs_by_session]
+                        }
+                        division_data['sessions'].append(session_data)
+
+                    data.append(division_data)
+
+                context['divisions'] = data
+
+                serializer = serializers.SessionEventSerializer((sub.session_event for sub in subs), many=True)
+                context['session_events_json'] = JSONRenderer().render(serializer.data)
 
             except CustomUser.DoesNotExist:
                 pass

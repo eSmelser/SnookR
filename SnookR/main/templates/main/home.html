@@ -5,6 +5,9 @@
 {% extends 'main/base.html' %}
 {% load staticfiles %}
 {% block title %}Home{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'main/css/home.css' %}">
+{% endblock %}
 
 {% block content %}
     <main role="main">
@@ -45,18 +48,28 @@
                     <p>Hi, {{ user.username }}! </p>
 
 
+                    {#  Styling based off of https://stackoverflow.com/questions/29063244/consistent-styling-for-nested-lists-with-bootstrap #}
                     <h2>Your Available Sessions</h2>
                     {% for division in divisions %}
-                        <h3><a href="{{ division.get_absolute_url }}">{{ division.name }}</a></h3>
-                        <ul>
-                            {% for session in sessions %}
-                                {% if session.division == division %}
-                                    <li>
-                                        <a href="{{ session.get_absolute_url }}">{{ session.name }}</a>
-                                    </li>
-                                {% endif %}
+                        <div class="list-group list-group-root well">
+                            <a class="list-group-item">{{ division.instance.name }}</a>
+
+                            {% for session in division.sessions %}
+                                <div class="list-group">
+                                    <a href="#session-{{ session.instance.id }}" class="list-group-item"
+                                       data-toggle="collapse">
+                                        <i class="glyphicon glyphicon-chevron-right"></i>
+                                        {{ session.instance.name }}
+                                    </a>
+
+                                    <div href="" class="list-group collapse" id="session-{{ session.instance.id }}">
+                                        {% for session_event in session.session_events %}
+                                            <a href="{{ session_event.get_absolute_url }}" class="list-group-item">{{ session_event.date }} at {{ session_event.start_time }}</a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
                             {% endfor %}
-                        </ul>
+                        </div>
                     {% endfor %}
 
                     {% if not divisions %}
@@ -92,6 +105,16 @@
 {% endblock %}
 
 {% block footer_scripts %}
+    <script type="text/javascript">
+        const initialSessionEvents = JSON.parse('{{ session_events_json|escapejs|safe }}');
+        $(function () {
+            $('.list-group-item').on('click', function () {
+                $('.glyphicon', this)
+                    .toggleClass('glyphicon-chevron-right')
+                    .toggleClass('glyphicon-chevron-down');
+            });
+        });
+    </script>
     {% if user.is_authenticated %}
         <link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
         <link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.print.css' %}" rel='stylesheet'

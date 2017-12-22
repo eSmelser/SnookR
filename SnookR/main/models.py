@@ -183,8 +183,6 @@ class Session(models.Model):
     start_date = models.DateTimeField('start date')
     end_date = models.DateTimeField('end date')
 
-    # subs = models.ManyToManyField(Sub, blank=True)
-
     def __str__(self):
         return self.name
 
@@ -239,6 +237,10 @@ class SessionEvent(models.Model):
         serializer = serializers.SessionEventSerializer(self)
         return JSONRenderer().render(serializer.data)
 
+    @property
+    def get_absolute_url(self):
+        kwargs = {'division': self.session.division.slug, 'session': self.session.slug}
+        return reverse('session', kwargs=kwargs) + '?sessionEventId=' + str(self.id)
 
 '''
 Subs are a "tuple-ish" construction tying a player and a date together to indicate what date they are

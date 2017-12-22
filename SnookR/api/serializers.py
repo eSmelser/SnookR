@@ -102,7 +102,7 @@ class SessionEventSerializer(serializers.Serializer):
         rep = super().to_representation(instance)
         rep['register_url'] = instance.get_register_url
         rep['unregister_url'] = instance.get_unregister_url
-
+        rep['url'] = instance.get_absolute_url
         return rep
 
 
