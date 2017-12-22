@@ -152,20 +152,17 @@ class SessionEventRegisterView(LoginRequiredMixin, RedirectView):
         return super().get(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('home')
+        return self.request.environ['HTTP_REFERER']
 
 
 class SessionEventUnregisterView(LoginRequiredMixin, RedirectView):
-    def get(self, request, *args, **kwargs):
+    def get_redirect_url(self, *args, **kwargs):
         id = kwargs.get('pk')
         qs = Sub.objects.filter(session_event=SessionEvent.objects.get(id=id), user=self.request.user)
         if qs.exists():
             qs.delete()
 
-        return super().get(request, *args, **kwargs)
-
-    def get_redirect_url(self, *args, **kwargs):
-        return reverse('home')
+        return self.request.environ['HTTP_REFERER']
 
 
 class SessionRegisterView(SessionViewMixin, FormView):

@@ -33,8 +33,8 @@ urlpatterns = [
         views.SessionUnregisterView.as_view(),
         name='session_unregister'),
     url(r'^search/(?P<search_type>substitute|session)/$', views.SearchView.as_view(), name='search'),
-    url(r'^session-events/(?P<pk>[0-9]+)/register$', views.SessionEventRegisterView.as_view(), name='session_event_register'),
-    url(r'^session-events/(?P<pk>[0-9]+)/unregister$', views.SessionEventUnregisterView.as_view(), name='session_event_unregister'),
+    url(r'^session-events/(?P<pk>[0-9]+)/register/$', views.SessionEventRegisterView.as_view(), name='session_event_register'),
+    url(r'^session-events/(?P<pk>[0-9]+)/unregister/$', views.SessionEventUnregisterView.as_view(), name='session_event_unregister'),
 
 ]
 

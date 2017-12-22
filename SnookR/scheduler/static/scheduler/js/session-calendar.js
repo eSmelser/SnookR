@@ -83,14 +83,13 @@ const removeCurrentUserSub = function (user, subArray) {
     return subArray.filter(sub => sub.user.id !== user.id);
 };
 
-const renderRegisterForm = function (currentUserSub, unregisterUrl) {
+const renderRegisterForm = function (currentUserSub, sessionEvent) {
     let $div = $('#register-form-div').empty();
 
     // There only exists a sub for the current user if he is registered for the current session
     if (!currentUserSub) {
-        let action = `${unregisterUrl}?next=${window.location.pathname + window.location.search}`;
         let DOMString =
-            `<form action="${action}">
+            `<form action="${sessionEvent.register_url}">
                 <input class="btn btn-primary" type="submit" value="Sign up for ${SESSION_NAME}'s sub list!">
             </form>`;
 
@@ -124,7 +123,7 @@ const initializePage = function (currentUser) {
     renderCurrentUserHeader(initialSessionEvent, currentUserSub);
     renderSublistHeader(initialSessionEvent);
     renderCurrentUserPanel(currentUserSub);
-    renderRegisterForm(currentUserSub, initialSessionEvent.unregister_url);
+    renderRegisterForm(currentUserSub, initialSessionEvent);
     renderSublistPanels(subArray);
 
     setUrl(initialSessionEvent);
@@ -161,7 +160,7 @@ $(document).ready(function () {
 
                         renderCurrentUserHeader(sessionEvent, currentUserSub);
                         renderCurrentUserPanel(currentUserSub);
-                        renderRegisterForm(currentUserSub, sessionEvent.unregister_url);
+                        renderRegisterForm(currentUserSub, sessionEvent);
                         renderSublistPanels(subArray);
                     });
                 },
