@@ -180,6 +180,7 @@ class SessionEventRegisterView(LoginRequiredMixin, RedirectView):
         return super().get(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
+        # Redirect back to where you came from!
         return self.request.environ['HTTP_REFERER']
 
 
@@ -190,6 +191,7 @@ class SessionEventUnregisterView(LoginRequiredMixin, RedirectView):
         if qs.exists():
             qs.delete()
 
+        # Redirect back to where you came from!
         return self.request.environ['HTTP_REFERER']
 
 
