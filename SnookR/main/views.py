@@ -120,10 +120,14 @@ class SessionViewMixin(TemplateView):
 
     def get_session_event(self):
         session = self.get_session_instance()
-        return SessionEvent.objects \
-            .filter(session=session, date__month=datetime.now().month) \
-            .order_by('date') \
-            .first()
+        id = self.request.GET.get('sessionEventId', False)
+        if id:
+            return SessionEvent.objects.get(session=session, id=id)
+        else:
+            return SessionEvent.objects \
+                .filter(session=session, date__month=datetime.now().month) \
+                .order_by('date') \
+                .first()
 
     def get_session_instance(self):
         session_slug = self.kwargs.get('session')

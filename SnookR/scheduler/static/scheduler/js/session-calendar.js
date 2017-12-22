@@ -3,6 +3,7 @@
  */
 
 function genericUserPanelDOM(user, actionDOMString) {
+    //This layout is inspired by the snippet found here: https://bootsnipp.com/snippets/56ExR
     return $(`
                     <div class="panel panel-default">
                         <div class="panel-body">
@@ -40,36 +41,76 @@ function subUserPanelDOM(user) {
 }
 
 
-function renderSublistPanels(userId, subArray) {
+function renderSublistPanels(subArray) {
     // We only need to empty the list once
-    $list = $('#sub-list').empty();
-    subArray.filter(sub => sub.user.id !== userId).map(sub => $list.append(subUserPanelDOM(sub.user)));
+    let $list = $('#sub-list').empty();
+    if (subArray) {
+        subArray.map(sub => $list.append(subUserPanelDOM(sub.user)));
+    } else {
+        $list.append('<strong>No subs registered!</strong>');
+    }
 }
 
-function renderCurrentUserPanels(userId, unregisterUrl, subArray) {
-    $currentUserPanel = $('#current-user-panel').empty();
-    subArray
-        .filter(sub => sub.user.id === userId)
-        .slice(0, 1)
-        .map(sub => $currentUserPanel.append(currentUserPanelDOM(sub.user, unregisterUrl)));
+function renderCurrentUserPanel(currentUserSub) {
+    let $currentUserPanel = $('#current-user-panel').empty();
+    if (currentUserSub)
+        $currentUserPanel.append(currentUserPanelDOM(currentUserSub.user, currentUserSub.session_event.unregister_url));
 }
 
 function renderSublistHeader(sessionEvent) {
     $('#sub-list-header')
-        .replaceWith(`<h2 id="sub-list-header">Subs Available for ${sessionEvent.session.name} on ${sessionEvent.date}</h2>`);
+        .text(`Subs Available for ${sessionEvent.session.name} on ${sessionEvent.date}`);
 }
 
-function renderCurrentUserHeader(sessionEvent) {
-    $('#current-user-header')
-        .replaceWith(`<h2>You Are Available for ${sessionEvent.session.name} on ${sessionEvent.date}</h2>`)
+function renderCurrentUserHeader(sessionEvent, currentUserSub) {
+    let $header = $('#current-user-header');
+    let text = `You Are Available for ${sessionEvent.session.name} on ${sessionEvent.date}`;
+
+    currentUserSub ? $header.text(text) : $header.empty();
+}
+
+function getCurrentUserSub(user, subArray) {
+    return subArray.filter(sub => sub.user.id === user.id).pop();
+}
+
+function removeCurrentUserSub(user, subArray) {
+    return subArray.filter(sub => sub.user.id !== user.id);
+}
+
+function renderRegisterForm(currentUserSub) {
+    let $div = $('#register-form-div').empty();
+    if (currentUserSub) {
+        let action = `${currentUserSub.session_event.unregister_url}?next=${window.location.pathname + window.location.search}`;
+        let DOMString =
+            `<form action="${action}">
+                <input class="btn btn-primary" type="submit" value="Sign up for ${SESSION_NAME}'s sub list!">
+            </form>`;
+
+        let $form = $(DOMString);
+        $div.append($form);
+    }
 }
 
 // Setup the page with the initial data set by the template
+// Note: must wait to have current user to create current user panel
 function initializePage(currentUser) {
+    let currentUserSub = getCurrentUserSub(currentUser, initialSubArray);
+    let subArray = removeCurrentUserSub(currentUser, initialSubArray);
+
+    renderCurrentUserHeader(initialSessionEvent, currentUserSub);
     renderSublistHeader(initialSessionEvent);
-    renderCurrentUserHeader(initialSessionEvent);
-    renderSublistPanels(currentUser.id, initialSubArray);
-    renderCurrentUserPanels(currentUser.id, initialSessionEvent.unregister_url, initialSubArray);
+
+    renderCurrentUserPanel(currentUserSub);
+    renderRegisterForm(currentUserSub);
+    renderSublistPanels(subArray);
+
+    setUrl(initialSessionEvent);
+}
+
+function setUrl(sessionEvent) {
+    const message = `Clicked Session ${sessionEvent.id}`;
+    const queryParams = `?sessionEventId=${sessionEvent.id}`;
+    history.pushState({sessionEvent: sessionEvent}, message, queryParams);
 }
 
 $(document).ready(function () {
@@ -93,13 +134,18 @@ $(document).ready(function () {
                 eventClick: function (calEvent, jsEvent, view) {
                     const sessionEvent = calEvent.sessionEvent;
                     renderSublistHeader(sessionEvent);
-                    renderCurrentUserHeader(sessionEvent);
+                    setUrl(sessionEvent);
 
                     api.getSubList({
                         session_event__id: sessionEvent.id
                     }).done(subArray => {
-                        renderSublistPanels(currentUser.id, subArray);
-                        renderCurrentUserPanels(currentUser.id, sessionEvent.unregister_url, subArray);
+                        let currentUserSub = getCurrentUserSub(currentUser, subArray);
+                        subArray = removeCurrentUserSub(currentUser, subArray);
+
+                        renderCurrentUserHeader(sessionEvent, currentUserSub);
+                        renderCurrentUserPanel(currentUserSub);
+                        renderRegisterForm(currentUserSub);
+                        renderSublistPanels(subArray);
                     });
                 },
                 events: sessionEvents.map(sessionEvent => {
