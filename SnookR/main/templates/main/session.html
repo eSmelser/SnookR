@@ -16,15 +16,20 @@
 {% block content %}
     <div class="container">
     <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-8">
-            <div id="calendar"></div>
-
-            {# These are placeholders rendered in session-calendar.js #}
+        <div class="col-md-12">
             <div id="register-form-div"></div>
-            <h2 id="current-user-header"></h2>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-6">
+            <div id="calendar"></div>
+        </div>
+        <div class="col-md-6">
+            {# These are placeholders rendered in session-calendar.js #}
+            <h3 id="current-user-header"></h3>
             <div id="current-user-panel"></div>
-            <h2 id="sub-list-header"></h2>
+            <h3 id="sub-list-header"></h3>
             <div id='sub-list' class="post-content">
             </div>
             <div class="col-md-2"></div>

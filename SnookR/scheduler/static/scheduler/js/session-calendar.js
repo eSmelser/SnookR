@@ -2,7 +2,7 @@
  * Created by bobby on 12/16/17.
  */
 
-function genericUserPanelDOM(user, actionDOMString) {
+const genericUserPanelDOM = function (user, actionDOMString) {
     //This layout is inspired by the snippet found here: https://bootsnipp.com/snippets/56ExR
     return $(`
                     <div class="panel panel-default">
@@ -22,26 +22,26 @@ function genericUserPanelDOM(user, actionDOMString) {
                         </div>
                     </div>
     `);
-}
+};
 
-function currentUserPanelDOM(user, unregisterUrl) {
+const currentUserPanelDOM = function (user, unregisterUrl) {
     let formDOMString =
         `<form class="pull-right session-button" action="${unregisterUrl}">
                 <input type="submit" value="Unregister">
             </form>`;
 
     return genericUserPanelDOM(user, formDOMString);
-}
+};
 
-function subUserPanelDOM(user) {
+const subUserPanelDOM = function (user) {
     let buttonDOMString =
         `<button class="session-button pull-right" type="button" href="${user.inviteUrl}">Invite</button>`;
 
     return genericUserPanelDOM(user, buttonDOMString);
-}
+};
 
 
-function renderSublistPanels(subArray) {
+const renderSublistPanels = function (subArray) {
     // We only need to empty the list once
     let $list = $('#sub-list').empty();
     if (subArray) {
@@ -49,38 +49,46 @@ function renderSublistPanels(subArray) {
     } else {
         $list.append('<strong>No subs registered!</strong>');
     }
-}
+};
 
-function renderCurrentUserPanel(currentUserSub) {
+const renderCurrentUserPanel = function (currentUserSub) {
     let $currentUserPanel = $('#current-user-panel').empty();
-    if (currentUserSub)
-        $currentUserPanel.append(currentUserPanelDOM(currentUserSub.user, currentUserSub.session_event.unregister_url));
-}
+    if (currentUserSub) {
+        $currentUserPanel
+            .show()
+            .append(currentUserPanelDOM(currentUserSub.user, currentUserSub.session_event.unregister_url));
+    } else {
+        $currentUserPanel.hide();
+    }
+};
 
-function renderSublistHeader(sessionEvent) {
+const renderSublistHeader = function (sessionEvent) {
     $('#sub-list-header')
+        .show()
         .text(`Subs Available for ${sessionEvent.session.name} on ${sessionEvent.date}`);
-}
+};
 
-function renderCurrentUserHeader(sessionEvent, currentUserSub) {
+const renderCurrentUserHeader = function (sessionEvent, currentUserSub) {
     let $header = $('#current-user-header');
     let text = `You Are Available for ${sessionEvent.session.name} on ${sessionEvent.date}`;
 
-    currentUserSub ? $header.text(text) : $header.empty();
-}
+    currentUserSub ? $header.text(text).show() : $header.empty().hide();
+};
 
-function getCurrentUserSub(user, subArray) {
+const getCurrentUserSub = function (user, subArray) {
     return subArray.filter(sub => sub.user.id === user.id).pop();
-}
+};
 
-function removeCurrentUserSub(user, subArray) {
+const removeCurrentUserSub = function (user, subArray) {
     return subArray.filter(sub => sub.user.id !== user.id);
-}
+};
 
-function renderRegisterForm(currentUserSub) {
+const renderRegisterForm = function (currentUserSub, unregisterUrl) {
     let $div = $('#register-form-div').empty();
-    if (currentUserSub) {
-        let action = `${currentUserSub.session_event.unregister_url}?next=${window.location.pathname + window.location.search}`;
+
+    // There only exists a sub for the current user if he is registered for the current session
+    if (!currentUserSub) {
+        let action = `${unregisterUrl}?next=${window.location.pathname + window.location.search}`;
         let DOMString =
             `<form action="${action}">
                 <input class="btn btn-primary" type="submit" value="Sign up for ${SESSION_NAME}'s sub list!">
@@ -89,29 +97,38 @@ function renderRegisterForm(currentUserSub) {
         let $form = $(DOMString);
         $div.append($form);
     }
-}
+};
 
-// Setup the page with the initial data set by the template
-// Note: must wait to have current user to create current user panel
-function initializePage(currentUser) {
+/**
+ * setUrl() changes the url to match the current session event
+ * @param sessionEvent
+ */
+const setUrl = function (sessionEvent) {
+    const message = `Clicked Session ${sessionEvent.id}`;
+    const queryParams = `?sessionEventId=${sessionEvent.id}`;
+    history.pushState({sessionEvent: sessionEvent}, message, queryParams);
+};
+
+/**
+ * initializePage() renders DOM based on global data set by the Django template
+ * @param currentUser
+ *
+ * Note 1:  We use global data from the Django template to reduce an unnecessary API request after page load.
+ * Note 2: We must wait to get the currentUser from an API call.  This is so we don't have to put user data
+ *         inside html at all, which I suspect would be a security risk.
+ */
+const initializePage = function (currentUser) {
     let currentUserSub = getCurrentUserSub(currentUser, initialSubArray);
     let subArray = removeCurrentUserSub(currentUser, initialSubArray);
 
     renderCurrentUserHeader(initialSessionEvent, currentUserSub);
     renderSublistHeader(initialSessionEvent);
-
     renderCurrentUserPanel(currentUserSub);
-    renderRegisterForm(currentUserSub);
+    renderRegisterForm(currentUserSub, initialSessionEvent.unregister_url);
     renderSublistPanels(subArray);
 
     setUrl(initialSessionEvent);
-}
-
-function setUrl(sessionEvent) {
-    const message = `Clicked Session ${sessionEvent.id}`;
-    const queryParams = `?sessionEventId=${sessionEvent.id}`;
-    history.pushState({sessionEvent: sessionEvent}, message, queryParams);
-}
+};
 
 $(document).ready(function () {
     api.getLoggedInUser().done(function (currentUser) {
@@ -144,7 +161,7 @@ $(document).ready(function () {
 
                         renderCurrentUserHeader(sessionEvent, currentUserSub);
                         renderCurrentUserPanel(currentUserSub);
-                        renderRegisterForm(currentUserSub);
+                        renderRegisterForm(currentUserSub, sessionEvent.unregister_url);
                         renderSublistPanels(subArray);
                     });
                 },
