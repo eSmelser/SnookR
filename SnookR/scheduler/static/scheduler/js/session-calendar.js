@@ -137,6 +137,12 @@ $(document).ready(function () {
             // SESSION_SLUG comes from the Django template that includes this script
             session__slug: SESSION_SLUG,
         }).done(function (sessionEvents) {
+
+
+            let times = sessionEvents.map(event => new Date(event.date + 'T' + event.start_time).getTime());
+            let minTime = new Date(Math.min(...times)).getHours() - 2 + ':00:00';
+            let maxTime = new Date(Math.min(...times)).getHours() + 2 + ':00:00';
+
             $('#calendar').fullCalendar({
                 header: {
                     left: 'prev,next today',
@@ -146,6 +152,8 @@ $(document).ready(function () {
                 defaultDate: new Date().toISOString(),
                 navLinks: true, // can click day/week names to navigate views
                 editable: false,
+                minTime: minTime,
+                maxTime: maxTime,
                 eventLimit: true, // allow "more" link when too many events
                 eventClick: function (calEvent, jsEvent, view) {
                     const sessionEvent = calEvent.sessionEvent;

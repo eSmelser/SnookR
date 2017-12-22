@@ -1,4 +1,9 @@
 $(document).ready(function () {
+
+    let times = initialSessionEvents.map( event => new Date(event.date + 'T' + event.start_time).getTime() );
+    let minTime = new Date(Math.min(...times)).getHours() - 2 + ':00:00';
+    let maxTime = new Date(Math.min(...times)).getHours() + 2 + ':00:00';
+
     $('#calendar').fullCalendar({
         header: {
             left: 'prev,next today',
@@ -6,6 +11,8 @@ $(document).ready(function () {
             right: 'month,agendaWeek,agendaDay,listWeek'
         },
         defaultDate: new Date().toISOString(),
+        minTime: minTime,
+        maxTime: maxTime,
         navLinks: true, // can click day/week names to navigate views
         editable: false,
         eventLimit: true, // allow "more" link when too many events
