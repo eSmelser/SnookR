@@ -127,7 +127,7 @@ class Command(BaseCommand):
             session_events = SessionEvent.objects.filter(session=session)
             for session_event in session_events:
                 for user in users:
-                    if random.random() < 0.5:
+                    if random.random() < 0.1:
                         Sub.objects.create(user=user, date=timezone.now(), session_event=session_event)
 
 
