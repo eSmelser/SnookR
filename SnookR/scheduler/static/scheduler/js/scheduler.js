@@ -21,6 +21,7 @@ const createSessionPanel = function (sessionData) {
     return $row;
 };
 
+
 $(document).ready(function () {
     // Filter the Session data set on the Division.slug field of the Division foreign key.
     let division = $('#id_division').val();

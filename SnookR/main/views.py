@@ -115,7 +115,13 @@ class DivisionView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['division'] = Division.objects.get(slug=kwargs.get('division'))
+        slug = kwargs.get('division')
+        division = get_object_or_404(Division, slug=slug)
+
+        session_events = SessionEvent.objects.filter(session__division=division)
+        serializer = serializers.SessionEventSerializer(session_events, many=True)
+        context['division'] = division
+        context['session_events_json'] = JSONRenderer().render(serializer.data)
         return context
 
 

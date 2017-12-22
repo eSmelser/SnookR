@@ -1,6 +1,4 @@
 $(document).ready(function () {
-    console.log('here', initialSessionEvents);
-
     $('#calendar').fullCalendar({
         header: {
             left: 'prev,next today',
