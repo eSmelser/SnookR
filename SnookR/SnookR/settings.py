@@ -82,6 +82,8 @@ INSTALLED_APPS = [
     'api',
     'sublist',
     'scheduler',
+    'teams',
+    'core',
 ]
 
 MIDDLEWARE = [

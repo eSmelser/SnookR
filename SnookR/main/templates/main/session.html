@@ -5,9 +5,6 @@
 {% extends 'main/base.html' %}
 {% load static %}
 
-{# snooker_extras uses the get_unregister_url tag #}
-{% load snooker_extras %}
-
 {% block styles %}
     <link rel="stylesheet" href="{% static 'main/css/session.css' %}">
 {% endblock %}
@@ -52,5 +49,6 @@
     <script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/moment.min.js' %}"></script>
     <script src="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.js' %}"></script>
     <script src="{% static 'api/js/api.js' %}"></script>
+    <script src="{% static 'core/js/templates.js' %}"></script>
     <script src="{% static 'scheduler/js/session-calendar.js' %}"></script>
 {% endblock %}

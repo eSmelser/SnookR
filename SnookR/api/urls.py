@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^sessions/$', views.SessionListView.as_view(), name='sessions'),
     url(r'^session-events/$', views.SessionEventListView.as_view(), name='session_events'),
     url(r'^subs/$', views.SubListView.as_view(), name='sub_list'),
+    url(r'^search-user/$', views.SearchUserView.as_view(), name='search_user'),
 ]

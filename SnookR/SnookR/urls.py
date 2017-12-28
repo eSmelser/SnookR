@@ -27,5 +27,6 @@ urlpatterns = [
     url(r'api/', include('api.urls', namespace='api')),
     url(r'^', include('main.urls')),
     url(r'^sublist/', include('sublist.urls')),
-    url(r'^scheduler/', include('scheduler.urls')), # This is just for developments
+    url(r'^scheduler/', include('scheduler.urls')),  # This is just for developments
+    url(r'^teams/', include('teams.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

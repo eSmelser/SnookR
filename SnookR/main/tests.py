@@ -8,7 +8,8 @@ from django.test.utils import override_settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
-from main.models import CustomUser, Team, Division, TeamInvite
+from main.models import CustomUser, Division
+from teams.models import Team, TeamInvite
 from selenium import webdriver
 from django.conf import settings
 

@@ -1,6 +1,6 @@
 from rest_framework import serializers
-#from main.models import Team, TeamInvite, CustomUser, NonUserPlayer, Session, SessionEvent
-from main import models
+from main import models as main_models
+from teams.models import Team, TeamInvite
 
 def must_have_id(data):
     if 'id' not in data:
@@ -25,18 +25,18 @@ class CustomUserSerializer(serializers.Serializer):
 
 class TeamSerializer(serializers.Serializer):
     players = CustomUserSerializer(many=True)
-    team_captain = CustomUserSerializer(required=True)
     id = serializers.IntegerField(required=False)
     name = serializers.CharField(required=True)
+    team_captain = CustomUserSerializer(required=False)
 
     def create(self, validated_data):
-        captain = CustomUser.objects.get(**validated_data.get('team_captain'))
+        captain = main_models.CustomUser.objects.get(id=self.context['request'].user.id)
         name = validated_data.get('name')
         instance = Team.objects.create(team_captain=captain, name=name)
 
         players = []
         for player in validated_data.get('players', []):
-            players.append(CustomUser.objects.get(**player))
+            players.append(main_models.CustomUser.objects.get(**player))
 
         instance.players.add(*players)
         return instance
@@ -52,7 +52,7 @@ class TeamInviteSerializer(serializers.Serializer):
         team_id = validated_data.get('team').get('id')
         username = validated_data.get('invitee').get('username')
         team = Team.objects.get(id=team_id)
-        invitee = CustomUser.objects.get(username=username)
+        invitee = main_models.CustomUser.objects.get(username=username)
         return TeamInvite.objects.create(team=team, invitee=invitee)
 
 
@@ -77,7 +77,7 @@ class NonUserPlayerSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         obj = Team.objects.get(id=validated_data.get('team').get('id'))
-        return NonUserPlayer.objects.create(team=obj, name=validated_data.get('name'))
+        return main_models.NonUserPlayer.objects.create(team=obj, name=validated_data.get('name'))
 
 
 class DivisionSerializer(serializers.Serializer):

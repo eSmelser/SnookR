@@ -9,7 +9,8 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
-from main.models import Team, Session, SessionEvent, Sub, Division, UserProfile, CustomUser
+from main.models import Session, SessionEvent, Sub, Division, UserProfile, CustomUser
+from teams.models import Team
 import random
 
 TZINFO = timezone.get_current_timezone()

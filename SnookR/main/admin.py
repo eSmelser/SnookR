@@ -4,7 +4,7 @@
 from django.contrib import admin
 from .models import UserProfile
 from .models import Sub
-from .models import Team
+from teams.models import Team
 from .models import Division
 from .models import Session
 

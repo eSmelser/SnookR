@@ -5,6 +5,8 @@ from django.conf.urls import url
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+
+import teams.views
 from main import views
 
 urlpatterns = [
@@ -21,9 +23,6 @@ urlpatterns = [
     url(r'^profile/(?P<username>.+)/$', views.ProfileView.as_view(), name='profile'),
     url(r'^delete_thumbnail/$', views.DeleteThumbnail.as_view(), name='delete_thumbnail'),
     url(r'^invites/$', views.InviteListView.as_view(), name='invites'),
-    url(r'^team/$', views.TeamView.as_view(), name='team'),
-    url(r'^team/create$', views.CreateTeamView.as_view(), name='create_team'),
-    url(r'^team/delete(?P<team>[\w-]+)/(?P<pk>[\d]+)$', views.DeleteTeamView.as_view(), name='delete_team'),
     url(r'^divisions/$', views.DivisionListView.as_view(), name='divisions'),
     url(r'^divisions/(?P<division>[\w-]+)/$', views.DivisionView.as_view(), name='division'),
     url(r'^divisions/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/$', views.SessionView.as_view(), name='session'),

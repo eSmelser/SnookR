@@ -194,6 +194,15 @@ const api = (function () {
         });
     };
 
+    // Search for a user using a term search string
+    const searchForUser = function(data) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/search-user',
+            data: data,
+        });
+    };
+
     // Return public methods for API
     return {
         baseURL,
@@ -205,6 +214,7 @@ const api = (function () {
         patchInvitation,
         getSessionList,
         getSessionEventList,
-        getSubList
+        getSubList,
+        searchForUser,
     }
 })();

@@ -3,28 +3,28 @@
 
 import itertools
 from datetime import datetime
-from functools import reduce
 
 import django.contrib.auth.views as auth_views
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
-from django.db.models import Q
-from django.contrib.auth import login, authenticate
-from django.views.generic.edit import FormView, CreateView
 from django.views.generic.base import TemplateView, RedirectView
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-
+from django.views.generic.edit import FormView
+from functools import reduce
 from rest_framework.renderers import JSONRenderer
 
-from main.models import UserProfile, Division, Session, SessionEvent, CustomUser, Team, Sub
+from api import serializers
 from main.forms import (
     CustomUserForm, SessionRegistrationForm,
     CustomUserLoginForm,
-    TeamForm, CustomUserChangeForm,
+    CustomUserChangeForm,
     UploadThumbnailForm
 )
-from api import serializers
+from main.models import UserProfile, Division, Session, SessionEvent, CustomUser, Sub
+from teams.models import Team
 
 
 def signup(request):
@@ -218,30 +218,6 @@ class SessionUnregisterView(RedirectView, SessionViewMixin):
         session = get_object_or_404(Session, slug=kwargs.get('session'), division__slug=kwargs.get('division'))
         session.remove_user_as_sub(self.request.user, date=date)
         return reverse('home')
-
-
-class TeamView(TemplateView, LoginRequiredMixin):
-    template_name = 'main/team.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['teams'] = Team.get_all_related(self.request.user)
-        return context
-
-
-class CreateTeamView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    template_name = 'main/create_team.html'
-    form_class = TeamForm
-    success_url = reverse_lazy('home')
-    permission_required = 'main.add_team'
-    login_url = '/login/'
-
-
-class DeleteTeamView(RedirectView):
-    def get_redirect_url(self, *args, **kwargs):
-        team = Team.objects.get(slug=kwargs.get('team'), team_captain=self.request.user, id=kwargs.get('pk'))
-        team.delete()
-        return reverse('team')
 
 
 class AccountView(FormView):

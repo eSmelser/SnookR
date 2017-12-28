@@ -1,7 +1,8 @@
-from main.models import Team, TeamInvite, CustomUser, Division, Session, SessionEvent, Sub
+from main.models import CustomUser, Division, Session, SessionEvent, Sub
+from teams.models import Team, TeamInvite
 import rest_framework_filters as filters
 
-character_filters = ['exact', 'contains', 'icontains']
+character_filters = ['exact', 'contains', 'icontains', 'startswith']
 time_filters = ['exact', 'gt', 'gte', 'lt', 'lte']
 
 

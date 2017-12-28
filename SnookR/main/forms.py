@@ -11,7 +11,8 @@ from django.core import validators
 from django.utils import timezone
 from django.contrib.auth import password_validation
 from django.utils.translation import gettext_lazy as _
-from .models import Team, Division, TeamInvite, CustomUser
+from .models import Division, CustomUser
+from teams.models import Team, TeamInvite
 
 phone_regex = validators.RegexValidator(regex=r'^\d{9,15}$',
                                         message="Phone number must be entered in the format: '999999999'. Up to 15 digits allowed.")

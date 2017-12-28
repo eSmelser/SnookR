@@ -1,5 +1,12 @@
-from rest_framework.generics import ListCreateAPIView, UpdateAPIView, ListAPIView, RetrieveAPIView
-from main.models import Team, CustomUser, TeamInvite, NonUserPlayer, Session, SessionEvent, Sub
+import functools
+import hashlib
+
+from rest_framework.generics import ListCreateAPIView, UpdateAPIView, ListAPIView, RetrieveAPIView, CreateAPIView
+from django.core.cache import caches
+from rest_framework.response import Response
+from main.models import CustomUser, Session, SessionEvent, Sub
+from django.db.models import Q
+from teams.models import Team, TeamInvite, NonUserPlayer
 from api.serializers import (
     TeamInviteSerializer,
     TeamInviteUpdateSerializer,
@@ -20,6 +27,14 @@ class UserView(RetrieveAPIView):
 
     def get_object(self):
         return CustomUser.objects.get(username=self.request.user.username)
+
+
+class UserSearchView(ListAPIView):
+    serializer_class = CustomUserSerializer
+    queryset = CustomUser.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        import pdb;pdb.set_trace()
 
 
 class UserListView(ListAPIView):
@@ -76,3 +91,17 @@ class SessionEventListView(ListAPIView):
     queryset = SessionEvent.objects.all()
     serializer_class = SessionEventSerializer
     filter_class = SessionEventFilter
+
+
+class SearchUserView(ListAPIView):
+    def list(self, request, *args, **kwargs):
+        cache = caches['default']
+        query = self.request.GET.get('query', '')
+        key = 'search_user_view:%s' % hashlib.md5(query.encode('ascii', 'ignore')).hexdigest()
+        objs = cache.get(key)
+        if objs is None:
+            objs = CustomUser.objects.search(query)
+            cache.set(key, objs, 60 * 10)
+
+        serializer = CustomUserSerializer(objs, many=True)
+        return Response(serializer.data)
