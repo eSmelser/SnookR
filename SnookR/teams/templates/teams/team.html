@@ -57,23 +57,27 @@
                                    placeholder="Team name..."/>
                         </div>
 
+                        <h2>Added players</h2>
+                        <div id="added-players">
+                        </div>
+
+                        <button type="submit" class="btn btn-default">Submit</button>
+                    </form>
+                    <form action="">
                         <div class="form-group">
                             <label for="player-search">Search</label>
                             <input type="text" class="form-control" id="player-search"
                                    placeholder="Search for a player">
                         </div>
+                    </form>
 
-                        <div id="search-results">
-                            <div id="loader-panel" class="panel panel-default">
-                                <div class="panel-body text-center">
-                                    <div class="loader" id="player-loader" style="display:none"></div>
-                                </div>
+                    <div id="search-results">
+                        <div id="loader-panel" class="panel panel-default">
+                            <div class="panel-body text-center">
+                                <div class="loader" id="player-loader" style="display:none"></div>
                             </div>
                         </div>
-
-
-                        <button type="submit" class="btn btn-default">Submit</button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -91,24 +95,66 @@
             if (term in cache) {
                 let data = cache[term];
                 let $search = $('#search-results').empty();
-                data.map(e => $search.append(genericUserPanelDOM(e)[0]));
+                data.map(e => {
+                    let $panel = $(genericUserPanelDOM(e)[0]);
+                    $panel.hover(function () {
+                            $(this)
+                                .css('background-color', '#f5f5f5')
+                                .css('cursor', 'pointer');
+                        }, function () {
+                            $(this)
+                                .css('background-color', '#ffffff')
+                                .css('cursor', 'auto');
+                        }
+                    ).click(function (event) {
+                        $(this).detach();
+                        $('#added-players').append($(this));
+                    });
+                    $search.append($panel)
+                });
             } else {
                 $('.loader').show();
                 api.searchForUser({query: term}).done(function (data) {
                     cache[term] = data;
                     let $search = $('#search-results').empty();
                     data.map(e => {
-                        let $panel = genericUserPanelDOM(e)[0];
+                        let $panel = $(genericUserPanelDOM(e)[0]);
+                        $panel.hover(function () {
+                                $(this)
+                                    .css('background-color', '#f5f5f5')
+                                    .css('cursor', 'pointer');
+                            }, function () {
+                                $(this)
+                                    .css('background-color', '#ffffff')
+                                    .css('cursor', 'auto');
+                            }
+                        ).click(function (event) {
+                            $(this).detach();
+                            $('#added-players').append($(this));
+                        });
                         $search.append($panel);
                     });
                 }).fail(function (data) {
                     console.log('err!', data);
                 })
-
             }
+
+
+            $('.panel-body').on({
+                mouseover: function () {
+                    console.log('hover');
+                    $(this).css('background-color', '#f5f5f5');
+                },
+                mouseleave: function () {
+                    console.log('hover off');
+                    $(this).css('background-color', '#ffffff');
+                }
+            });
         };
 
         $(document).ready(function () {
+
+
             let searchTerm = '';
 
             let $teamItems = $('.team-item');
@@ -158,7 +204,8 @@
             $('#team-form').submit(function (event) {
                 event.preventDefault();
             });
-        });
+        })
+        ;
     </script>
 {% endblock %}
 
