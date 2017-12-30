@@ -1,0 +1,37 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Profile for {{ player.username }}{% endblock %}
+{% block content %}
+<div>
+    <div class="row">
+        <div class="col-md-2 pull-left">
+            {% if player.profile.thumbnail %}
+                <img class="img-thumbnail img-circle" width=75 height=75 src="{{ player.profile.thumbnail.url }}">
+            {% else %}
+                <img class="img-thumbnail img-circle" width=75 height=75 src="{% static 'substitutes/images/default_profile.jpg' %}">
+            {% endif %}
+        </div>
+        <div class="col-md-10">
+            <h2>{{ player.username }}</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <hr>
+            Username: {{ player.username }}
+            <br>
+            First Name: {{ player.first_name }}
+            <br>
+            Last Name: {{ player.last_name }}
+            <br>
+            Phone: {{ player.profile.phone_number }}
+            <br>
+            Email: {{ player.email }}
+            <br>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer_scripts %}
+{% endblock %}

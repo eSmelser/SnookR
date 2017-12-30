@@ -10428,7 +10428,7 @@ const api = (function () {
      *           Required fields: name, team_captain.
      *           Optional fields: players
      *
-     * Permisions: User must have the 'main.add_team' permission to POST a team.
+     * Permisions: User must have the 'substitutes.add_team' permission to POST a team.
      *
      * Example data arg:
      *       {
@@ -10851,7 +10851,9 @@ let Handlebars = __webpack_require__(131);
         }
     };
 
-    team.init();
+    $(document).ready(function() {
+        team.init();
+    });
 })();
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))

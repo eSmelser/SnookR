@@ -11,8 +11,8 @@ class Team(models.Model):
     '''
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
-    team_captain = models.ForeignKey('main.CustomUser', related_name="team_captain")
-    players = models.ManyToManyField('main.CustomUser', blank=True)
+    team_captain = models.ForeignKey('accounts.CustomUser', related_name="team_captain")
+    players = models.ManyToManyField('accounts.CustomUser', blank=True)
 
     class Meta:
         permissions = (
@@ -50,7 +50,7 @@ class TeamInvite(models.Model):
     )
 
     status = models.CharField(default=PENDING, max_length=1, choices=STATUS_CHOICES)
-    invitee = models.ForeignKey('main.CustomUser')
+    invitee = models.ForeignKey('accounts.CustomUser')
     team = models.ForeignKey(Team)
 
     def __str__(self):

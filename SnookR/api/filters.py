@@ -1,4 +1,5 @@
-from main.models import CustomUser, Division, Session, SessionEvent, Sub
+from substitutes.models import Division, Session, SessionEvent, Sub
+from accounts.models import CustomUser
 from teams.models import Team, TeamInvite
 import rest_framework_filters as filters
 

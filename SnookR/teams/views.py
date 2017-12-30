@@ -4,8 +4,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.urls import reverse
 from django.views.generic import TemplateView, CreateView, RedirectView
 
-from main.forms import TeamForm
-from main.models import CustomUser
+from teams.forms import TeamForm
+from accounts.models import CustomUser
 from teams.models import Team, TeamInvite
 from api.serializers import TeamInviteSerializer, TeamSerializer, CustomUserSerializer
 from rest_framework.renderers import JSONRenderer

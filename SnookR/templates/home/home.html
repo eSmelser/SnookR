@@ -1,0 +1,129 @@
+<!-- 
+     Copyright &copy; 2017 Evan Smelser
+      This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+-->
+{% extends 'core/base.html' %}
+{% load staticfiles %}
+{% block title %}Home{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'substitutes/css/home.css' %}">
+    {% load render_bundle from webpack_loader %}
+
+{% endblock %}
+
+{% block content %}
+    <main role="main">
+        {% if not user.is_authenticated %}
+
+            <div class="jumbotron text-center">
+                <div class="container">
+                    <h1 class="jumbotron-heading">Find a sub... blah blah marketing speech</h1>
+                    <p class="lead text-muted">Something short about what SnookR is. Some more text here to fill up
+                        space.
+                    </p>
+                    <p>
+                        <a href="{% url 'signup' %}" class="btn btn-primary">Signup!</a>
+                    </p>
+                    <p>
+                        Currently <span style="color: red">{{ sub_count }}</span> subs available!
+                    </p>
+                </div>
+            </div>
+            <div id="lower_container" class="container text-muted">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2>Find players your session</h2>
+                        <table class="table">
+                            <tbody>
+                            {% for session in sessions %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="container">
+            <div class="row">
+            <div class="col-md-6">
+                {% if user.is_authenticated %}
+                    <p>Hi, {{ user.username }}! </p>
+
+                    {#  Styling based off of https://stackoverflow.com/questions/29063244/consistent-styling-for-nested-lists-with-bootstrap #}
+                    <h2>Your Available Sessions</h2>
+                    {% for division in divisions %}
+                        <div class="list-group list-group-root well">
+                            <a class="list-group-item">{{ division.instance.name }}</a>
+
+                            {% for session in division.sessions %}
+                                <div class="list-group">
+                                    <a href="#session-{{ session.instance.id }}" class="list-group-item"
+                                       data-toggle="collapse">
+                                        <i class="glyphicon glyphicon-chevron-right"></i>
+                                        {{ session.instance.name }}
+                                    </a>
+
+                                    <div href="" class="list-group collapse" id="session-{{ session.instance.id }}">
+                                        {% for session_event in session.session_events %}
+                                            <a href="{{ session_event.get_absolute_url }}"
+                                               class="list-group-item">{{ session_event.date }}
+                                                at {{ session_event.start_time }}</a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    {% if not divisions %}
+                        <h3>No registered sessions found, go to <a href="{% url 'divisions' %}">Divisions</a> to
+                            register.</h3>
+                    {% endif %}
+
+                {% elif not player %}
+                    <p>Hi, {{ user.username }}! </p>
+                    <p>You are not registered for any sessions</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="col-md-6">
+            <div id="calendar"></div>
+        </div>
+        </div> <!-- /.row -->
+        {% if user.is_authenticated %}
+            <div class="row">
+                <div class="col-md-12">
+                    <br>
+                    <hr>
+                    <h3>Teams</h3>
+                    {% include 'teams/team_list.html' %}
+                </div> <!-- col-md-12 -->
+            </div> <!-- /.row -->
+        {% endif %}
+        </div> <!-- /.container -->
+    </main>
+{% endblock %}
+
+{% block footer_scripts %}
+    <script type="text/javascript">
+        {% if session_events_json %}
+            const initialSessionEvents = JSON.parse('{{ session_events_json|escapejs|safe }}');
+        {%  endif %}
+        $(function () {
+            $('.list-group-item').on('click', function () {
+                $('.glyphicon', this)
+                    .toggleClass('glyphicon-chevron-right')
+                    .toggleClass('glyphicon-chevron-down');
+            });
+        });
+    </script>
+    {% if user.is_authenticated %}
+        <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
+        <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.print.css' %}" rel='stylesheet'
+              media='print'/>
+
+        {% render_bundle 'session-event-calendar' %}
+
+    {% endif %}
+{% endblock %}

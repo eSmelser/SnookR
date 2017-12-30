@@ -275,5 +275,7 @@ let Handlebars = require('handlebars');
         }
     };
 
-    team.init();
+    $(document).ready(function() {
+        team.init();
+    });
 })();

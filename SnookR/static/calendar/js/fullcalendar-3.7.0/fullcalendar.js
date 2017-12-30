@@ -12014,7 +12014,7 @@ var ListView = /** @class */ (function (_super) {
         return '<tr class="fc-list-heading" data-date="' + dayDate.format('YYYY-MM-DD') + '">' +
             '<td class="' + this.calendar.theme.getClass('widgetHeader') + '" colspan="3">' +
             (mainFormat ?
-                this.buildGotoAnchorHtml(dayDate, { 'class': 'fc-list-heading-main' }, util_1.htmlEscape(dayDate.format(mainFormat)) // inner HTML
+                this.buildGotoAnchorHtml(dayDate, { 'class': 'fc-list-heading-substitutes' }, util_1.htmlEscape(dayDate.format(mainFormat)) // inner HTML
                 ) :
                 '') +
             (altFormat ?

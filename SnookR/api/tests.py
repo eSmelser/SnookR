@@ -5,7 +5,8 @@ from django.utils import timezone
 
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, APITestCase
-from main.models import CustomUser, Division, Session, SessionEvent, Sub
+from substitutes.models import Division, Session, SessionEvent, Sub
+from accounts.models import CustomUser
 from teams.models import Team, TeamInvite
 
 

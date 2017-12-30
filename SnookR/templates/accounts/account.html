@@ -1,0 +1,53 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Your Account Settings{% endblock %}
+{% block content %}
+<div>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <h2>{{ user.username }}</h2>
+            <br>
+            {% if user.profile.thumbnail %}
+            <img class="img-thumbnail img-circle" width=75 height=75 src="{{ user.profile.thumbnail.url }}">
+            <a href="{% url 'delete_thumbnail' %}">Delete thumbnail</a>
+            {% else %}
+            <img class="img-thumbnail img-circle" width=75 height=75
+                 src="{% static 'substitutes/images/default_profile.jpg' %}">
+            <br>
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form }}
+                <input type="submit" value="Upload">
+            </form>
+            {% endif %}
+
+            <hr>
+            Username: {{ user.username }}
+            <br>
+            First Name: {{ user.first_name }}
+            <br>
+            Last Name: {{ user.last_name }}
+            <br>
+            Phone: {{ user.profile.phone_number }}
+            <br>
+            Email: {{ user.email }}
+            <br>
+
+            Change account settings <a href="{% url 'account_change' %}">here</a>
+            <br>
+            <a id="id_delete_account_link" href="{% url 'account_delete' %}">Delete Account</a>
+            <br>
+            <a id="id_password_change_link" href="{% url 'password_change' %}">Change password</a>
+            <br>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+
+</div>
+{% endblock %}
+
+{% block footer_scripts %}
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+{% endblock %}

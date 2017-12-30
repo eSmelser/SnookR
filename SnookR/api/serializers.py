@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from main import models as main_models
+
+import accounts.models
+from substitutes import models as main_models
 from teams.models import Team, TeamInvite
 
 def must_have_id(data):
@@ -30,13 +32,13 @@ class TeamSerializer(serializers.Serializer):
     team_captain = CustomUserSerializer(required=False)
 
     def create(self, validated_data):
-        captain = main_models.CustomUser.objects.get(id=self.context['request'].user.id)
+        captain = accounts.models.CustomUser.objects.get(id=self.context['request'].user.id)
         name = validated_data.get('name')
         instance = Team.objects.create(team_captain=captain, name=name)
 
         players = []
         for player in validated_data.get('players', []):
-            players.append(main_models.CustomUser.objects.get(**player))
+            players.append(accounts.models.CustomUser.objects.get(**player))
 
         instance.players.add(*players)
         return instance
@@ -52,7 +54,7 @@ class TeamInviteSerializer(serializers.Serializer):
         team_id = validated_data.get('team').get('id')
         username = validated_data.get('invitee').get('username')
         team = Team.objects.get(id=team_id)
-        invitee = main_models.CustomUser.objects.get(username=username)
+        invitee = accounts.models.CustomUser.objects.get(username=username)
         return TeamInvite.objects.create(team=team, invitee=invitee)
 
 

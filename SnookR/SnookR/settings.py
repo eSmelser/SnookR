@@ -55,7 +55,7 @@ if not DEBUG and os.environ.get('DJANGO_LOG', False):
                 'propagate': True,
                 'level': 'DEBUG',
             },
-            'main': {
+            'substitutes': {
                 'handlers': ['file'],
                 'level': 'DEBUG',
             },
@@ -78,11 +78,12 @@ INSTALLED_APPS = [
     'rest_framework_filters',
     'crispy_forms',
     'webpack_loader',
-    'main',
+    'substitutes',
+    'home',
     'api',
-    'sublist',
     'teams',
     'core',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -100,7 +101,7 @@ ROOT_URLCONF = 'SnookR.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -109,7 +110,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
-                'main.context_processors.custom_user',
+                'accounts.context_processors.custom_user',
             ],
         },
     },
