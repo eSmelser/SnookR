@@ -17,8 +17,8 @@ const currentUserPanelDOM = function (user, unregisterUrl) {
 };
 
 const subUserPanelDOM = function (user) {
-    let buttonDOMString =
-        `<button class="session-button pull-right" type="button" href="${user.inviteUrl}">Invite</button>`;
+    let buttonDOMString = context.currentUserIsCaptain ?
+        `<button class="session-button pull-right" type="button" href="${user.inviteUrl}">Invite</button>` : '';
 
     return templates.genericUserPanelDOM(user, buttonDOMString);
 };
@@ -100,13 +100,13 @@ const setUrl = function (sessionEvent) {
  *         inside html at all, which I suspect would be a security risk.
  */
 const initializePage = function (currentUser) {
-    let currentUserSub = getCurrentUserSub(currentUser, initialSubArray);
-    let subArray = removeCurrentUserSub(currentUser, initialSubArray);
+    let currentUserSub = getCurrentUserSub(currentUser, context.initialSubArray);
+    let subArray = removeCurrentUserSub(currentUser, context.initialSubArray);
 
-    renderCurrentUserHeader(initialSessionEvent, currentUserSub);
-    renderSublistHeader(initialSessionEvent);
+    renderCurrentUserHeader(context.initialSessionEvent, currentUserSub);
+    renderSublistHeader(context.initialSessionEvent);
     renderCurrentUserPanel(currentUserSub);
-    renderRegisterForm(currentUserSub, initialSessionEvent);
+    renderRegisterForm(currentUserSub, context.initialSessionEvent);
     renderSublistPanels(subArray);
 
     setUrl(initialSessionEvent);
@@ -118,7 +118,7 @@ $(document).ready(function () {
 
         api.getSessionEventList({
             // SESSION_SLUG comes from the Django template that includes this script
-            session__slug: SESSION_SLUG,
+            session__slug: context.SESSION_SLUG,
         }).done(function (sessionEvents) {
 
 
@@ -157,7 +157,7 @@ $(document).ready(function () {
                 },
                 events: sessionEvents.map(sessionEvent => {
                     return {
-                        title: SESSION_NAME,
+                        title: context.SESSION_NAME,
                         start: sessionEvent.date + 'T' + sessionEvent.start_time,
                         sessionEvent: sessionEvent
                     }

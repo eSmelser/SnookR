@@ -38,12 +38,12 @@
     <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
     <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.print.css' %}" rel='stylesheet' media='print'/>
     <script type="text/javascript">
-        const DIVISION_SLUG = "{{ session.division.slug|escapejs|safe }}";
-        const SESSION_SLUG = "{{ session.slug|escapejs|safe }}";
-        const SESSION_NAME = "{{  session.name|escapejs|safe }}";
-        const initialSessionEvent = JSON.parse('{{ session_event_json | escapejs }}');
-        const initialSubArray = JSON.parse('{{ subs_json | escapejs }}');
+        const context = {};
+        context.SESSION_NAME = "{{  session.name|escapejs|safe }}";
+        context.initialSessionEvent = JSON.parse('{{ session_event_json | escapejs }}');
+        context.initialSubArray = JSON.parse('{{ subs_json | escapejs }}');
+        context.SESSION_SLUG = "{{ session.slug|escapejs|safe }}";
+        context.currentUserIsCaptain = {% if perms.teams.add_team %}true{% else %}false{% endif %};
     </script>
-
     {% render_bundle 'session-calendar' %}
 {% endblock %}
