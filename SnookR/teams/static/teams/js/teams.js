@@ -30,20 +30,26 @@
         },
 
         bindEvents: function () {
-            this.$teamItemElementsDiv.on('click', '.team-item', {self: this}, this.selectTeam);
-            this.$teamItemElementsDiv.on('click', '.team-item', this.showTeamPlayersDiv.bind(this));
-            this.$newTeamButton.click(this.selectTeamCreator.bind(this));
-            this.$newTeamButton.click(this.activateTeamCreator.bind(this));
-            this.$newTeamButton.click(this.hideTeamPlayersDiv.bind(this));
-            this.$searchInput.on('keyup', this.searchPlayers.bind(this));
-            this.$searchResultsDiv.on('click', '.panel-body', {self: this}, this.addPlayer);
-            this.$searchResultsDiv.on('mouseenter', '.panel-body', this.activatePanelMouseOver);
-            this.$searchResultsDiv.on('mouseleave', '.panel-body', this.activatePanelMouseOff);
-            this.$addedPlayersDiv.on('mouseenter', '.panel-body', this.activatePanelMouseOver);
-            this.$addedPlayersDiv.on('mouseleave', '.panel-body', this.activatePanelMouseOff);
-            this.$addedPlayersDiv.on('click', '.panel-body', {self: this}, this.removePlayer);
-            this.$form.find('#submit').click(this.validateForm.bind(this));
-            this.$form.find('#submit').click(this.addAddedPlayersToForm.bind(this));
+            this.$searchInput
+                .on('keyup', this.searchPlayers.bind(this));
+            this.$teamItemElementsDiv
+                .on('click', '.team-item', {self: this}, this.selectTeam)
+                .on('click', '.team-item', this.showTeamPlayersDiv.bind(this));
+            this.$newTeamButton
+                .click(this.selectTeamCreator.bind(this))
+                .click(this.activateTeamCreator.bind(this))
+                .click(this.hideTeamPlayersDiv.bind(this));
+            this.$searchResultsDiv
+                .on('click', '.panel-body', {self: this}, this.addPlayer)
+                .on('mouseenter', '.panel-body', this.activatePanelMouseOver)
+                .on('mouseleave', '.panel-body', this.activatePanelMouseOff);
+            this.$addedPlayersDiv
+                .on('mouseenter', '.panel-body', this.activatePanelMouseOver)
+                .on('mouseleave', '.panel-body', this.activatePanelMouseOff)
+                .on('click', '.panel-body', {self: this}, this.removePlayer);
+            this.$form.find('#submit')
+                .click(this.validateForm.bind(this))
+                .click(this.addAddedPlayersToForm.bind(this));
         },
 
         validateForm: function () {
@@ -57,7 +63,7 @@
             }
 
             // Validate players field
-            if (!this.addedPlayers.length) {
+            if (this.addedPlayers.length <= 0) {
                 let $warning = $('<strong>').css('color', 'red').append('No players selected!');
                 this.$addedPlayersDiv.empty().append($warning);
                 valid = false;
