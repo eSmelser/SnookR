@@ -14,42 +14,59 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-md-4">
+            <div id="left-column" class="col-md-4">
+                <div id="team-list"></div>
                 <h3>Your Teams</h3>
-
                 <div class="list-group">
-                    {% for team in teams %}
-                        <a href="#team-{{ team.id }}" class="list-group-item team-item"
-                           data-team-id="{{ team.id }}">{{ team|title }}</a>
-                    {% endfor %}
 
-                    {% if perms.teams.add_team %}
-                        <a id="new-team-button" href="#" class="list-group-item"><span
-                                class="glyphicon glyphicon-plus"></span> New Team</a>
-                    {% endif %}
+                    <div id="team-item-elements">
+                        {% for team in teams %}
+                            <a href="#team-{{ team.id }}" class="list-group-item team-item"
+                               data-team-id="{{ team.id }}">
+                                {{ team.name }}
+                            </a>
+                        {% endfor %}
+                        {% if perms.teams.add_team %}
+                            <a id="new-team-button" href="#" class="list-group-item"><span
+                                    class="glyphicon glyphicon-plus"></span> New Team</a>
+                        {% endif %}
+                    </div>
+
+
                 </div>
             </div>
-            <div class="col-md-8">
+            <div id="right-column" class="col-md-8">
                 <div id="players-div">
                     <h3>Players</h3>
                     {% for team in teams %}
-                        <div class="list-group">
+                        <div class="list-group player-group" id="player-group-{{ team.id }}" style="display:none">
                             {% for player in players %}
                                 {% if team == player.team %}
-                                    <a class="list-group-item player-group-item player-group-{{ player.team.id }}"
-                                       href="{{ player.instance.get_absolute_url }}"
-                                            {% if player.team.id != first_team_id %}
-                                       style="display:none"
-                                            {% endif %}
-                                    >{{ player.instance }}</a>
+                                    <div class="panel panel-default">
+                                        <div class="panel-body player-group-item" data-user-id="{{ id }}">
+                                            <div class="pull-left">
+                                                <a href="{{ player.instance.get_absolute_url }}">
+                                                    <img class="img-circle" width="50px" height="50px"
+                                                         style="margin-right:8px; margin-top:-5px;"
+                                                         src="{{ player.instance.profile.thumbnail.url }}">
+                                                </a>
+                                            </div>
+                                            <h4 class="pull-left">
+                                                <a href="{{ player.instance.get_absolute_url }}"
+                                                   style="text-decoration:none;"><strong>{{ player.instance.username }}</strong></a>
+                                            </h4>
+                                        </div>
+                                    </div>
+
+
                                 {% endif %}
                             {% endfor %}
                         </div>
                     {% endfor %}
                 </div>
-                <div id="new-team-div" style="display:none">
+                <div id="team-creator-div" style="display:none">
                     <h3>Create a new team</h3>
-                    <form id="team-form" action="{% url 'api:team' %}" method="post">
+                    <form id="team-form" action="{% url 'create_team' %}" method="post">
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="team-name">Team Name</label>
@@ -59,14 +76,33 @@
 
                         <h2>Added players</h2>
                         <div id="added-players">
+                            <script id="user-panel-template" type="text/template">
+                                {% verbatim %}
+                                <div class="panel panel-default">
+                                    <div class="panel-body" data-user-id="{{ id }}">
+                                        <div class="pull-left">
+                                            <a href="{{ url }}">
+                                                <img class="img-circle" width="50px" height="50px"
+                                                     style="margin-right:8px; margin-top:-5px;"
+                                                     src="{{ thumbnail_url }}">
+                                            </a>
+                                        </div>
+                                        <h4 class="pull-left">
+                                            <a href="{{ url }}"
+                                               style="text-decoration:none;"><strong>{{ username }}</strong></a>
+                                        </h4>
+                                    </div>
+                                </div>
+                                {% endverbatim %}
+                            </script>
                         </div>
 
-                        <button type="submit" class="btn btn-default">Submit</button>
+                        <button id="submit" type="submit" class="btn btn-default">Submit</button>
                     </form>
                     <form action="">
                         <div class="form-group">
                             <label for="player-search">Search</label>
-                            <input type="text" class="form-control" id="player-search"
+                            <input type="text" class="form-control" id="input-search"
                                    placeholder="Search for a player">
                         </div>
                     </form>
@@ -85,127 +121,305 @@
 {% endblock %}
 
 {% block footer_scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
     <script src="{% static 'core/js/templates.js' %}"></script>
     <script src="{% static 'api/js/api.js' %}"></script>
 
     <script type="text/javascript">
-        let cache = {};
+        // Initialize JavaScript data using the Django template language + JavaScript
+        const context = {};
+        context.teams = JSON.parse('{{ teams_json | escapejs }}');
+        context.invites = JSON.parse('{{ invites_json | escapejs }}');
+        context.currentUserCanAddTeam = {{ perms.teams.add_team|lower }};
 
-        const searchForTerm = function (term) {
-            if (term in cache) {
-                let data = cache[term];
-                let $search = $('#search-results').empty();
-                data.map(e => {
-                    let $panel = $(genericUserPanelDOM(e)[0]);
-                    $panel.hover(function () {
-                            $(this)
-                                .css('background-color', '#f5f5f5')
-                                .css('cursor', 'pointer');
-                        }, function () {
-                            $(this)
-                                .css('background-color', '#ffffff')
-                                .css('cursor', 'auto');
-                        }
-                    ).click(function (event) {
-                        $(this).detach();
-                        $('#added-players').append($(this));
-                    });
-                    $search.append($panel)
-                });
-            } else {
-                $('.loader').show();
-                api.searchForUser({query: term}).done(function (data) {
-                    cache[term] = data;
-                    let $search = $('#search-results').empty();
-                    data.map(e => {
-                        let $panel = $(genericUserPanelDOM(e)[0]);
-                        $panel.hover(function () {
-                                $(this)
-                                    .css('background-color', '#f5f5f5')
-                                    .css('cursor', 'pointer');
-                            }, function () {
-                                $(this)
-                                    .css('background-color', '#ffffff')
-                                    .css('cursor', 'auto');
-                            }
-                        ).click(function (event) {
-                            $(this).detach();
-                            $('#added-players').append($(this));
-                        });
-                        $search.append($panel);
-                    });
-                }).fail(function (data) {
-                    console.log('err!', data);
-                })
-            }
-
-
-            $('.panel-body').on({
-                mouseover: function () {
-                    console.log('hover');
-                    $(this).css('background-color', '#f5f5f5');
-                },
-                mouseleave: function () {
-                    console.log('hover off');
-                    $(this).css('background-color', '#ffffff');
-                }
-            });
+        const STATUS = {
+            'P': 'Pending',
+            'A': 'Accepted',
+            'D': 'Declined',
         };
 
-        $(document).ready(function () {
+        // Special definitions
+        String.prototype.toTitleCase = function () {
+            return this.slice(0, 1).toUpperCase() + this.slice(1).toLowerCase();
+        };
 
-
-            let searchTerm = '';
-
-            let $teamItems = $('.team-item');
-            let $firstTeam = $teamItems.first().addClass('active');
-            let firstTeamId = $firstTeam.attr('data-team-id');
-            $('.player-group-item').not(`.player-group-${firstTeamId}`).hide();
-
-
-            $teamItems.click(function () {
-                let selectedTeam = $(this).attr('data-team-id');
-                let selectorString = `.player-group-${selectedTeam}`;
-                $(`.player-group-${selectedTeam}`).show();
-                $('#players-div').show();
-                $('#new-team-div').hide();
-                $('.player-group-item').not(selectorString).hide();
-            });
-
-            $('.list-group-item').click(function () {
-                $('.list-group-item').removeClass('active');
-                $(this).addClass('active');
-            });
-
-            $('#new-team-button').click(function () {
-                $('#new-team-div').show();
-                $('#players-div').hide();
-            });
-
-            $('#player-search').on('keyup', function (event) {
-                const key = event.originalEvent.key;
-                const isLetter = event.keyCode >= 65 && event.keyCode <= 90;
-                const isNumber = event.keyCode >= 48 && event.keyCode <= 57;
-
-                if (isLetter || isNumber) {
-                    searchTerm = searchTerm + key;
-
-                } else if (key === 'Backspace') {
-                    searchTerm = searchTerm.slice(0, searchTerm.length - 1);
+        const getObjectValues = function (object) {
+            let array = [];
+            for (id in object) {
+                if (object.hasOwnProperty(id)) {
+                    array.push(object[id])
                 }
+            }
 
-                if (searchTerm) {
-                    console.log('searchTerm', searchTerm);
-                    searchForTerm(searchTerm);
-                    $('#player-loader').show();
+            return array;
+        };
+
+        (function () {
+            let team = {
+                init: function () {
+                    this.clientCache = {};
+                    this.userPanelTemplate = Handlebars.compile($('#user-panel-template').html());
+                    this.userPanelDomCache = {};
+                    this.teamCreatorSelected = false;
+                    this.searchResults = [];
+                    this.addedPlayers = [];
+                    this.cacheDom();
+                    this.selectedTeamId = this.initSelectedTeam();
+                    this.bindEvents();
+                    this.render();
+                },
+
+                cacheDom: function () {
+                    this.$teamItemElementsDiv = $("#team-item-elements");
+                    this.$newTeamButton = $('#new-team-button');
+                    this.$teamCreatorDiv = $('#team-creator-div');
+                    this.$teamPlayersDiv = $('#players-div');
+                    this.$searchInput = $('#input-search');
+                    this.$loader = $('#player-loader');
+                    this.$searchResultsDiv = $('#search-results');
+                    this.$addedPlayersDiv = $('#added-players');
+                    this.$form = $('#team-form');
+                },
+
+                bindEvents: function () {
+                    this.$teamItemElementsDiv.on('click', '.team-item', {self: this}, this.selectTeam);
+                    this.$teamItemElementsDiv.on('click', '.team-item', this.showTeamPlayersDiv.bind(this));
+                    this.$newTeamButton.click(this.selectTeamCreator.bind(this));
+                    this.$newTeamButton.click(this.activateTeamCreator.bind(this));
+                    this.$newTeamButton.click(this.hideTeamPlayersDiv.bind(this));
+                    this.$searchInput.on('keyup', this.searchPlayers.bind(this));
+                    this.$searchResultsDiv.on('click', '.panel-body', {self: this}, this.addPlayer);
+                    this.$searchResultsDiv.on('mouseenter', '.panel-body', this.activatePanelMouseOver);
+                    this.$searchResultsDiv.on('mouseleave', '.panel-body', this.activatePanelMouseOff);
+                    this.$addedPlayersDiv.on('mouseenter', '.panel-body', this.activatePanelMouseOver);
+                    this.$addedPlayersDiv.on('mouseleave', '.panel-body', this.activatePanelMouseOff);
+                    this.$addedPlayersDiv.on('click', '.panel-body', {self: this}, this.removePlayer);
+                    this.$form.find('#submit').click(this.validateForm.bind(this));
+                    this.$form.find('#submit').click(this.addAddedPlayersToForm.bind(this));
+                },
+
+                validateForm: function () {
+                    let valid = true;
+
+                    // Validate name field
+                    let $name = this.$form.find('#team-name');
+                    if ($name.val().length <= 0) {
+                        this.$form.find('#team-name').css('border-color', 'red');
+                        valid = false;
+                    }
+
+                    // Validate players field
+                    if (!this.addedPlayers.length) {
+                        let $warning = $('<strong>').css('color', 'red').append('No players selected!');
+                        this.$addedPlayersDiv.empty().append($warning);
+                        valid = false;
+                    }
+
+                    return valid;
+                },
+
+                searchPlayers: function () {
+                    this.$loader.show();
+                    let searchTerm = this.$searchInput.val();
+                    if (searchTerm) {
+                        this.searchForTerm(searchTerm);
+                    } else {
+                        this.searchResults = [];
+                    }
+
+                    self.render();
+                },
+
+                searchForTerm: function (term) {
+                    if (term in this.clientCache) {
+                        this.searchResults = this.clientCache[term];
+                    } else {
+                        self = this;
+                        this.$loader.show();
+                        api.searchForUser({query: term}).done(function (data) {
+                            data = data.filter(player => !(player.id in self.addedPlayers));
+                            self.clientCache[term] = data;
+                            self.searchResults = data;
+                            self.render();
+                        }).fail(function (data) {
+                            console.log('err!', data);
+                        })
+                    }
+                },
+
+                initSelectedTeam: function () {
+                    // The first selected team is fromt he top-most .team-item element.
+                    let id = this.$teamItemElementsDiv
+                        .find('.team-item')
+                        .first()
+                        .attr('data-team-id');
+
+                    this.selectedTeamId = parseInt(id);
+                    return this.selectedTeamId;
+                },
+
+                selectTeamCreator: function () {
+                    this.teamCreatorSelected = true;
+                    this.render();
+                },
+
+                selectTeam: function (event) {
+                    let self = event.data.self;
+                    let id = $(this).attr('data-team-id');
+                    self.selectedTeamId = parseInt(id);
+                    self.teamCreatorSelected = false;
+                    self.render();
+                },
+
+                render: function () {
+                    let selector = `.team-item[data-team-id=${this.selectedTeamId}]`;
+                    this.$teamItemElementsDiv.find(selector).addClass('active');
+                    this.hideUnselectedPlayerGroups();
+                    this.showSelectedPlayerGroup();
+                    this.deactiveUnselectedTeams();
+                    this.activateSelectedTeam();
+
+                    if (this.teamCreatorSelected) {
+                        this.deactivateAllTeams();
+                        this.hideTeamPlayersDiv();
+                        this.showTeamCreator();
+                        this.activateTeamCreator();
+                        this.renderSearchResultsDiv();
+                        this.renderAddedPlayersDiv();
+                    } else {
+                        this.hideTeamCreator();
+                        this.showTeamPlayersDiv();
+                        this.deactivateTeamCreator();
+                    }
+                },
+
+                addAddedPlayersToForm: function () {
+                    this.$form.append(this.addedPlayers.map((p, i) => `<input type="hidden" value="${p.id}" name="player-${i}">`))
+                },
+
+                activatePanelMouseOver: function () {
+                    $(this)
+                        .css('background-color', '#f5f5f5')
+                        .css('cursor', 'pointer');
+                },
+
+                activatePanelMouseOff: function () {
+                    $(this)
+                        .css('background-color', '#ffffff')
+                        .css('cursor', 'auto');
+                },
+
+                getUserPanelDom: function (user) {
+                    if (user.id in this.userPanelDomCache) {
+                        return this.userPanelDomCache[user.id];
+                    } else {
+                        let html = this.userPanelTemplate(user);
+                        this.userPanelDomCache[user.id] = $(html);
+                        return this.userPanelDomCache[user.id];
+                    }
+                },
+
+                renderSearchResultsDiv: function () {
+                    this.$searchResultsDiv.empty();
+                    this.searchResults.map(user => {
+                        let $dom = this.getUserPanelDom(user);
+                        this.$searchResultsDiv.append($dom);
+                    });
+                },
+
+                renderAddedPlayersDiv: function () {
+                    console.log(this.addedPlayers);
+                    this.$addedPlayersDiv.empty();
+                    this.addedPlayers.map(user => {
+                        let $dom = this.getUserPanelDom(user);
+                        this.$addedPlayersDiv.append($dom)
+                    });
+                },
+
+                activateSelectedTeam: function (event) {
+                    let selector = this.getTeamItemSelector();
+                    this.$teamItemElementsDiv.find(selector).addClass('active');
+                },
+
+                showSelectedPlayerGroup: function () {
+                    let selector = this.getPlayerGroupSelector();
+                    this.$teamPlayersDiv.find(selector).show();
+                },
+
+                hideUnselectedPlayerGroups: function () {
+                    let selector = this.getPlayerGroupSelector();
+                    this.$teamPlayersDiv.find('.player-group').not(selector).hide();
+                },
+
+                activateTeamCreator: function () {
+                    this.$newTeamButton.addClass('active')
+                },
+
+                deactivateTeamCreator: function () {
+                    this.$newTeamButton.removeClass('active')
+                },
+
+                deactiveUnselectedTeams: function () {
+                    this.$teamItemElementsDiv
+                        .find('.team-item')
+                        .not(this.getTeamItemSelector())
+                        .removeClass('active');
+                },
+
+                deactivateAllTeams: function () {
+                    this.$teamItemElementsDiv
+                        .find('.team-item')
+                        .removeClass('active');
+                },
+
+                showTeamCreator: function () {
+                    this.$teamCreatorDiv.show();
+                },
+
+                hideTeamCreator: function () {
+                    this.$teamCreatorDiv.hide();
+                },
+
+                showTeamPlayersDiv: function () {
+                    this.$teamPlayersDiv.show();
+                },
+
+                hideTeamPlayersDiv: function () {
+                    this.$teamPlayersDiv.hide();
+                },
+
+                getTeamItemSelector: function () {
+                    return `.team-item[data-team-id=${this.selectedTeamId}]`;
                 }
-            });
+                ,
 
-            $('#team-form').submit(function (event) {
-                event.preventDefault();
-            });
-        })
-        ;
+                getPlayerGroupSelector: function () {
+                    return `#player-group-${this.selectedTeamId}`;
+                },
+
+                addPlayer: function (event) {
+                    let self = event.data.self;
+                    let id = parseInt($(this).attr('data-user-id'));
+                    let index = self.searchResults.findIndex(user => user.id === id);
+                    let user = self.searchResults[index];
+                    self.searchResults.splice(index, 1);
+                    self.addedPlayers.push(user);
+                    self.render();
+                },
+
+                removePlayer: function (event) {
+                    let self = event.data.self;
+                    let id = parseInt($(this).attr('data-user-id'));
+                    let index = self.addedPlayers.findIndex(user => user.id === id);
+                    let user = self.addedPlayers[index];
+                    self.addedPlayers.splice(index, 1);
+                    self.searchResults.push(user);
+                    self.render();
+                }
+            };
+
+            team.init();
+        })();
     </script>
 {% endblock %}
 

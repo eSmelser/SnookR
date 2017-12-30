@@ -2,12 +2,13 @@
  * Created by bobby on 12/27/17.
  */
 const genericUserPanelDOM = function (user, actionDOMString) {
-    //This layout is inspired by the snippet found here: https://bootsnipp.com/snippets/56ExR
     return $(genericUserPanelDOMString(user, actionDOMString));
 };
 
+
 const genericUserPanelDOMString = function (user, actionDOMString) {
-    return `<div class="panel panel-default">
+    //This layout is inspired by the snippet found here: https://bootsnipp.com/snippets/56ExR
+    return (`<div class="panel panel-default">
                 <div class="panel-body">
                       <div class="pull-left">
                             <a href="${user.url}">
@@ -22,5 +23,5 @@ const genericUserPanelDOMString = function (user, actionDOMString) {
                         </h4>
                         ${actionDOMString ? actionDOMString : '<span></span>'}
                 </div>  
-            </div>`
+            </div>`)
 };

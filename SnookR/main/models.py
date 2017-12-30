@@ -3,7 +3,7 @@
 
 import functools
 from autoslug import AutoSlugField
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, UserManager
 from django.db.models import Q
 from django.db import models
 from django.urls import reverse
@@ -15,12 +15,19 @@ from api import serializers
 
 class CustomUserQuerySet(models.QuerySet):
     def search(self, string):
-        terms = string.split()
-        # Match the beginning of username, first_name, or last_name with each word in the search phrase
-        q_objects = [Q(username__startswith=term) | Q(first_name__startswith=term) | Q(last_name__startswith=term) for
-                     term in terms]
-        query = functools.reduce(lambda x, y: x | y, q_objects, Q())
+        query = Q()
+        for term in string.split():
+            query |= Q(username__startswith=term) | Q(first_name__startswith=term) | Q(last_name__startswith=term)
+
         return self.filter(query)
+
+
+class CustomUserManager(UserManager):
+    def get_queryset(self):
+        return CustomUserQuerySet(self.model, using=self._db)
+
+    def search(self, string):
+        return self.get_queryset().search(string)
 
 
 class CustomUser(User):
@@ -30,7 +37,7 @@ class CustomUser(User):
     class Meta:
         proxy = True
 
-    objects = CustomUserQuerySet.as_manager()
+    objects = CustomUserManager()
 
     def as_json(self):
         return {
@@ -78,7 +85,7 @@ Player -> Sub      :
 
 
 def thumbnail_path(instance, filename):
-    return 'uploads/user/{0}/{1}'.format(instance.user.username, filename)
+    return '/uploads/user/{0}/{1}'.format(instance.user.username, filename)
 
 
 class UserProfile(models.Model):
