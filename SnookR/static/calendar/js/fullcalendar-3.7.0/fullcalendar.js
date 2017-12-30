@@ -6159,7 +6159,7 @@ var DayTableMixin = /** @class */ (function (_super) {
     };
     // TODO: a generic method for dealing with <tr>, RTL, intro
     // when increment internalApiVersion
-    // wrapTr (scheduler)
+    // wrapTr (calendar)
     /* Utils
     ------------------------------------------------------------------------------------------------------------------*/
     // Applies the generic "intro" and "outro" HTML to the given cells.
@@ -11566,7 +11566,7 @@ var TimeGrid = /** @class */ (function (_super) {
         return 'minute'; // will refresh on the minute
     };
     TimeGrid.prototype.renderNowIndicator = function (date) {
-        // HACK: if date columns not ready for some reason (scheduler)
+        // HACK: if date columns not ready for some reason (calendar)
         if (!this.colContainerEls) {
             return;
         }

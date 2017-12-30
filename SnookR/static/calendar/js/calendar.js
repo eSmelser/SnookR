@@ -1,3 +1,6 @@
+let api = require('../../api/js/api.js');
+let fullcalendar = require('fullcalendar');
+
 const createSessionPanel = function (sessionData) {
     let subs = sessionData['subs']
         .map(elem =>

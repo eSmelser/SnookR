@@ -218,3 +218,5 @@ const api = (function () {
         searchForUser,
     }
 })();
+
+module.exports = api;

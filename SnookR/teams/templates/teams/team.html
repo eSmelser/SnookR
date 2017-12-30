@@ -5,10 +5,11 @@
 
 {% extends 'main/base.html' %}
 {% load static %}
+{% load render_bundle from webpack_loader %}
 {% block title %}Teams{% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'teams/css/teams.css' %}">
+    <link rel="stylesheet" href="{% static 'css/teams.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -77,8 +78,9 @@
 
                         <h2>Added players</h2>
                         <div id="added-players">
+                            {# Use verbatim so Django doesn't render the text/template for Handlebars.js #}
+                            {% verbatim %}
                             <script id="user-panel-template" type="text/template">
-                                {% verbatim %}
                                 <div class="panel panel-default">
                                     <div class="panel-body" data-user-id="{{ id }}">
                                         <div class="pull-left">
@@ -94,8 +96,8 @@
                                         </h4>
                                     </div>
                                 </div>
-                                {% endverbatim %}
                             </script>
+                            {% endverbatim %}
                         </div>
 
                         <button id="submit" type="submit" class="btn btn-default">Submit</button>
@@ -122,9 +124,6 @@
 {% endblock %}
 
 {% block footer_scripts %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
-    <script src="{% static 'core/js/templates.js' %}"></script>
-    <script src="{% static 'api/js/api.js' %}"></script>
-    <script src="{% static 'teams/js/teams.js' %}"></script>
+    {% render_bundle 'teams' %}
 {% endblock %}
 

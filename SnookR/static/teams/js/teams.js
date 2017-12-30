@@ -2,6 +2,9 @@
  * Created by bobby on 12/29/17.
  */
 
+let api = require('../../api/js/api');
+let Handlebars = require('handlebars');
+
 (function () {
     let team = {
         init: function () {

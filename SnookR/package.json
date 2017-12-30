@@ -11,8 +11,19 @@
   "license": "ISC",
   "devDependencies": {
     "babel": "^6.23.0",
+    "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
+    "css-loader": "^0.28.7",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "style-loader": "^0.19.1",
     "webpack": "^3.10.0",
     "webpack-bundle-tracker": "^0.2.1"
+  },
+  "dependencies": {
+    "expose-loader": "^0.7.4",
+    "fullcalendar": "^3.8.0",
+    "handlebars": "^4.0.11",
+    "jquery": "^3.2.1",
+    "jquery-ui": "^1.12.1"
   }
 }

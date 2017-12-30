@@ -1,3 +1,7 @@
+let api = require('../../api/js/api');
+let fullcalendar = require('fullcalendar');
+let templates = require('../../core/js/templates');
+
 $(document).ready(function () {
     api.getSessionList(data).done(function (data) {
         $('#calendar').fullCalendar({

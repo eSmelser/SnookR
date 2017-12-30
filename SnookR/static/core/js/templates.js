@@ -25,3 +25,8 @@ const genericUserPanelDOMString = function (user, actionDOMString) {
                 </div>  
             </div>`)
 };
+
+module.exports = {
+    genericUserPanelDOM,
+    genericUserPanelDOMString
+};

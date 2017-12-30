@@ -34,8 +34,8 @@ if not DEBUG and os.environ.get('DJANGO_LOG', False):
         'disable_existing_loggers': False,
         'formatters': {
             'verbose': {
-                'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-                'datefmt' : "%d/%b/%Y %H:%M:%S"
+                'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+                'datefmt': "%d/%b/%Y %H:%M:%S"
             },
             'simple': {
                 'format': '%(levelname)s %(message)s'
@@ -51,9 +51,9 @@ if not DEBUG and os.environ.get('DJANGO_LOG', False):
         },
         'loggers': {
             'django': {
-                'handlers':['file'],
+                'handlers': ['file'],
                 'propagate': True,
-                'level':'DEBUG',
+                'level': 'DEBUG',
             },
             'main': {
                 'handlers': ['file'],
@@ -62,8 +62,7 @@ if not DEBUG and os.environ.get('DJANGO_LOG', False):
         }
     }
 
-
-#ALLOWED_HOSTS =  ['localhost', '127.0.0.1', '[::1]', '*']
+# ALLOWED_HOSTS =  ['localhost', '127.0.0.1', '[::1]', '*']
 
 # Application definition
 
@@ -78,10 +77,10 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework_filters',
     'crispy_forms',
+    'webpack_loader',
     'main',
     'api',
     'sublist',
-    'scheduler',
     'teams',
     'core',
 ]
@@ -120,8 +119,8 @@ WSGI_APPLICATION = 'SnookR.wsgi.application'
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
-    'django_filters.rest_framework.DjangoFilterBackend',
-    'rest_framework_filters.backends.DjangoFilterBackend',)
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework_filters.backends.DjangoFilterBackend',)
 
 }
 
@@ -170,7 +169,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -182,3 +183,10 @@ LOGIN_REDIRECT_URL = 'home'  # TODO:  Change this to something appropriate
 CRISPY_TEMPLATE_PACK = 'bootstrap'
 
 CHROME_DRIVER = os.environ.get('CHROME_DRIVER', None)
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}

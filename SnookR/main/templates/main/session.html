@@ -4,6 +4,7 @@
 -->
 {% extends 'main/base.html' %}
 {% load static %}
+{% load render_bundle from webpack_loader %}
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'main/css/session.css' %}">
@@ -34,6 +35,8 @@
     </div>
 {% endblock %}
 {% block footer_scripts %}
+    <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
+    <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.print.css' %}" rel='stylesheet' media='print'/>
     <script type="text/javascript">
         const DIVISION_SLUG = "{{ session.division.slug|escapejs|safe }}";
         const SESSION_SLUG = "{{ session.slug|escapejs|safe }}";
@@ -42,13 +45,5 @@
         const initialSubArray = JSON.parse('{{ subs_json | escapejs }}');
     </script>
 
-    <link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
-    <link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.print.css' %}" rel='stylesheet' media='print'/>
-    <script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery.min.js' %}"></script>
-    <script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery-ui.min.js' %}"></script>
-    <script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/moment.min.js' %}"></script>
-    <script src="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.js' %}"></script>
-    <script src="{% static 'api/js/api.js' %}"></script>
-    <script src="{% static 'core/js/templates.js' %}"></script>
-    <script src="{% static 'scheduler/js/session-calendar.js' %}"></script>
+    {% render_bundle 'session-calendar' %}
 {% endblock %}

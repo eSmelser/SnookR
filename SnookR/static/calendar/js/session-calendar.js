@@ -2,20 +2,25 @@
  * Created by bobby on 12/16/17.
  */
 
+require('moment');
+require('fullcalendar');
+let templates = require('../../core/js/templates');
+let api = require('../../api/js/api.js');
+
 const currentUserPanelDOM = function (user, unregisterUrl) {
     let formDOMString =
         `<form class="pull-right session-button" action="${unregisterUrl}">
                 <input type="submit" value="Unregister">
             </form>`;
 
-    return genericUserPanelDOM(user, formDOMString);
+    return templates.genericUserPanelDOM(user, formDOMString);
 };
 
 const subUserPanelDOM = function (user) {
     let buttonDOMString =
         `<button class="session-button pull-right" type="button" href="${user.inviteUrl}">Invite</button>`;
 
-    return genericUserPanelDOM(user, buttonDOMString);
+    return templates.genericUserPanelDOM(user, buttonDOMString);
 };
 
 

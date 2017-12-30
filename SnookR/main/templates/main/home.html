@@ -7,6 +7,8 @@
 {% block title %}Home{% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="{% static 'main/css/home.css' %}">
+    {% load render_bundle from webpack_loader %}
+
 {% endblock %}
 
 {% block content %}
@@ -116,14 +118,11 @@
         });
     </script>
     {% if user.is_authenticated %}
-        <link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
-        <link href="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.print.css' %}" rel='stylesheet'
+        <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
+        <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.print.css' %}" rel='stylesheet'
               media='print'/>
-        <script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery.min.js' %}"></script>
-        <script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/jquery-ui.min.js' %}"></script>
-        <script src="{% static 'scheduler/js/fullcalendar-3.7.0/lib/moment.min.js' %}"></script>
-        <script src="{% static 'scheduler/js/fullcalendar-3.7.0/fullcalendar.js' %}"></script>
-        <script src="{% static 'api/js/api.js' %}"></script>
-        <script src="{% static 'scheduler/js/session-event-calendar.js' %}"></script>
+
+            {% render_bundle 'session-event-calendar' %}
+
     {% endif %}
 {% endblock %}

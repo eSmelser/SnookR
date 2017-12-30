@@ -1,6 +1,9 @@
+let api = require('../../api/js/api.js');
+require('fullcalendar');
+
 $(document).ready(function () {
 
-    let times = initialSessionEvents.map( event => new Date(event.date + 'T' + event.start_time).getTime() );
+    let times = initialSessionEvents.map(event => new Date(event.date + 'T' + event.start_time).getTime());
     let minTime = new Date(Math.min(...times)).getHours() - 2 + ':00:00';
     let maxTime = new Date(Math.min(...times)).getHours() + 2 + ':00:00';
 
