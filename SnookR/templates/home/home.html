@@ -4,11 +4,11 @@
 -->
 {% extends 'core/base.html' %}
 {% load staticfiles %}
+{% load render_bundle from webpack_loader %}
+
 {% block title %}Home{% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="{% static 'substitutes/css/home.css' %}">
-    {% load render_bundle from webpack_loader %}
-
 {% endblock %}
 
 {% block content %}
@@ -124,6 +124,5 @@
               media='print'/>
 
         {% render_bundle 'session-event-calendar' %}
-
     {% endif %}
 {% endblock %}
