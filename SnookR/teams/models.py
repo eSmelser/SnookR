@@ -66,6 +66,11 @@ class TeamInvite(models.Model):
     def is_closed(self):
         return self.status != TeamInvite.PENDING
 
+    @staticmethod
+    def human_readable_status(status):
+        for k, v in TeamInvite.STATUS_CHOICES:
+            if status == k:
+                return v
 
 class NonUserPlayer(models.Model):
     name = models.CharField(max_length=200)

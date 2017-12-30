@@ -27,15 +27,16 @@ class TeamView(TemplateView, LoginRequiredMixin):
         players = []
         for team in teams:
             for player in team.players.all():
-                data = Player(team, player, 'A')
+                data = Player(team, player, 'Approved')
                 players.append(data)
 
-            players.append(Player(team, user, 'A'))
+            players.append(Player(team, user, 'Approved'))
 
         # Get every invited player for every team
         invites = TeamInvite.objects.filter(team__in=teams)
         for invite in invites:
-            data = Player(invite.team, invite.invitee, invite.status)
+            print(invite.get_status_display())
+            data = Player(invite.team, invite.invitee, invite.get_status_display())
             players.append(data)
 
         serializer = TeamSerializer(teams, many=True)
