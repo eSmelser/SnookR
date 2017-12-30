@@ -85,7 +85,7 @@ Player -> Sub      :
 
 
 def thumbnail_path(instance, filename):
-    return '/uploads/user/{0}/{1}'.format(instance.user.username, filename)
+    return 'uploads/user/{0}/{1}'.format(instance.user.username, filename)
 
 
 class UserProfile(models.Model):

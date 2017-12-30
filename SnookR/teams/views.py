@@ -21,8 +21,6 @@ class TeamView(TemplateView, LoginRequiredMixin):
         context['first_team_id'] = teams[0].id if teams else None
         Player = namedtuple('Player', ['team', 'instance', 'status'])
 
-        user = CustomUser.objects.get(pk=self.request.user.id)
-
         # Get every player for every team related to the current user
         players = []
         for team in teams:
@@ -30,7 +28,8 @@ class TeamView(TemplateView, LoginRequiredMixin):
                 data = Player(team, player, 'Approved')
                 players.append(data)
 
-            players.append(Player(team, user, 'Approved'))
+            # Add the team captain too
+            players.append(Player(team, team.team_captain, 'Approved'))
 
         # Get every invited player for every team
         invites = TeamInvite.objects.filter(team__in=teams)
