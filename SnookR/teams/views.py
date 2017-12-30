@@ -1,10 +1,8 @@
-import json
 from collections import namedtuple
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse
 from django.views.generic import TemplateView, CreateView, RedirectView
-from django.core.serializers.json import DjangoJSONEncoder
 
 from main.forms import TeamForm
 from main.models import CustomUser
