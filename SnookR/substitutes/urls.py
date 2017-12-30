@@ -1,0 +1,24 @@
+# Copyright &copy; 2017 Evan Smelser
+# This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+
+from django.conf.urls import url
+from django.conf import settings
+from django.conf.urls.static import static
+from substitutes import views
+
+urlpatterns = [
+    url(r'^invites/$', views.InviteListView.as_view(), name='invites'),
+    url(r'^divisions/$', views.DivisionListView.as_view(), name='divisions'),
+    url(r'^divisions/(?P<division>[\w-]+)/$', views.DivisionView.as_view(), name='division'),
+    url(r'^divisions/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/$', views.SessionView.as_view(), name='session'),
+    url(r'^divisions/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/date/(?P<date>\d{4}-\d{2}-\d{2}_\d{2}-\d{2})/unregister/$',
+        views.SessionUnregisterView.as_view(),
+        name='session_unregister'),
+    url(r'^search/(?P<search_type>substitute|session)/$', views.SearchView.as_view(), name='search'),
+    url(r'^session-events/(?P<pk>[0-9]+)/register/$', views.SessionEventRegisterView.as_view(), name='session_event_register'),
+    url(r'^session-events/(?P<pk>[0-9]+)/unregister/$', views.SessionEventUnregisterView.as_view(), name='session_event_unregister'),
+
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

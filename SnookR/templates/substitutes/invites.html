@@ -1,0 +1,65 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Profile for {{ player.username }}{% endblock %}
+{% block content %}
+<div>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            Pending Invites:
+            <br>
+            <ul id="id_pending_invites_list">
+                {% for invite in user.pending_invites %}
+                <li id="id_invite_{{ invite.id }}">
+                    Team: <span id="id_pending_invite_{{ invite.id }}_team"
+                                data-id="{{ invite.id }}">{{ invite.team }}</span>
+                    Captain: <span id="id_pending_invite_{{ invite.id }}_team_captain" data-id="{{ invite.id }}">{{ invite.team.team_captain }}</span>
+                    <button id="id_accept_button_{{ invite.id }}" class="accept_button" data-id="{{ invite.id }}">
+                        Accept
+                    </button>
+                    <button id="id_decline_button_{{ invite.id }}" class="decline_button" data-id="{{ invite.id }}">
+                        Decline
+                    </button>
+                </li>
+                {% endfor %}
+            </ul>
+            <hr>
+            Accepted Invites:
+            <ul id="id_accepted_invites_list">
+                {% for invite in user.all_invites %}
+                {% if invite.status == 'A' %}
+                <li>
+                    Team: <span id="id_accepted_invite_{{ invite.id }}_team">{{ invite.team }}</span>
+                    Captain: <span
+                        id="id_accepted_invite_{{ invite.id }}_team_captain">{{ invite.team.team_captain }}</span>
+                    Status: Accepted
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+            <hr>
+            Declined Invites:
+            <ul id="id_declined_invites_list">
+                {% for invite in user.all_invites %}
+                {% if invite.status == 'D' %}
+                <li>
+                    Team: <span id="id_declined_invite_{{ invite.id }}_team">{{ invite.team }}</span>
+                    Captain: <span
+                        id="id_declined_invite_{{ invite.id }}_team_captain">{{ invite.team.team_captain }}</span>
+                    Status: Declined
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-2">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer_scripts %}
+<script src="{% static 'substitutes/js/utils.js' %}"></script>
+<script src="{% static 'api/js/api.js' %}"></script>
+<script src="{% static 'substitutes/js/invites.js' %}"></script>
+{% endblock %}

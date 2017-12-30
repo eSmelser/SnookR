@@ -1,0 +1,47 @@
+<!-- 
+     Copyright &copy; 2017 Evan Smelser
+      This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+-->
+
+{% extends 'core/base.html' %}
+{% load render_bundle from webpack_loader %}
+
+{% load staticfiles %}
+{% block title %}Divisions{% endblock %}
+{% block content %}
+    <div>
+
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <h3>Division: {{ division }}</h3>
+                <hr>
+                <h3>Sessions</h3>
+                <ul>
+                    {% for session in division.session_set.all %}
+                        <li><a href="{{ session.get_absolute_url }}">{{ session.name }}</a></li>
+                    {% endfor %}
+                </ul>
+                <h3>Calendar</h3>
+                <div>
+                    <div id="calendar"></div>
+                    <input type="hidden" id="id_division" value="{{ view.kwargs.division }}">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div id="id_event_content"></div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer_scripts %}
+    <script type="text/javascript">
+        const initialSessionEvents = JSON.parse('{{ session_events_json|escapejs|safe }}');
+    </script>
+    <!-- Imports for calendar/scheduler -->
+    <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
+    <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.print.css' %}" rel='stylesheet' media='print'/>
+    {% render_bundle 'session-event-calendar' %}
+{% endblock %}
