@@ -25,10 +25,11 @@ module.exports = {
     ],
 
     module: {
-        loaders: [
-            {test: /\.css$/, loader: "style-loader!css-loader"},
-            {test: require.resolve('jquery'), loader: 'expose-loader?$!expose-loader?jQuery'},
-            {test: require.resolve('moment'), loader: 'expose-loader?moment'}
+       rules: [
+            {test: /\.css$/, use: "style-loader!css-loader"},
+            {test: require.resolve('jquery'), use: 'expose-loader?$!expose-loader?jQuery'},
+            {test: require.resolve('moment'), use: 'expose-loader?moment'},
+            {test: /\.handlebars$/, use: "handlebars-loader" }
         ],
     },
 

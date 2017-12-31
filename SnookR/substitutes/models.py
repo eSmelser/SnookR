@@ -51,13 +51,6 @@ class Session(models.Model):
     def get_absolute_url(self):
         return reverse('session', args=self.get_url_args())
 
-    def get_register_url(self):
-        return reverse('session_register', args=self.get_url_args())
-
-    def get_unregister_url(self, sub):
-        datestring = sub.date.strftime(Session.date_format)
-        return reverse('session_unregister', args=self.get_url_args() + [datestring])
-
     def get_url_args(self):
         return [str(self.division.slug), str(self.slug)]
 
@@ -133,3 +126,11 @@ class Sub(models.Model):
 
     def is_registered(self, session_event: SessionEvent):
         return self.user.is_authenticated() and Sub.objects.filter(user=self.user, session_event=session_event).exists()
+
+
+class SubEventInvite(models.Model):
+    sub = models.ForeignKey(Sub)
+    event = models.ForeignKey(SessionEvent)
+
+    def __str__(self):
+        return "<SubEventInvite: {} at {} on {}>".format(self.sub.user.username, self.event.session.name, self.event.date)

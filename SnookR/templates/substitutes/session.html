@@ -23,13 +23,12 @@
         <div class="col-md-6">
             <div id="calendar"></div>
         </div>
-        <div class="col-md-6">
+        <div id="right-column" class="col-md-6">
             {# These are placeholders rendered in session-calendar.js #}
             <h3 id="current-user-header"></h3>
             <div id="current-user-panel"></div>
-            <h3 id="sub-list-header"></h3>
-            <div id='sub-list' class="post-content">
-            </div>
+            <h3 id="sub-list-header">Subs Available for <span class="session-name">{{session_event.session.name}}</span> on <span class="session-date">{{ session_event.date }}</span></h3>
+            <div id='sub-list' class="post-content"></div>
             <div class="col-md-2"></div>
         </div>
     </div>
@@ -40,10 +39,11 @@
     <script type="text/javascript">
         const context = {};
         context.SESSION_NAME = "{{  session.name|escapejs|safe }}";
-        context.initialSessionEvent = JSON.parse('{{ session_event_json | escapejs }}');
-        context.initialSubArray = JSON.parse('{{ subs_json | escapejs }}');
+        context.initialSessionEvent = JSON.parse('{{ json.session_event | escapejs }}');
+        context.initialSessionEvents = JSON.parse('{{ json.session_events | escapejs }}');
+        context.initialSubArray = JSON.parse('{{ json.subs | escapejs }}');
         context.SESSION_SLUG = "{{ session.slug|escapejs|safe }}";
-        context.currentUserIsCaptain = {% if perms.teams.add_team %}true{% else %}false{% endif %};
+        context.currentUser = JSON.parse('{{ json.current_user | escapejs }}');
     </script>
     {% render_bundle 'session-calendar' %}
 {% endblock %}

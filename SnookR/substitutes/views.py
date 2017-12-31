@@ -45,16 +45,15 @@ class DivisionView(TemplateView):
 class SessionViewMixin(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user_registered = self.user_is_registered()
-        subs = self.get_all_subs()
-        session_event = self.get_session_event()
 
+        session = self.get_session_instance()
+        session_event = self.get_session_event(session)
+        session_events = self.get_session_events(session)
+        subs = self.get_all_subs(session)
+        user_registered = self.user_is_registered(subs)
 
-
-        context['session'] = self.get_session_instance()
+        context['session'] = session
         context['session_event'] = session_event
-        serializer = serializers.SessionEventSerializer(session_event)
-        context['session_event_json'] = JSONRenderer().render(serializer.data)
         context['user_registered'] = user_registered
 
         # Separate current user from the normal list of subs so they can be given a special display
@@ -65,31 +64,44 @@ class SessionViewMixin(TemplateView):
             context['subs'] = subs
             context['current_user_sub'] = None
 
-        serializer = serializers.SubSerializer(subs, many=True)
-        context['subs_json'] = JSONRenderer().render(serializer.data)
+        context = self.jsonify_context(session_event, session_events, subs, context)
         return context
 
-    def get_session_event(self):
-        session = self.get_session_instance()
+    def jsonify_context(self, session_event, session_events, subs, context):
+        subs_serializer = serializers.SubSerializer(subs, many=True, context={'request': self.request})
+        event_serializer = serializers.SessionEventSerializer(session_event)
+        events_serializer = serializers.SessionEventSerializer(session_events, many=True)
+
+        context['json'] = dict()
+        if self.request.user.is_authenticated():
+            user = CustomUser.objects.get(id=self.request.user.id)
+            custom_user_serializer = serializers.CustomUserSerializer(user, context={'request': self.request})
+            context['json']['current_user'] = JSONRenderer().render(custom_user_serializer.data)
+
+        context['json']['session_events'] = JSONRenderer().render(events_serializer.data)
+        context['json']['session_event'] = JSONRenderer().render(event_serializer.data)
+        context['json']['subs'] = JSONRenderer().render(subs_serializer.data)
+        return context
+
+    def get_session_event(self, session):
         id = self.request.GET.get('sessionEventId', False)
-        if id:
-            return SessionEvent.objects.get(session=session, id=id)
-        else:
-            return SessionEvent.objects \
-                .filter(session=session, date__month=datetime.now().month) \
-                .order_by('date') \
-                .first()
+        return self.get_session_events(session).filter(id=id).first()
+
+    def get_session_events(self, session):
+        return SessionEvent.objects \
+            .filter(session=session, date__month=datetime.now().month) \
+            .order_by('date')
 
     def get_session_instance(self):
         session_slug = self.kwargs.get('session')
         division_slug = self.kwargs.get('division')
         return Session.objects.get(slug=session_slug, division__slug=division_slug)
 
-    def user_is_registered(self):
-        return self.get_all_subs().filter(user=self.request.user).exists()
+    def user_is_registered(self, subs):
+        return subs.filter(user=self.request.user).exists()
 
-    def get_all_subs(self):
-        return Sub.objects.filter(session_event=self.get_session_event())
+    def get_all_subs(self, session):
+        return Sub.objects.filter(session_event=self.get_session_event(session))
 
 
 class SessionView(SessionViewMixin, TemplateView):

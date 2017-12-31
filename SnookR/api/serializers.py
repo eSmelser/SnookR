@@ -22,6 +22,13 @@ class CustomUserSerializer(serializers.Serializer):
         json = super().to_representation(instance)
         json['url'] = instance.get_absolute_url
         json['thumbnail_url'] = instance.profile.thumbnail.url if instance.profile else None
+        json['is_captain'] = instance.has_perm('teams.add_team')
+        request = self.context.get('request', False)
+        if request:
+            json['is_current_user'] = request.user.id == instance.id
+
+        json['invite_url'] = self.context.get('invite_url', None)
+        json['unregister_url'] = self.context.get('unregister_url', None)
         return json
 
 
@@ -102,8 +109,8 @@ class SessionEventSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        rep['register_url'] = instance.get_register_url
-        rep['unregister_url'] = instance.get_unregister_url
+        rep['registerUrl'] = instance.get_register_url
+        rep['unregisterUrl'] = instance.get_unregister_url
         rep['url'] = instance.get_absolute_url
         return rep
 
