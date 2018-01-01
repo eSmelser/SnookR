@@ -6,7 +6,8 @@ from django.views.generic import TemplateView, CreateView, RedirectView
 
 from teams.forms import TeamForm
 from accounts.models import CustomUser
-from teams.models import Team, TeamInvite
+from invites.models import TeamInvite
+from teams.models import Team
 from api.serializers import TeamInviteSerializer, TeamSerializer, CustomUserSerializer
 from rest_framework.renderers import JSONRenderer
 

@@ -2,19 +2,22 @@
     <div class="panel-body">
         <div class="pull-left">
             <a href="{{ sub.url }}">
-                <img class="img-circle" width="50px" height="50px" style="margin-right:8px; margin-top:-5px;" src="{{ sub.thumbnailUrl }}">
+                <img class="img-circle" width="50px" height="50px" style="margin-right:8px; margin-top:-5px;"
+                     src="{{ sub.thumbnailUrl }}">
             </a>
         </div>
-        <h4 class="pull-left"><a href="{{ sub.url }}" style="text-decoration:none;"><strong>{{ sub.username }}</strong></a></h4>
-
-        {{#if currentUserisCaptain}}
-            <button class="session-button pull-right" type="button" href="{{ sub.sessionEvent.registerUrl }}">Invite</button>
-        {{/if}}
+        <h4 class="pull-left"><a href="{{ sub.url }}" style="text-decoration:none;"><strong>{{ sub.username }}</strong></a>
+        </h4>
 
         {{#if sub.isCurrentUser}}
             <form class="pull-right session-button" action="{{ sub.sessionEvent.unregisterUrl }}">
                 <input type="submit" value="Unregister">
             </form>
+        {{else}}
+            {{#if sub.currentUser.isCaptain}}
+                <button class="invite-button session-button pull-right" type="button" href="/invites/session-events/{{ sub.sessionEvent.id }}/subs/{{ sub.id }}/">Invite
+                </button>
+            {{/if}}
         {{/if}}
     </div>
 </div>

@@ -2,7 +2,9 @@ from rest_framework import serializers
 
 import accounts.models
 from substitutes import models as main_models
-from teams.models import Team, TeamInvite
+from teams.models import Team
+from invites.models import TeamInvite
+
 
 def must_have_id(data):
     if 'id' not in data:
@@ -112,6 +114,7 @@ class SessionEventSerializer(serializers.Serializer):
         rep['registerUrl'] = instance.get_register_url
         rep['unregisterUrl'] = instance.get_unregister_url
         rep['url'] = instance.get_absolute_url
+
         return rep
 
 

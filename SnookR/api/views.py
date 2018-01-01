@@ -1,4 +1,3 @@
-import functools
 import hashlib
 
 from rest_framework.generics import ListCreateAPIView, UpdateAPIView, ListAPIView, RetrieveAPIView, CreateAPIView
@@ -6,8 +5,8 @@ from django.core.cache import caches
 from rest_framework.response import Response
 from substitutes.models import Session, SessionEvent, Sub
 from accounts.models import CustomUser
-from django.db.models import Q
-from teams.models import Team, TeamInvite, NonUserPlayer
+from teams.models import Team, NonUserPlayer
+from invites.models import TeamInvite
 from api.serializers import (
     TeamInviteSerializer,
     TeamInviteUpdateSerializer,

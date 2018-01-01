@@ -126,11 +126,3 @@ class Sub(models.Model):
 
     def is_registered(self, session_event: SessionEvent):
         return self.user.is_authenticated() and Sub.objects.filter(user=self.user, session_event=session_event).exists()
-
-
-class SubEventInvite(models.Model):
-    sub = models.ForeignKey(Sub)
-    event = models.ForeignKey(SessionEvent)
-
-    def __str__(self):
-        return "<SubEventInvite: {} at {} on {}>".format(self.sub.user.username, self.event.session.name, self.event.date)

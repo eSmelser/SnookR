@@ -25,7 +25,7 @@
         </div>
         <div id="right-column" class="col-md-6">
             {# These are placeholders rendered in session-calendar.js #}
-            <h3 id="current-user-header"></h3>
+            <h3 id="current-user-header" style="display:none">You Available for <span class="session-name">{{session_event.session.name}}</span> on <span class="session-date">{{ session_event.date }}</span></h3>
             <div id="current-user-panel"></div>
             <h3 id="sub-list-header">Subs Available for <span class="session-name">{{session_event.session.name}}</span> on <span class="session-date">{{ session_event.date }}</span></h3>
             <div id='sub-list' class="post-content"></div>

@@ -15,10 +15,11 @@ let substitutes = {
         this.currentUser = new User(context.currentUser);
         this.currentSessionEvent = context.initialSessionEvent;
         this.sessionEvents = context.initialSessionEvents;
-        this.subs = context.initialSubArray.map(sub => new Sub(sub));
+        this.subs = context.initialSubArray.map(sub => this.getSub(sub));
         this.sessionName = context.sessionName;
         this.cacheDom();
         this.render();
+        this.bindEvents();
     },
 
     cacheDom: function () {
@@ -27,11 +28,40 @@ let substitutes = {
         this.$calendar = $('#calendar');
         this.$sessionName = this.$rightColumn.find('.session-name');
         this.$sessionDate = this.$rightColumn.find('.session-date');
+        this.$currentUserPanel = this.$rightColumn.find('#current-user-panel');
+        this.$currentUserHeader = this.$rightColumn.find('#current-user-header');
     },
+
+    bindEvents: function () {
+        this.$rightColumn.on('click', '.invite-button', this.goToHref);
+    },
+
+    goToHref: function() {
+        window.location.href = $(this).attr('href');
+    },
+
+    getSub: function (subJson) {
+        return new Sub(subJson, this.currentUser);
+    },
+
+    getCurrentUserSub: function () {
+        return this.subs.find(sub => sub.isCurrentUser) || null;
+    },
+
 
     render: function () {
         this.$subList.empty();
-        this.subs.map(sub => this.$subList.append(sub.getDOM(this.currentUser.is_captain)));
+        this.subs
+            .filter(sub => !sub.isCurrentUser)
+            .map(sub => this.$subList.append(sub.$dom));
+
+        let currentUserSub = this.getCurrentUserSub();
+        this.$currentUserPanel.empty();
+        this.$currentUserHeader.hide();
+        if (currentUserSub) {
+            this.$currentUserPanel.append(currentUserSub.$dom);
+            this.$currentUserHeader.show()
+        }
         this.$sessionName.text(this.currentSessionEvent.name);
         this.$sessionDate.text(this.currentSessionEvent.date);
         this.renderCalendar();
@@ -61,7 +91,7 @@ let substitutes = {
         api.getSubList({
             session_event__id: this.currentSessionEvent.id
         }).done(subArray => {
-            self.subs = subArray.map(sub => new Sub(sub));
+            this.subs = subArray.map(sub => this.getSub(sub));
             self.render();
         });
     },

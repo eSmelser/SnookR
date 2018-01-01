@@ -26,10 +26,10 @@ urlpatterns = [
     url(r'^api/', include('api.urls', namespace='api')),
     url(r'^teams/', include('teams.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^invites/', include('invites.urls')),
     url(r'^accounts/', include('accounts.urls')),
     url(r'^substitutes/', include('substitutes.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

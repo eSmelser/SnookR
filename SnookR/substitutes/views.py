@@ -104,7 +104,7 @@ class SessionViewMixin(TemplateView):
         return Sub.objects.filter(session_event=self.get_session_event(session))
 
 
-class SessionView(SessionViewMixin, TemplateView):
+class SessionView(LoginRequiredMixin, SessionViewMixin, TemplateView):
     template_name = 'substitutes/session.html'
 
 

@@ -42389,10 +42389,11 @@ let substitutes = {
         this.currentUser = new User(context.currentUser);
         this.currentSessionEvent = context.initialSessionEvent;
         this.sessionEvents = context.initialSessionEvents;
-        this.subs = context.initialSubArray.map(sub => new Sub(sub));
+        this.subs = context.initialSubArray.map(sub => this.getSub(sub));
         this.sessionName = context.sessionName;
         this.cacheDom();
         this.render();
+        this.bindEvents();
     },
 
     cacheDom: function () {
@@ -42401,11 +42402,40 @@ let substitutes = {
         this.$calendar = $('#calendar');
         this.$sessionName = this.$rightColumn.find('.session-name');
         this.$sessionDate = this.$rightColumn.find('.session-date');
+        this.$currentUserPanel = this.$rightColumn.find('#current-user-panel');
+        this.$currentUserHeader = this.$rightColumn.find('#current-user-header');
     },
+
+    bindEvents: function () {
+        this.$rightColumn.on('click', '.invite-button', this.goToHref);
+    },
+
+    goToHref: function() {
+        window.location.href = $(this).attr('href');
+    },
+
+    getSub: function (subJson) {
+        return new Sub(subJson, this.currentUser);
+    },
+
+    getCurrentUserSub: function () {
+        return this.subs.find(sub => sub.isCurrentUser) || null;
+    },
+
 
     render: function () {
         this.$subList.empty();
-        this.subs.map(sub => this.$subList.append(sub.getDOM(this.currentUser.is_captain)));
+        this.subs
+            .filter(sub => !sub.isCurrentUser)
+            .map(sub => this.$subList.append(sub.$dom));
+
+        let currentUserSub = this.getCurrentUserSub();
+        this.$currentUserPanel.empty();
+        this.$currentUserHeader.hide();
+        if (currentUserSub) {
+            this.$currentUserPanel.append(currentUserSub.$dom);
+            this.$currentUserHeader.show()
+        }
         this.$sessionName.text(this.currentSessionEvent.name);
         this.$sessionDate.text(this.currentSessionEvent.date);
         this.renderCalendar();
@@ -42435,7 +42465,7 @@ let substitutes = {
         api.getSubList({
             session_event__id: this.currentSessionEvent.id
         }).done(subArray => {
-            self.subs = subArray.map(sub => new Sub(sub));
+            this.subs = subArray.map(sub => this.getSub(sub));
             self.render();
         });
     },
@@ -43468,17 +43498,18 @@ let $ = __webpack_require__(1);
 let template = __webpack_require__(157);
 let User = __webpack_require__(137);
 
-const Sub = function (sub, currentUserIsCaptain) {
+const Sub = function (sub, currentUser) {
     User.call(this, sub.user);
-    this.currentUserIsCaptain = currentUserIsCaptain;
+    this.currentUser = currentUser;
+    this.isCurrentUser = this.id === this.currentUser.id;
     this.sessionEvent = sub.session_event;
     this.$dom = this.getDOM();
 };
 
 // All users have the same template and getDOM function();
 Sub.prototype.template = template;
-Sub.prototype.getDOM = function (currentUserIsCaptain) {
-    return $(this.template({ sub: this, currentUserIsCaptain: this.currentUserIsCaptain }));
+Sub.prototype.getDOM = function () {
+    return $(this.template({ sub: this }));
 };
 
 Sub.prototype.constructor = Sub;
@@ -43493,30 +43524,34 @@ function __default(obj) { return obj && (obj.__esModule ? obj["default"] : obj);
 module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "            <button class=\"session-button pull-right\" type=\"button\" href=\""
-    + container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.sessionEvent : stack1)) != null ? stack1.registerUrl : stack1), depth0))
-    + "\">Invite</button>\n";
-},"3":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
   return "            <form class=\"pull-right session-button\" action=\""
     + container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.sessionEvent : stack1)) != null ? stack1.unregisterUrl : stack1), depth0))
     + "\">\n                <input type=\"submit\" value=\"Unregister\">\n            </form>\n";
+},"3":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.currentUser : stack1)) != null ? stack1.isCaptain : stack1),{"name":"if","hash":{},"fn":container.program(4, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+},"4":function(container,depth0,helpers,partials,data) {
+    var stack1, alias1=container.lambda, alias2=container.escapeExpression;
+
+  return "                <button class=\"invite-button session-button pull-right\" type=\"button\" href=\"/invites/session-events/"
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.sessionEvent : stack1)) != null ? stack1.id : stack1), depth0))
+    + "/subs/"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.id : stack1), depth0))
+    + "/\">Invite\n                </button>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    var stack1, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : (container.nullContext || {});
+    var stack1, alias1=container.lambda, alias2=container.escapeExpression;
 
   return "<div class=\"panel panel-default\">\n    <div class=\"panel-body\">\n        <div class=\"pull-left\">\n            <a href=\""
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.url : stack1), depth0))
-    + "\">\n                <img class=\"img-circle\" width=\"50px\" height=\"50px\" style=\"margin-right:8px; margin-top:-5px;\" src=\""
+    + "\">\n                <img class=\"img-circle\" width=\"50px\" height=\"50px\" style=\"margin-right:8px; margin-top:-5px;\"\n                     src=\""
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.thumbnailUrl : stack1), depth0))
     + "\">\n            </a>\n        </div>\n        <h4 class=\"pull-left\"><a href=\""
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.url : stack1), depth0))
     + "\" style=\"text-decoration:none;\"><strong>"
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.username : stack1), depth0))
-    + "</strong></a></h4>\n\n"
-    + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.currentUserisCaptain : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "\n"
-    + ((stack1 = helpers["if"].call(alias3,((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.isCurrentUser : stack1),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "</strong></a>\n        </h4>\n\n"
+    + ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.isCurrentUser : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
     + "    </div>\n</div>\n";
 },"useData":true});
 

@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     'teams',
     'core',
     'accounts',
+    'invites',
 ]
 
 MIDDLEWARE = [
