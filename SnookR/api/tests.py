@@ -7,7 +7,9 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory, APITestCase
 from substitutes.models import Division, Session, SessionEvent, Sub
 from accounts.models import CustomUser
-from teams.models import Team, TeamInvite
+from teams.models import Team
+from invites.models import TeamInvite, SessionEventInvite
+from api.serializers import SessionEventInvite
 
 
 class UserListTestCase(APITestCase):
@@ -271,6 +273,7 @@ class SessionEventTestCase(APITestCase):
         SessionEvent.objects.create(session=self.session, start_time=start_time, date=self.now.date())
 
     def test_filter(self):
+
         url = reverse('api:session_events')
         json = self.client.get(url, data={'session__slug': self.session.slug}).json()
         self.assertEqual(json[0]['date'], str(self.now.date()))
@@ -280,3 +283,26 @@ class SessionEventTestCase(APITestCase):
         url = reverse('api:session_events')
         json = self.client.get(url, data={'session__slug': 'garbage'}).json()
         self.assertEqual(len(json), 0)
+
+
+class SessionEventInviteTestCase(APITestCase):
+    def setUp(self):
+        self.username = 'joe'
+        self.password = 'joepassword'
+        self.user = CustomUser.objects.create_user(username=self.username, password=self.password)
+        division = Division.objects.create(name='Division A', division_rep=self.user)
+
+        self.now = datetime.now()
+        start_time = datetime(self.now.year, self.now.month, self.now.day, self.now.hour)
+        self.session = Session.objects.create(name='Session A', division=division, game='8ball',
+                                              start_date=timezone.now(), end_date=timezone.now())
+
+        self.session_event = SessionEvent.objects.create(session=self.session, start_time=start_time, date=self.now.date())
+        self.sub = Sub.objects.create(user=self.user, date=timezone.now(), session_event=self.session_event)
+        self.captain = CustomUser.objects.create_user(username='evan', password=self.password)
+
+    def test_post(self):
+        url = reverse('api:session_event_invite_list')
+        response = self.client.post(url, { 'sub': {'id': self.sub.id, 'session_event': { 'id': self.sub.session_event.id }}, 'captain': {'username': self.captain.username } }, format='json')
+        print(response.json())
+        self.assertEqual(response.status_code, 201)

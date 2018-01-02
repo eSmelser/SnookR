@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from substitutes.models import Session, SessionEvent, Sub
 from accounts.models import CustomUser
 from teams.models import Team, NonUserPlayer
-from invites.models import TeamInvite
+from invites.models import SessionEventInvite, TeamInvite
+
 from api.serializers import (
     TeamInviteSerializer,
     TeamInviteUpdateSerializer,
@@ -16,9 +17,11 @@ from api.serializers import (
     SessionSerializer,
     SessionEventSerializer,
     SubSerializer,
+    SessionEventInviteSerializer,
 )
 from api.permissions import TeamPermission, TeamInvitePermission
-from api.filters import TeamFilter, TeamInviteFilter, UserFilter, SessionFilter, SessionEventFilter, SubFilter
+from api.filters import TeamFilter, TeamInviteFilter, UserFilter, SessionFilter, SessionEventFilter, SubFilter, \
+    SessionEventInviteFilter
 
 
 class UserView(RetrieveAPIView):
@@ -34,7 +37,8 @@ class UserSearchView(ListAPIView):
     queryset = CustomUser.objects.all()
 
     def list(self, request, *args, **kwargs):
-        import pdb;pdb.set_trace()
+        import pdb;
+        pdb.set_trace()
 
 
 class UserListView(ListAPIView):
@@ -105,3 +109,15 @@ class SearchUserView(ListAPIView):
 
         serializer = CustomUserSerializer(objs, many=True)
         return Response(serializer.data)
+
+
+class SessionEventInviteListView(ListCreateAPIView):
+    queryset = SessionEventInvite.objects.all()
+    serializer_class = SessionEventInviteSerializer
+    filter_class = SessionEventInviteFilter
+
+
+class SessionEventInviteView(RetrieveAPIView):
+    queryset = SessionEventInvite.objects.all()
+    serializer_class = SessionEventInviteSerializer
+    filter_class = SessionEventInviteFilter

@@ -78,14 +78,17 @@ class SessionViewMixin(TemplateView):
             custom_user_serializer = serializers.CustomUserSerializer(user, context={'request': self.request})
             context['json']['current_user'] = JSONRenderer().render(custom_user_serializer.data)
 
-        context['json']['session_events'] = JSONRenderer().render(events_serializer.data)
         context['json']['session_event'] = JSONRenderer().render(event_serializer.data)
+        context['json']['session_events'] = JSONRenderer().render(events_serializer.data)
         context['json']['subs'] = JSONRenderer().render(subs_serializer.data)
         return context
 
     def get_session_event(self, session):
         id = self.request.GET.get('sessionEventId', False)
-        return self.get_session_events(session).filter(id=id).first()
+        if not id:
+            return self.get_session_events(session).filter(date__month=datetime.now().month).first()
+        else:
+            return self.get_session_events(session).filter(id=id).first()
 
     def get_session_events(self, session):
         return SessionEvent.objects \

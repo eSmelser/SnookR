@@ -60,21 +60,21 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 136);
+/******/ 	return __webpack_require__(__webpack_require__.s = 137);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["moment"] = __webpack_require__(127);
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["moment"] = __webpack_require__(126);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["$"] = __webpack_require__(123);
+/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["$!expose-loader?jQuery"] = __webpack_require__(124);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
@@ -239,6 +239,260 @@ function appendContextPath(contextPath, id) {
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
+/* WEBPACK VAR INJECTION */(function(jQuery, $) {// This module defines the JS API for SnookR
+
+const api = (function () {
+    /***** AJAX Setup *****/
+
+    const baseURL = 'http://127.0.0.1:8000';
+
+    const getCookie = function (name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            let cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    };
+
+    const csrftoken = getCookie('csrftoken');
+
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        },
+        contentType: 'application/json'
+    });
+
+    const csrfSafeMethod = function (method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    };
+
+    /**** SnookR API ****/
+
+    /* getUserList(): Returns an AJAX request for the list of all users
+     *
+     *
+     * Arguments:
+     *     data: JSON file for filtering on the User model
+     *           Fields username, last_name, and first_name can be filtered
+     *           on using icontains, contains, and exact equalities.
+     *
+     *           For example, with a user named MyUser in the database queries with the following
+     *           data would return MyUser:
+     *
+     *           { 'username': 'MyUser' }           // exact match
+     *
+     *           { 'username__contains': 'yUser' }   // case-sensitive contains
+     *
+     *           { 'username__icontains': 'yuser' }  // case-insensitive contains
+     *
+     *
+     *
+     * Usage:
+     *       // Log all users to console
+     *       request = api.requestUserList()
+     *       request.done(function(data) {
+     *           for (var i=0; i<data.length; i++) {
+     *               console.log(data[i])
+     *           }
+     *       })
+     */
+    const getUserList = function (data) {
+        return $.ajax({
+            dataType: 'json',
+            url: '/api/users/',
+            data: JSON.stringify(data)
+        });
+    };
+    /* postTeam() : Returns a POST request for creating a Team.
+     *
+     * Arguments:
+     *     data: An object describing the team to be created.
+     *           Required fields: name, team_captain.
+     *           Optional fields: players
+     *
+     * Permisions: User must have the 'substitutes.add_team' permission to POST a team.
+     *
+     * Example data arg:
+     *       {
+     *           'name': MyTeam,
+     *           'team_captain': {
+     *              'username': 'evan'
+     *            },
+     *           'players': [
+     *               {'username': 'joe'},
+     *               {'username': 'john'}
+     *           ]
+     *       }
+     */
+    const postTeam = function (data) {
+        return $.post({
+            dataType: 'json',
+            url: '/api/team/',
+            data: JSON.stringify(data),
+        });
+    };
+    /* getInvitationList(): Returns a response object containing a list of invitations.
+     *
+     * Arguments:
+     *    data: object
+     *          The query parameters for filtering invitations.
+     *          Should take the form:
+     *                  {
+     *                    'invitee': {  // user fields (see getUserList comments) // },
+     *                    'team': { // team fields (see postTeam()) // },
+     *                    'id': integer,
+     *                    'status': 'P' (pending) or 'D' (declined) or 'A' (accepted)
+     *
+     *
+     * Example:
+     *
+     *     // Print out every pending invite for joe
+     *     getInvitationList({
+     *         'invitee': {'username': 'joe'},
+     *         'status': 'P'
+     *     }).done(function(data) {
+     *         for (var i=0; i<data.length; i++) {
+     *            console.log(data[i]);
+     *         }
+     *     })
+     *
+     *
+     */
+    const getInvitationList = function (data) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/invites/',
+            data: JSON.stringify(data),
+        });
+    };
+    /* getLoggedInUser(): Returns a request with the data for the currently logged in user
+     *
+     * Arguments: None
+     */
+    const getLoggedInUser = function () {
+        return $.get({
+            dataType: 'json',
+            url: '/api/auth/user',
+            data: {},
+        })
+    };
+
+    /* postInvitation(data): Returns a request for POSTing a single invite
+     *f
+     */
+    const postInvitation = function (data) {
+        return $.post({
+            dataType: 'json',
+            url: '/api/invites/',
+            data: JSON.stringify(data)
+        })
+    };
+    /* patchInvitation(data): Returns a request for POSTing a single invite
+     *
+     */
+    const patchInvitation = function (data) {
+        return $.ajax({
+            type: 'PATCH',
+            dataType: 'json',
+            url: '/api/invites/' + data.id + '/',
+            data: JSON.stringify(data)
+        })
+    };
+
+    const getSessionList = function (data) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/sessions',
+            data: JSON.stringify(data),
+        });
+    };
+
+    const getSubList = function (data) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/subs',
+            data: JSON.stringify(data),
+        })
+    };
+
+    const getSessionEventList = function (data) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/session-events/',
+            data: JSON.stringify(data),
+        });
+    };
+
+    // Search for a user using a term search string
+    const searchForUser = function(data) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/search-user/',
+            data: JSON.stringify(data),
+        });
+    };
+
+    const getSessionEventInviteList = function(data) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/session-event-invites/',
+            data: JSON.stringify(data),
+        })
+    };
+
+    const getSessionEventInvite = function(id) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/session-event-invites/' + id,
+        })
+    };
+
+    const postSessionEventInvite = function(data) {
+        return $.post({
+            dataType: 'json',
+            url: '/api/session-event-invites/',
+            data: JSON.stringify(data),
+        })
+    };
+
+    // Return public methods for API
+    return {
+        baseURL,
+        getUserList,
+        postTeam,
+        getInvitationList,
+        getLoggedInUser,
+        postInvitation,
+        patchInvitation,
+        getSessionList,
+        getSessionEventList,
+        getSubList,
+        searchForUser,
+        getSessionEventInviteList,
+        getSessionEventInvite,
+        postSessionEventInvite
+    }
+})();
+
+module.exports = api;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(1)))
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
 //! moment.js locale configuration
 //! locale : Afrikaans [af]
 //! author : Werner Mollentze : https://github.com/wernerm
@@ -315,7 +569,7 @@ return af;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -463,7 +717,7 @@ return ar;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -528,7 +782,7 @@ return arDz;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -593,7 +847,7 @@ return arKw;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -725,7 +979,7 @@ return arLy;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -791,7 +1045,7 @@ return arMa;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -902,7 +1156,7 @@ return arSa;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -967,7 +1221,7 @@ return arTn;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -1078,7 +1332,7 @@ return az;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -1218,7 +1472,7 @@ return be;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -1314,7 +1568,7 @@ return bg;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -1379,7 +1633,7 @@ return bm;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -1504,7 +1758,7 @@ return bn;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -1629,7 +1883,7 @@ return bo;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -1743,7 +1997,7 @@ return br;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -1901,7 +2155,7 @@ return bs;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -1995,7 +2249,7 @@ return ca;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -2180,7 +2434,7 @@ return cs;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -2249,7 +2503,7 @@ return cv;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -2336,7 +2590,7 @@ return cy;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -2402,7 +2656,7 @@ return da;
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -2486,7 +2740,7 @@ return de;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -2571,7 +2825,7 @@ return deAt;
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -2655,7 +2909,7 @@ return deCh;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -2761,7 +3015,7 @@ return dv;
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -2867,7 +3121,7 @@ return el;
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -2940,7 +3194,7 @@ return enAu;
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -3009,7 +3263,7 @@ return enCa;
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -3082,7 +3336,7 @@ return enGb;
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -3155,7 +3409,7 @@ return enIe;
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -3228,7 +3482,7 @@ return enNz;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -3307,7 +3561,7 @@ return eo;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -3405,7 +3659,7 @@ return es;
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -3502,7 +3756,7 @@ return esDo;
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -3591,7 +3845,7 @@ return esUs;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -3678,7 +3932,7 @@ return et;
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -3750,7 +4004,7 @@ return eu;
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -3863,7 +4117,7 @@ return fa;
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -3978,7 +4232,7 @@ return fi;
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -4044,7 +4298,7 @@ return fo;
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -4133,7 +4387,7 @@ return fr;
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -4213,7 +4467,7 @@ return frCa;
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -4297,7 +4551,7 @@ return frCh;
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -4378,7 +4632,7 @@ return fy;
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -4460,7 +4714,7 @@ return gd;
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -4543,7 +4797,7 @@ return gl;
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -4672,7 +4926,7 @@ return gomLatn;
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -4802,7 +5056,7 @@ return gu;
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -4907,7 +5161,7 @@ return he;
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5037,7 +5291,7 @@ return hi;
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5197,7 +5451,7 @@ return hr;
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5313,7 +5567,7 @@ return hu;
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5414,7 +5668,7 @@ return hyAm;
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5503,7 +5757,7 @@ return id;
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5641,7 +5895,7 @@ return is;
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5717,7 +5971,7 @@ return it;
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5803,7 +6057,7 @@ return ja;
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5892,7 +6146,7 @@ return jv;
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5987,7 +6241,7 @@ return ka;
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6080,7 +6334,7 @@ return kk;
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6144,7 +6398,7 @@ return km;
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6276,7 +6530,7 @@ return kn;
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6364,7 +6618,7 @@ return ko;
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6458,7 +6712,7 @@ return ky;
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6601,7 +6855,7 @@ return lb;
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6677,7 +6931,7 @@ return lo;
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6801,7 +7055,7 @@ return lt;
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6905,7 +7159,7 @@ return lv;
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7023,7 +7277,7 @@ return me;
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7093,7 +7347,7 @@ return mi;
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7189,7 +7443,7 @@ return mk;
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7276,7 +7530,7 @@ return ml;
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7443,7 +7697,7 @@ return mr;
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7531,7 +7785,7 @@ return ms;
 
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7620,7 +7874,7 @@ return msMy;
 
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7686,7 +7940,7 @@ return mt;
 
 
 /***/ }),
-/* 80 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7788,7 +8042,7 @@ return my;
 
 
 /***/ }),
-/* 81 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7857,7 +8111,7 @@ return nb;
 
 
 /***/ }),
-/* 82 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7986,7 +8240,7 @@ return ne;
 
 
 /***/ }),
-/* 83 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8080,7 +8334,7 @@ return nl;
 
 
 /***/ }),
-/* 84 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8174,7 +8428,7 @@ return nlBe;
 
 
 /***/ }),
-/* 85 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8240,7 +8494,7 @@ return nn;
 
 
 /***/ }),
-/* 86 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8370,7 +8624,7 @@ return paIn;
 
 
 /***/ }),
-/* 87 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8502,7 +8756,7 @@ return pl;
 
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8573,7 +8827,7 @@ return pt;
 
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8640,7 +8894,7 @@ return ptBr;
 
 
 /***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8722,7 +8976,7 @@ return ro;
 
 
 /***/ }),
-/* 91 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8912,7 +9166,7 @@ return ru;
 
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9016,7 +9270,7 @@ return sd;
 
 
 /***/ }),
-/* 93 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9083,7 +9337,7 @@ return se;
 
 
 /***/ }),
-/* 94 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9160,7 +9414,7 @@ return si;
 
 
 /***/ }),
-/* 95 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9323,7 +9577,7 @@ return sk;
 
 
 /***/ }),
-/* 96 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9502,7 +9756,7 @@ return sl;
 
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9578,7 +9832,7 @@ return sq;
 
 
 /***/ }),
-/* 98 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9695,7 +9949,7 @@ return sr;
 
 
 /***/ }),
-/* 99 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9812,7 +10066,7 @@ return srCyrl;
 
 
 /***/ }),
-/* 100 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9907,7 +10161,7 @@ return ss;
 
 
 /***/ }),
-/* 101 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9982,7 +10236,7 @@ return sv;
 
 
 /***/ }),
-/* 102 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10047,7 +10301,7 @@ return sw;
 
 
 /***/ }),
-/* 103 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10183,7 +10437,7 @@ return ta;
 
 
 /***/ }),
-/* 104 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10278,7 +10532,7 @@ return te;
 
 
 /***/ }),
-/* 105 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10352,7 +10606,7 @@ return tet;
 
 
 /***/ }),
-/* 106 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10425,7 +10679,7 @@ return th;
 
 
 /***/ }),
-/* 107 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10493,7 +10747,7 @@ return tlPh;
 
 
 /***/ }),
-/* 108 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10621,7 +10875,7 @@ return tlh;
 
 
 /***/ }),
-/* 109 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10717,7 +10971,7 @@ return tr;
 
 
 /***/ }),
-/* 110 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10815,7 +11069,7 @@ return tzl;
 
 
 /***/ }),
-/* 111 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10879,7 +11133,7 @@ return tzm;
 
 
 /***/ }),
-/* 112 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10943,7 +11197,7 @@ return tzmLatn;
 
 
 /***/ }),
-/* 113 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11101,7 +11355,7 @@ return uk;
 
 
 /***/ }),
-/* 114 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11206,7 +11460,7 @@ return ur;
 
 
 /***/ }),
-/* 115 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11270,7 +11524,7 @@ return uz;
 
 
 /***/ }),
-/* 116 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11334,7 +11588,7 @@ return uzLatn;
 
 
 /***/ }),
-/* 117 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11419,7 +11673,7 @@ return vi;
 
 
 /***/ }),
-/* 118 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11493,7 +11747,7 @@ return xPseudo;
 
 
 /***/ }),
-/* 119 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11559,7 +11813,7 @@ return yo;
 
 
 /***/ }),
-/* 120 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11676,7 +11930,7 @@ return zhCn;
 
 
 /***/ }),
-/* 121 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11787,7 +12041,7 @@ return zhHk;
 
 
 /***/ }),
-/* 122 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11895,13 +12149,6 @@ return zhTw;
 
 })));
 
-
-/***/ }),
-/* 123 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["jQuery"] = __webpack_require__(124);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
 /* 124 */
@@ -22165,234 +22412,6 @@ return jQuery;
 
 /***/ }),
 /* 125 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery, $) {// This module defines the JS API for SnookR
-
-const api = (function () {
-    /***** AJAX Setup *****/
-
-    const baseURL = 'http://127.0.0.1:8000';
-
-    const getCookie = function (name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            let cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                let cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    };
-
-    const csrftoken = getCookie('csrftoken');
-
-    $.ajaxSetup({
-        beforeSend: function (xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        },
-        contentType: 'application/json'
-    });
-
-    const csrfSafeMethod = function (method) {
-        // these HTTP methods do not require CSRF protection
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    };
-
-    /**** SnookR API ****/
-
-    /* getUserList(): Returns an AJAX request for the list of all users
-     *
-     *
-     * Arguments:
-     *     data: JSON file for filtering on the User model
-     *           Fields username, last_name, and first_name can be filtered
-     *           on using icontains, contains, and exact equalities.
-     *
-     *           For example, with a user named MyUser in the database queries with the following
-     *           data would return MyUser:
-     *
-     *           { 'username': 'MyUser' }           // exact match
-     *
-     *           { 'username__contains': 'yUser' }   // case-sensitive contains
-     *
-     *           { 'username__icontains': 'yuser' }  // case-insensitive contains
-     *
-     *
-     *
-     * Usage:
-     *       // Log all users to console
-     *       request = api.requestUserList()
-     *       request.done(function(data) {
-     *           for (var i=0; i<data.length; i++) {
-     *               console.log(data[i])
-     *           }
-     *       })
-     */
-    const getUserList = function (data) {
-        return $.ajax({
-            dataType: 'json',
-            url: '/api/users/',
-            data: JSON.stringify(data)
-        });
-    };
-    /* postTeam() : Returns a POST request for creating a Team.
-     *
-     * Arguments:
-     *     data: An object describing the team to be created.
-     *           Required fields: name, team_captain.
-     *           Optional fields: players
-     *
-     * Permisions: User must have the 'substitutes.add_team' permission to POST a team.
-     *
-     * Example data arg:
-     *       {
-     *           'name': MyTeam,
-     *           'team_captain': {
-     *              'username': 'evan'
-     *            },
-     *           'players': [
-     *               {'username': 'joe'},
-     *               {'username': 'john'}
-     *           ]
-     *       }
-     */
-    const postTeam = function (data) {
-        return $.post({
-            dataType: 'json',
-            url: '/api/team/',
-            data: JSON.stringify(data),
-        });
-    };
-    /* getInvitationList(): Returns a response object containing a list of invitations.
-     *
-     * Arguments:
-     *    data: object
-     *          The query parameters for filtering invitations.
-     *          Should take the form:
-     *                  {
-     *                    'invitee': {  // user fields (see getUserList comments) // },
-     *                    'team': { // team fields (see postTeam()) // },
-     *                    'id': integer,
-     *                    'status': 'P' (pending) or 'D' (declined) or 'A' (accepted)
-     *
-     *
-     * Example:
-     *
-     *     // Print out every pending invite for joe
-     *     getInvitationList({
-     *         'invitee': {'username': 'joe'},
-     *         'status': 'P'
-     *     }).done(function(data) {
-     *         for (var i=0; i<data.length; i++) {
-     *            console.log(data[i]);
-     *         }
-     *     })
-     *
-     *
-     */
-    const getInvitationList = function (data) {
-        return $.get({
-            dataType: 'json',
-            url: '/api/invites/',
-            data: JSON.stringify(data),
-        });
-    };
-    /* getLoggedInUser(): Returns a request with the data for the currently logged in user
-     *
-     * Arguments: None
-     */
-    const getLoggedInUser = function () {
-        return $.get({
-            dataType: 'json',
-            url: '/api/auth/user',
-            data: {},
-        })
-    };
-
-    /* postInvitation(data): Returns a request for POSTing a single invite
-     *f
-     */
-    const postInvitation = function (data) {
-        return $.post({
-            dataType: 'json',
-            url: '/api/invites/',
-            data: JSON.stringify(data)
-        })
-    };
-    /* patchInvitation(data): Returns a request for POSTing a single invite
-     *
-     */
-    const patchInvitation = function (data) {
-        return $.ajax({
-            type: 'PATCH',
-            dataType: 'json',
-            url: '/api/invites/' + data.id + '/',
-            data: JSON.stringify(data)
-        })
-    };
-
-    const getSessionList = function (data) {
-        return $.get({
-            dataType: 'json',
-            url: '/api/sessions',
-            data: data,
-        });
-    };
-
-    const getSubList = function (data) {
-        return $.get({
-            dataType: 'json',
-            url: '/api/subs',
-            data: data,
-        })
-    };
-
-    const getSessionEventList = function (data) {
-        return $.get({
-            dataType: 'json',
-            url: '/api/session-events',
-            data: data,
-        });
-    };
-
-    // Search for a user using a term search string
-    const searchForUser = function(data) {
-        return $.get({
-            dataType: 'json',
-            url: '/api/search-user',
-            data: data,
-        });
-    };
-
-    // Return public methods for API
-    return {
-        baseURL,
-        getUserList,
-        postTeam,
-        getInvitationList,
-        getLoggedInUser,
-        postInvitation,
-        patchInvitation,
-        getSessionList,
-        getSessionEventList,
-        getSubList,
-        searchForUser,
-    }
-})();
-
-module.exports = api;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(1)))
-
-/***/ }),
-/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -37330,7 +37349,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 127 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var require;//! moment.js
@@ -39177,7 +39196,7 @@ function loadLocale(name) {
         try {
             oldLocale = globalLocale._abbr;
             var aliasedRequire = require;
-            __webpack_require__(129)("./" + name);
+            __webpack_require__(128)("./" + name);
             getSetGlobalLocale(oldLocale);
         } catch (e) {}
     }
@@ -41869,10 +41888,10 @@ return hooks;
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(128)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(127)(module)))
 
 /***/ }),
-/* 128 */
+/* 127 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -41900,248 +41919,248 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 129 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./af": 4,
-	"./af.js": 4,
-	"./ar": 5,
-	"./ar-dz": 6,
-	"./ar-dz.js": 6,
-	"./ar-kw": 7,
-	"./ar-kw.js": 7,
-	"./ar-ly": 8,
-	"./ar-ly.js": 8,
-	"./ar-ma": 9,
-	"./ar-ma.js": 9,
-	"./ar-sa": 10,
-	"./ar-sa.js": 10,
-	"./ar-tn": 11,
-	"./ar-tn.js": 11,
-	"./ar.js": 5,
-	"./az": 12,
-	"./az.js": 12,
-	"./be": 13,
-	"./be.js": 13,
-	"./bg": 14,
-	"./bg.js": 14,
-	"./bm": 15,
-	"./bm.js": 15,
-	"./bn": 16,
-	"./bn.js": 16,
-	"./bo": 17,
-	"./bo.js": 17,
-	"./br": 18,
-	"./br.js": 18,
-	"./bs": 19,
-	"./bs.js": 19,
-	"./ca": 20,
-	"./ca.js": 20,
-	"./cs": 21,
-	"./cs.js": 21,
-	"./cv": 22,
-	"./cv.js": 22,
-	"./cy": 23,
-	"./cy.js": 23,
-	"./da": 24,
-	"./da.js": 24,
-	"./de": 25,
-	"./de-at": 26,
-	"./de-at.js": 26,
-	"./de-ch": 27,
-	"./de-ch.js": 27,
-	"./de.js": 25,
-	"./dv": 28,
-	"./dv.js": 28,
-	"./el": 29,
-	"./el.js": 29,
-	"./en-au": 30,
-	"./en-au.js": 30,
-	"./en-ca": 31,
-	"./en-ca.js": 31,
-	"./en-gb": 32,
-	"./en-gb.js": 32,
-	"./en-ie": 33,
-	"./en-ie.js": 33,
-	"./en-nz": 34,
-	"./en-nz.js": 34,
-	"./eo": 35,
-	"./eo.js": 35,
-	"./es": 36,
-	"./es-do": 37,
-	"./es-do.js": 37,
-	"./es-us": 38,
-	"./es-us.js": 38,
-	"./es.js": 36,
-	"./et": 39,
-	"./et.js": 39,
-	"./eu": 40,
-	"./eu.js": 40,
-	"./fa": 41,
-	"./fa.js": 41,
-	"./fi": 42,
-	"./fi.js": 42,
-	"./fo": 43,
-	"./fo.js": 43,
-	"./fr": 44,
-	"./fr-ca": 45,
-	"./fr-ca.js": 45,
-	"./fr-ch": 46,
-	"./fr-ch.js": 46,
-	"./fr.js": 44,
-	"./fy": 47,
-	"./fy.js": 47,
-	"./gd": 48,
-	"./gd.js": 48,
-	"./gl": 49,
-	"./gl.js": 49,
-	"./gom-latn": 50,
-	"./gom-latn.js": 50,
-	"./gu": 51,
-	"./gu.js": 51,
-	"./he": 52,
-	"./he.js": 52,
-	"./hi": 53,
-	"./hi.js": 53,
-	"./hr": 54,
-	"./hr.js": 54,
-	"./hu": 55,
-	"./hu.js": 55,
-	"./hy-am": 56,
-	"./hy-am.js": 56,
-	"./id": 57,
-	"./id.js": 57,
-	"./is": 58,
-	"./is.js": 58,
-	"./it": 59,
-	"./it.js": 59,
-	"./ja": 60,
-	"./ja.js": 60,
-	"./jv": 61,
-	"./jv.js": 61,
-	"./ka": 62,
-	"./ka.js": 62,
-	"./kk": 63,
-	"./kk.js": 63,
-	"./km": 64,
-	"./km.js": 64,
-	"./kn": 65,
-	"./kn.js": 65,
-	"./ko": 66,
-	"./ko.js": 66,
-	"./ky": 67,
-	"./ky.js": 67,
-	"./lb": 68,
-	"./lb.js": 68,
-	"./lo": 69,
-	"./lo.js": 69,
-	"./lt": 70,
-	"./lt.js": 70,
-	"./lv": 71,
-	"./lv.js": 71,
-	"./me": 72,
-	"./me.js": 72,
-	"./mi": 73,
-	"./mi.js": 73,
-	"./mk": 74,
-	"./mk.js": 74,
-	"./ml": 75,
-	"./ml.js": 75,
-	"./mr": 76,
-	"./mr.js": 76,
-	"./ms": 77,
-	"./ms-my": 78,
-	"./ms-my.js": 78,
-	"./ms.js": 77,
-	"./mt": 79,
-	"./mt.js": 79,
-	"./my": 80,
-	"./my.js": 80,
-	"./nb": 81,
-	"./nb.js": 81,
-	"./ne": 82,
-	"./ne.js": 82,
-	"./nl": 83,
-	"./nl-be": 84,
-	"./nl-be.js": 84,
-	"./nl.js": 83,
-	"./nn": 85,
-	"./nn.js": 85,
-	"./pa-in": 86,
-	"./pa-in.js": 86,
-	"./pl": 87,
-	"./pl.js": 87,
-	"./pt": 88,
-	"./pt-br": 89,
-	"./pt-br.js": 89,
-	"./pt.js": 88,
-	"./ro": 90,
-	"./ro.js": 90,
-	"./ru": 91,
-	"./ru.js": 91,
-	"./sd": 92,
-	"./sd.js": 92,
-	"./se": 93,
-	"./se.js": 93,
-	"./si": 94,
-	"./si.js": 94,
-	"./sk": 95,
-	"./sk.js": 95,
-	"./sl": 96,
-	"./sl.js": 96,
-	"./sq": 97,
-	"./sq.js": 97,
-	"./sr": 98,
-	"./sr-cyrl": 99,
-	"./sr-cyrl.js": 99,
-	"./sr.js": 98,
-	"./ss": 100,
-	"./ss.js": 100,
-	"./sv": 101,
-	"./sv.js": 101,
-	"./sw": 102,
-	"./sw.js": 102,
-	"./ta": 103,
-	"./ta.js": 103,
-	"./te": 104,
-	"./te.js": 104,
-	"./tet": 105,
-	"./tet.js": 105,
-	"./th": 106,
-	"./th.js": 106,
-	"./tl-ph": 107,
-	"./tl-ph.js": 107,
-	"./tlh": 108,
-	"./tlh.js": 108,
-	"./tr": 109,
-	"./tr.js": 109,
-	"./tzl": 110,
-	"./tzl.js": 110,
-	"./tzm": 111,
-	"./tzm-latn": 112,
-	"./tzm-latn.js": 112,
-	"./tzm.js": 111,
-	"./uk": 113,
-	"./uk.js": 113,
-	"./ur": 114,
-	"./ur.js": 114,
-	"./uz": 115,
-	"./uz-latn": 116,
-	"./uz-latn.js": 116,
-	"./uz.js": 115,
-	"./vi": 117,
-	"./vi.js": 117,
-	"./x-pseudo": 118,
-	"./x-pseudo.js": 118,
-	"./yo": 119,
-	"./yo.js": 119,
-	"./zh-cn": 120,
-	"./zh-cn.js": 120,
-	"./zh-hk": 121,
-	"./zh-hk.js": 121,
-	"./zh-tw": 122,
-	"./zh-tw.js": 122
+	"./af": 5,
+	"./af.js": 5,
+	"./ar": 6,
+	"./ar-dz": 7,
+	"./ar-dz.js": 7,
+	"./ar-kw": 8,
+	"./ar-kw.js": 8,
+	"./ar-ly": 9,
+	"./ar-ly.js": 9,
+	"./ar-ma": 10,
+	"./ar-ma.js": 10,
+	"./ar-sa": 11,
+	"./ar-sa.js": 11,
+	"./ar-tn": 12,
+	"./ar-tn.js": 12,
+	"./ar.js": 6,
+	"./az": 13,
+	"./az.js": 13,
+	"./be": 14,
+	"./be.js": 14,
+	"./bg": 15,
+	"./bg.js": 15,
+	"./bm": 16,
+	"./bm.js": 16,
+	"./bn": 17,
+	"./bn.js": 17,
+	"./bo": 18,
+	"./bo.js": 18,
+	"./br": 19,
+	"./br.js": 19,
+	"./bs": 20,
+	"./bs.js": 20,
+	"./ca": 21,
+	"./ca.js": 21,
+	"./cs": 22,
+	"./cs.js": 22,
+	"./cv": 23,
+	"./cv.js": 23,
+	"./cy": 24,
+	"./cy.js": 24,
+	"./da": 25,
+	"./da.js": 25,
+	"./de": 26,
+	"./de-at": 27,
+	"./de-at.js": 27,
+	"./de-ch": 28,
+	"./de-ch.js": 28,
+	"./de.js": 26,
+	"./dv": 29,
+	"./dv.js": 29,
+	"./el": 30,
+	"./el.js": 30,
+	"./en-au": 31,
+	"./en-au.js": 31,
+	"./en-ca": 32,
+	"./en-ca.js": 32,
+	"./en-gb": 33,
+	"./en-gb.js": 33,
+	"./en-ie": 34,
+	"./en-ie.js": 34,
+	"./en-nz": 35,
+	"./en-nz.js": 35,
+	"./eo": 36,
+	"./eo.js": 36,
+	"./es": 37,
+	"./es-do": 38,
+	"./es-do.js": 38,
+	"./es-us": 39,
+	"./es-us.js": 39,
+	"./es.js": 37,
+	"./et": 40,
+	"./et.js": 40,
+	"./eu": 41,
+	"./eu.js": 41,
+	"./fa": 42,
+	"./fa.js": 42,
+	"./fi": 43,
+	"./fi.js": 43,
+	"./fo": 44,
+	"./fo.js": 44,
+	"./fr": 45,
+	"./fr-ca": 46,
+	"./fr-ca.js": 46,
+	"./fr-ch": 47,
+	"./fr-ch.js": 47,
+	"./fr.js": 45,
+	"./fy": 48,
+	"./fy.js": 48,
+	"./gd": 49,
+	"./gd.js": 49,
+	"./gl": 50,
+	"./gl.js": 50,
+	"./gom-latn": 51,
+	"./gom-latn.js": 51,
+	"./gu": 52,
+	"./gu.js": 52,
+	"./he": 53,
+	"./he.js": 53,
+	"./hi": 54,
+	"./hi.js": 54,
+	"./hr": 55,
+	"./hr.js": 55,
+	"./hu": 56,
+	"./hu.js": 56,
+	"./hy-am": 57,
+	"./hy-am.js": 57,
+	"./id": 58,
+	"./id.js": 58,
+	"./is": 59,
+	"./is.js": 59,
+	"./it": 60,
+	"./it.js": 60,
+	"./ja": 61,
+	"./ja.js": 61,
+	"./jv": 62,
+	"./jv.js": 62,
+	"./ka": 63,
+	"./ka.js": 63,
+	"./kk": 64,
+	"./kk.js": 64,
+	"./km": 65,
+	"./km.js": 65,
+	"./kn": 66,
+	"./kn.js": 66,
+	"./ko": 67,
+	"./ko.js": 67,
+	"./ky": 68,
+	"./ky.js": 68,
+	"./lb": 69,
+	"./lb.js": 69,
+	"./lo": 70,
+	"./lo.js": 70,
+	"./lt": 71,
+	"./lt.js": 71,
+	"./lv": 72,
+	"./lv.js": 72,
+	"./me": 73,
+	"./me.js": 73,
+	"./mi": 74,
+	"./mi.js": 74,
+	"./mk": 75,
+	"./mk.js": 75,
+	"./ml": 76,
+	"./ml.js": 76,
+	"./mr": 77,
+	"./mr.js": 77,
+	"./ms": 78,
+	"./ms-my": 79,
+	"./ms-my.js": 79,
+	"./ms.js": 78,
+	"./mt": 80,
+	"./mt.js": 80,
+	"./my": 81,
+	"./my.js": 81,
+	"./nb": 82,
+	"./nb.js": 82,
+	"./ne": 83,
+	"./ne.js": 83,
+	"./nl": 84,
+	"./nl-be": 85,
+	"./nl-be.js": 85,
+	"./nl.js": 84,
+	"./nn": 86,
+	"./nn.js": 86,
+	"./pa-in": 87,
+	"./pa-in.js": 87,
+	"./pl": 88,
+	"./pl.js": 88,
+	"./pt": 89,
+	"./pt-br": 90,
+	"./pt-br.js": 90,
+	"./pt.js": 89,
+	"./ro": 91,
+	"./ro.js": 91,
+	"./ru": 92,
+	"./ru.js": 92,
+	"./sd": 93,
+	"./sd.js": 93,
+	"./se": 94,
+	"./se.js": 94,
+	"./si": 95,
+	"./si.js": 95,
+	"./sk": 96,
+	"./sk.js": 96,
+	"./sl": 97,
+	"./sl.js": 97,
+	"./sq": 98,
+	"./sq.js": 98,
+	"./sr": 99,
+	"./sr-cyrl": 100,
+	"./sr-cyrl.js": 100,
+	"./sr.js": 99,
+	"./ss": 101,
+	"./ss.js": 101,
+	"./sv": 102,
+	"./sv.js": 102,
+	"./sw": 103,
+	"./sw.js": 103,
+	"./ta": 104,
+	"./ta.js": 104,
+	"./te": 105,
+	"./te.js": 105,
+	"./tet": 106,
+	"./tet.js": 106,
+	"./th": 107,
+	"./th.js": 107,
+	"./tl-ph": 108,
+	"./tl-ph.js": 108,
+	"./tlh": 109,
+	"./tlh.js": 109,
+	"./tr": 110,
+	"./tr.js": 110,
+	"./tzl": 111,
+	"./tzl.js": 111,
+	"./tzm": 112,
+	"./tzm-latn": 113,
+	"./tzm-latn.js": 113,
+	"./tzm.js": 112,
+	"./uk": 114,
+	"./uk.js": 114,
+	"./ur": 115,
+	"./ur.js": 115,
+	"./uz": 116,
+	"./uz-latn": 117,
+	"./uz-latn.js": 117,
+	"./uz.js": 116,
+	"./vi": 118,
+	"./vi.js": 118,
+	"./x-pseudo": 119,
+	"./x-pseudo.js": 119,
+	"./yo": 120,
+	"./yo.js": 120,
+	"./zh-cn": 121,
+	"./zh-cn.js": 121,
+	"./zh-hk": 122,
+	"./zh-hk.js": 122,
+	"./zh-tw": 123,
+	"./zh-tw.js": 123
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -42157,10 +42176,10 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 129;
+webpackContext.id = 128;
 
 /***/ }),
-/* 130 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42221,7 +42240,7 @@ module.exports = exports['default'];
 
 
 /***/ }),
-/* 131 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**!
@@ -42255,8 +42274,16 @@ THE SOFTWARE.
 var f=g.nameLookup(e,b[c],a);return d?[" && ",f]:[" != null ? ",f," : ",e]})},resolvePossibleLambda:function(){this.push([this.aliasable("container.lambda"),"(",this.popStack(),", ",this.contextName(0),")"])},pushStringParam:function(a,b){this.pushContext(),this.pushString(b),"SubExpression"!==b&&("string"==typeof a?this.pushString(a):this.pushStackLiteral(a))},emptyHash:function(a){this.trackIds&&this.push("{}"),this.stringParams&&(this.push("{}"),this.push("{}")),this.pushStackLiteral(a?"undefined":"{}")},pushHash:function(){this.hash&&this.hashes.push(this.hash),this.hash={values:[],types:[],contexts:[],ids:[]}},popHash:function(){var a=this.hash;this.hash=this.hashes.pop(),this.trackIds&&this.push(this.objectLiteral(a.ids)),this.stringParams&&(this.push(this.objectLiteral(a.contexts)),this.push(this.objectLiteral(a.types))),this.push(this.objectLiteral(a.values))},pushString:function(a){this.pushStackLiteral(this.quotedString(a))},pushLiteral:function(a){this.pushStackLiteral(a)},pushProgram:function(a){null!=a?this.pushStackLiteral(this.programExpression(a)):this.pushStackLiteral(null)},registerDecorator:function(a,b){var c=this.nameLookup("decorators",b,"decorator"),d=this.setupHelperArgs(b,a);this.decorators.push(["fn = ",this.decorators.functionCall(c,"",["fn","props","container",d])," || fn;"])},invokeHelper:function(a,b,c){var d=this.popStack(),e=this.setupHelper(a,b),f=c?[e.name," || "]:"",g=["("].concat(f,d);this.options.strict||g.push(" || ",this.aliasable("helpers.helperMissing")),g.push(")"),this.push(this.source.functionCall(g,"call",e.callParams))},invokeKnownHelper:function(a,b){var c=this.setupHelper(a,b);this.push(this.source.functionCall(c.name,"call",c.callParams))},invokeAmbiguous:function(a,b){this.useRegister("helper");var c=this.popStack();this.emptyHash();var d=this.setupHelper(0,a,b),e=this.lastHelper=this.nameLookup("helpers",a,"helper"),f=["(","(helper = ",e," || ",c,")"];this.options.strict||(f[0]="(helper = ",f.push(" != null ? helper : ",this.aliasable("helpers.helperMissing"))),this.push(["(",f,d.paramsInit?["),(",d.paramsInit]:[],"),","(typeof helper === ",this.aliasable('"function"')," ? ",this.source.functionCall("helper","call",d.callParams)," : helper))"])},invokePartial:function(a,b,c){var d=[],e=this.setupParams(b,1,d);a&&(b=this.popStack(),delete e.name),c&&(e.indent=JSON.stringify(c)),e.helpers="helpers",e.partials="partials",e.decorators="container.decorators",a?d.unshift(b):d.unshift(this.nameLookup("partials",b,"partial")),this.options.compat&&(e.depths="depths"),e=this.objectLiteral(e),d.push(e),this.push(this.source.functionCall("container.invokePartial","",d))},assignToHash:function(a){var b=this.popStack(),c=void 0,d=void 0,e=void 0;this.trackIds&&(e=this.popStack()),this.stringParams&&(d=this.popStack(),c=this.popStack());var f=this.hash;c&&(f.contexts[a]=c),d&&(f.types[a]=d),e&&(f.ids[a]=e),f.values[a]=b},pushId:function(a,b,c){"BlockParam"===a?this.pushStackLiteral("blockParams["+b[0]+"].path["+b[1]+"]"+(c?" + "+JSON.stringify("."+c):"")):"PathExpression"===a?this.pushString(b):"SubExpression"===a?this.pushStackLiteral("true"):this.pushStackLiteral("null")},compiler:e,compileChildren:function(a,b){for(var c=a.children,d=void 0,e=void 0,f=0,g=c.length;f<g;f++){d=c[f],e=new this.compiler;var h=this.matchExistingProgram(d);if(null==h){this.context.programs.push("");var i=this.context.programs.length;d.index=i,d.name="program"+i,this.context.programs[i]=e.compile(d,b,this.context,!this.precompile),this.context.decorators[i]=e.decorators,this.context.environments[i]=d,this.useDepths=this.useDepths||e.useDepths,this.useBlockParams=this.useBlockParams||e.useBlockParams,d.useDepths=this.useDepths,d.useBlockParams=this.useBlockParams}else d.index=h.index,d.name="program"+h.index,this.useDepths=this.useDepths||h.useDepths,this.useBlockParams=this.useBlockParams||h.useBlockParams}},matchExistingProgram:function(a){for(var b=0,c=this.context.environments.length;b<c;b++){var d=this.context.environments[b];if(d&&d.equals(a))return d}},programExpression:function(a){var b=this.environment.children[a],c=[b.index,"data",b.blockParams];return(this.useBlockParams||this.useDepths)&&c.push("blockParams"),this.useDepths&&c.push("depths"),"container.program("+c.join(", ")+")"},useRegister:function(a){this.registers[a]||(this.registers[a]=!0,this.registers.list.push(a))},push:function(a){return a instanceof d||(a=this.source.wrap(a)),this.inlineStack.push(a),a},pushStackLiteral:function(a){this.push(new d(a))},pushSource:function(a){this.pendingContent&&(this.source.push(this.appendToBuffer(this.source.quotedString(this.pendingContent),this.pendingLocation)),this.pendingContent=void 0),a&&this.source.push(a)},replaceStack:function(a){var b=["("],c=void 0,e=void 0,f=void 0;if(!this.isInline())throw new j["default"]("replaceStack on non-inline");var g=this.popStack(!0);if(g instanceof d)c=[g.value],b=["(",c],f=!0;else{e=!0;var h=this.incrStack();b=["((",this.push(h)," = ",g,")"],c=this.topStack()}var i=a.call(this,c);f||this.popStack(),e&&this.stackSlot--,this.push(b.concat(i,")"))},incrStack:function(){return this.stackSlot++,this.stackSlot>this.stackVars.length&&this.stackVars.push("stack"+this.stackSlot),this.topStackName()},topStackName:function(){return"stack"+this.stackSlot},flushInline:function(){var a=this.inlineStack;this.inlineStack=[];for(var b=0,c=a.length;b<c;b++){var e=a[b];if(e instanceof d)this.compileStack.push(e);else{var f=this.incrStack();this.pushSource([f," = ",e,";"]),this.compileStack.push(f)}}},isInline:function(){return this.inlineStack.length},popStack:function(a){var b=this.isInline(),c=(b?this.inlineStack:this.compileStack).pop();if(!a&&c instanceof d)return c.value;if(!b){if(!this.stackSlot)throw new j["default"]("Invalid stack pop");this.stackSlot--}return c},topStack:function(){var a=this.isInline()?this.inlineStack:this.compileStack,b=a[a.length-1];return b instanceof d?b.value:b},contextName:function(a){return this.useDepths&&a?"depths["+a+"]":"depth"+a},quotedString:function(a){return this.source.quotedString(a)},objectLiteral:function(a){return this.source.objectLiteral(a)},aliasable:function(a){var b=this.aliases[a];return b?(b.referenceCount++,b):(b=this.aliases[a]=this.source.wrap(a),b.aliasable=!0,b.referenceCount=1,b)},setupHelper:function(a,b,c){var d=[],e=this.setupHelperArgs(b,a,d,c),f=this.nameLookup("helpers",b,"helper"),g=this.aliasable(this.contextName(0)+" != null ? "+this.contextName(0)+" : (container.nullContext || {})");return{params:d,paramsInit:e,name:f,callParams:[g].concat(d)}},setupParams:function(a,b,c){var d={},e=[],f=[],g=[],h=!c,i=void 0;h&&(c=[]),d.name=this.quotedString(a),d.hash=this.popStack(),this.trackIds&&(d.hashIds=this.popStack()),this.stringParams&&(d.hashTypes=this.popStack(),d.hashContexts=this.popStack());var j=this.popStack(),k=this.popStack();(k||j)&&(d.fn=k||"container.noop",d.inverse=j||"container.noop");for(var l=b;l--;)i=this.popStack(),c[l]=i,this.trackIds&&(g[l]=this.popStack()),this.stringParams&&(f[l]=this.popStack(),e[l]=this.popStack());return h&&(d.args=this.source.generateArray(c)),this.trackIds&&(d.ids=this.source.generateArray(g)),this.stringParams&&(d.types=this.source.generateArray(f),d.contexts=this.source.generateArray(e)),this.options.data&&(d.data="data"),this.useBlockParams&&(d.blockParams="blockParams"),d},setupHelperArgs:function(a,b,c,d){var e=this.setupParams(a,b,c);return e=this.objectLiteral(e),d?(this.useRegister("options"),c.push("options"),["options=",e]):c?(c.push(e),""):e}},function(){for(var a="break else new var case finally return void catch for switch while continue function this with default if throw delete in try do instanceof typeof abstract enum int short boolean export interface static byte extends long super char final native synchronized class float package throws const goto private transient debugger implements protected volatile double import public let yield await null true false".split(" "),b=e.RESERVED_WORDS={},c=0,d=a.length;c<d;c++)b[a[c]]=!0}(),e.isValidJavaScriptVariableName=function(a){return!e.RESERVED_WORDS[a]&&/^[a-zA-Z_$][0-9a-zA-Z_$]*$/.test(a)},b["default"]=e,a.exports=b["default"]},function(a,b,c){"use strict";function d(a,b,c){if(f.isArray(a)){for(var d=[],e=0,g=a.length;e<g;e++)d.push(b.wrap(a[e],c));return d}return"boolean"==typeof a||"number"==typeof a?a+"":a}function e(a){this.srcFile=a,this.source=[]}b.__esModule=!0;var f=c(5),g=void 0;try{}catch(h){}g||(g=function(a,b,c,d){this.src="",d&&this.add(d)},g.prototype={add:function(a){f.isArray(a)&&(a=a.join("")),this.src+=a},prepend:function(a){f.isArray(a)&&(a=a.join("")),this.src=a+this.src},toStringWithSourceMap:function(){return{code:this.toString()}},toString:function(){return this.src}}),e.prototype={isEmpty:function(){return!this.source.length},prepend:function(a,b){this.source.unshift(this.wrap(a,b))},push:function(a,b){this.source.push(this.wrap(a,b))},merge:function(){var a=this.empty();return this.each(function(b){a.add(["  ",b,"\n"])}),a},each:function(a){for(var b=0,c=this.source.length;b<c;b++)a(this.source[b])},empty:function(){var a=this.currentLocation||{start:{}};return new g(a.start.line,a.start.column,this.srcFile)},wrap:function(a){var b=arguments.length<=1||void 0===arguments[1]?this.currentLocation||{start:{}}:arguments[1];return a instanceof g?a:(a=d(a,this,b),new g(b.start.line,b.start.column,this.srcFile,a))},functionCall:function(a,b,c){return c=this.generateList(c),this.wrap([a,b?"."+b+"(":"(",c,")"])},quotedString:function(a){return'"'+(a+"").replace(/\\/g,"\\\\").replace(/"/g,'\\"').replace(/\n/g,"\\n").replace(/\r/g,"\\r").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029")+'"'},objectLiteral:function(a){var b=[];for(var c in a)if(a.hasOwnProperty(c)){var e=d(a[c],this);"undefined"!==e&&b.push([this.quotedString(c),":",e])}var f=this.generateList(b);return f.prepend("{"),f.add("}"),f},generateList:function(a){for(var b=this.empty(),c=0,e=a.length;c<e;c++)c&&b.add(","),b.add(d(a[c],this));return b},generateArray:function(a){var b=this.generateList(a);return b.prepend("["),b.add("]"),b}},b["default"]=e,a.exports=b["default"]}])});
 
 /***/ }),
-/* 132 */,
-/* 133 */
+/* 131 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// Create a simple path alias to allow browserify to resolve
+// the runtime on a supported path.
+module.exports = __webpack_require__(140)['default'];
+
+
+/***/ }),
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42270,7 +42297,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 var _utils = __webpack_require__(3);
 
-var _exception = __webpack_require__(130);
+var _exception = __webpack_require__(129);
 
 var _exception2 = _interopRequireDefault(_exception);
 
@@ -42367,9 +42394,46 @@ exports.logger = _logger2['default'];
 
 
 /***/ }),
+/* 133 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/**
+ * Created by bobby on 12/31/17.
+ */
+let Handlebars = __webpack_require__(130);
+let $ = __webpack_require__(1);
+let template = __webpack_require__(155);
+
+
+const User = function (user) {
+    this.id = user.id;
+    this.firstname = user.first_name;
+    this.lastname = user.last_name;
+    this.thumbnailUrl = user.thumbnail_url;
+    this.username = user.username;
+    this.url = user.url;
+    this.isCaptain = user.is_captain;
+    this.isCurrentUser = user.is_current_user;
+    this.$dom = this.getDOM();
+
+    // Assign extra
+    this.extras = null;
+};
+
+// All users have the same template and getDOM function();
+User.prototype.template = template;
+User.prototype.getDOM = function () {
+    return $(this.template(this));
+};
+
+User.prototype.constructor = User;
+module.exports = User;
+
+/***/ }),
 /* 134 */,
 /* 135 */,
-/* 136 */
+/* 136 */,
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -42378,10 +42442,10 @@ exports.logger = _logger2['default'];
 
 let $ = __webpack_require__(1);
 __webpack_require__(0);
-__webpack_require__(126);
-let api = __webpack_require__(125);
-let Sub = __webpack_require__(156);
-let User = __webpack_require__(137);
+__webpack_require__(125);
+let api = __webpack_require__(4);
+let Sub = __webpack_require__(138);
+let User = __webpack_require__(133);
 
 
 let substitutes = {
@@ -42407,11 +42471,11 @@ let substitutes = {
     },
 
     bindEvents: function () {
-        this.$rightColumn.on('click', '.invite-button', this.goToHref);
+        this.$rightColumn.on('click', '.invite-button', this.createInvite);
     },
 
-    goToHref: function() {
-        window.location.href = $(this).attr('href');
+    createInvite: function() {
+        $(this)
     },
 
     getSub: function (subJson) {
@@ -42425,6 +42489,7 @@ let substitutes = {
 
     render: function () {
         this.$subList.empty();
+        console.log('-=---')
         this.subs
             .filter(sub => !sub.isCurrentUser)
             .map(sub => this.$subList.append(sub.$dom));
@@ -42497,82 +42562,102 @@ $(document).ready(function () {
     substitutes.init();
 });
 
-/***/ }),
-/* 137 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/**
- * Created by bobby on 12/31/17.
- */
-let Handlebars = __webpack_require__(131);
-let $ = __webpack_require__(1);
-let template = __webpack_require__(138);
-
-
-const User = function (user) {
-    this.id = user.id;
-    this.firstname = user.first_name;
-    this.lastname = user.last_name;
-    this.thumbnailUrl = user.thumbnail_url;
-    this.username = user.username;
-    this.url = user.url;
-    this.isCaptain = user.is_captain;
-    this.isCurrentUser = user.is_current_user;
-    this.$dom = this.getDOM();
-
-    // Assign extra
-    this.extras = null;
-};
-
-// All users have the same template and getDOM function();
-User.prototype.template = template;
-User.prototype.getDOM = function () {
-    return $(this.template(this));
-};
-
-User.prototype.constructor = User;
-module.exports = User;
 
 /***/ }),
 /* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Handlebars = __webpack_require__(139);
-function __default(obj) { return obj && (obj.__esModule ? obj["default"] : obj); }
-module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
-    return "            <button class=\"session-button pull-right\" type=\"button\" href=\""
-    + container.escapeExpression(container.lambda((depth0 != null ? depth0.sessionEventRegisterUrl : depth0), depth0))
-    + "\">Invite\n            </button>\n";
-},"3":function(container,depth0,helpers,partials,data) {
-    return "            <form class=\"pull-right session-button\" action=\""
-    + container.escapeExpression(container.lambda((depth0 != null ? depth0.sessionEventUnregisterUrl : depth0), depth0))
-    + "\">\n                <input type=\"submit\" value=\"Unregister\">\n            </form>\n";
-},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    var stack1, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : (container.nullContext || {});
+/**
+ * Created by bobby on 12/31/17.
+ */
 
-  return "<div class=\"panel panel-default\">\n    <div class=\"panel-body\">\n        <div class=\"pull-left\">\n            <a href=\""
-    + alias2(alias1(((stack1 = (depth0 != null ? depth0.user : depth0)) != null ? stack1.url : stack1), depth0))
-    + "\">\n                <img class=\"img-circle\" width=\"50px\" height=\"50px\" style=\"margin-right:8px; margin-top:-5px;\" src=\""
-    + alias2(alias1(((stack1 = (depth0 != null ? depth0.user : depth0)) != null ? stack1.thumbnail_url : stack1), depth0))
-    + "\">\n            </a>\n        </div>\n        <h4 class=\"pull-left\"><a href=\""
-    + alias2(alias1(((stack1 = (depth0 != null ? depth0.user : depth0)) != null ? stack1.url : stack1), depth0))
-    + "\" style=\"text-decoration:none;\"><strong>"
-    + alias2(alias1((depth0 != null ? depth0.username : depth0), depth0))
-    + "</strong></a></h4>\n\n"
-    + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.currentUserisCaptain : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "\n"
-    + ((stack1 = helpers["if"].call(alias3,((stack1 = (depth0 != null ? depth0.user : depth0)) != null ? stack1.isCurrentUser : stack1),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "    </div>\n</div>\n";
-},"useData":true});
+let Handlebars = __webpack_require__(130);
+let $ = __webpack_require__(1);
+let template = __webpack_require__(139);
+let User = __webpack_require__(133);
+let api = __webpack_require__(4);
+
+const Sub = function (sub, currentUser) {
+    User.call(this, sub.user);
+    console.log('Sub!');
+    this.currentUser = currentUser;
+    this.isCurrentUser = this.id === this.currentUser.id;
+    this.sessionEvent = sub.session_event;
+    this.cacheDom();
+    this.bindEvents();
+};
+
+// All users have the same template and getDOM function();
+Sub.prototype.template = template;
+
+Sub.prototype.getDOM = function () {
+    return $(this.template({ sub: this }));
+};
+
+Sub.prototype.cacheDom = function() {
+    this.$dom = this.getDOM();
+    this.$inviteButton = this.$dom.find('.invite-button');
+};
+
+Sub.prototype.bindEvents = function() {
+    console.log('here');
+    this.$inviteButton.click(this.createInvite.bind(this))
+};
+
+Sub.prototype.createInvite = function(event) {
+    event.preventDefault();
+    console.log('id', this.id);
+    let data = { invitee: this, event: this.sessionEvent };
+    console.log('data', data);
+    api.postSessionEventInvite(data)
+    .done(function(data) {
+        console.log('success!', data);
+        this.displaySuccessfulInvite();
+    }).fail(function(data) {
+        console.log('error!', data);
+    });
+};
+
+Sub.prototype.displaySuccessfulInvite = function() {
+    this.$inviteButton.replaceWith(`<strong>Successful Invite!</strong>`);
+};
+
+Sub.prototype.constructor = Sub;
+module.exports = Sub;
 
 /***/ }),
 /* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
-// Create a simple path alias to allow browserify to resolve
-// the runtime on a supported path.
-module.exports = __webpack_require__(140)['default'];
+var Handlebars = __webpack_require__(131);
+function __default(obj) { return obj && (obj.__esModule ? obj["default"] : obj); }
+module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
+    var stack1;
 
+  return "            <form class=\"pull-right session-button\" action=\""
+    + container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.sessionEvent : stack1)) != null ? stack1.unregisterUrl : stack1), depth0))
+    + "\">\n                <input type=\"submit\" value=\"Unregister\">\n            </form>\n";
+},"3":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.currentUser : stack1)) != null ? stack1.isCaptain : stack1),{"name":"if","hash":{},"fn":container.program(4, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+},"4":function(container,depth0,helpers,partials,data) {
+    return "                <button class=\"invite-button session-button pull-right\" type=\"button\">Invite</button>\n";
+},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, alias1=container.lambda, alias2=container.escapeExpression;
+
+  return "<div class=\"panel panel-default\">\n    <div class=\"panel-body\">\n        <div class=\"pull-left\">\n            <a href=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.url : stack1), depth0))
+    + "\">\n                <img class=\"img-circle\" width=\"50px\" height=\"50px\" style=\"margin-right:8px; margin-top:-5px;\"\n                     src=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.thumbnailUrl : stack1), depth0))
+    + "\">\n            </a>\n        </div>\n        <h4 class=\"pull-left\"><a href=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.url : stack1), depth0))
+    + "\" style=\"text-decoration:none;\"><strong>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.username : stack1), depth0))
+    + "</strong></a>\n        </h4>\n\n"
+    + ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.isCurrentUser : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
+    + "    </div>\n</div>\n";
+},"useData":true});
 
 /***/ }),
 /* 140 */
@@ -42590,7 +42675,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
-var _handlebarsBase = __webpack_require__(133);
+var _handlebarsBase = __webpack_require__(132);
 
 var base = _interopRequireWildcard(_handlebarsBase);
 
@@ -42601,7 +42686,7 @@ var _handlebarsSafeString = __webpack_require__(152);
 
 var _handlebarsSafeString2 = _interopRequireDefault(_handlebarsSafeString);
 
-var _handlebarsException = __webpack_require__(130);
+var _handlebarsException = __webpack_require__(129);
 
 var _handlebarsException2 = _interopRequireDefault(_handlebarsException);
 
@@ -42760,7 +42845,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 var _utils = __webpack_require__(3);
 
-var _exception = __webpack_require__(130);
+var _exception = __webpack_require__(129);
 
 var _exception2 = _interopRequireDefault(_exception);
 
@@ -42859,7 +42944,7 @@ exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _exception = __webpack_require__(130);
+var _exception = __webpack_require__(129);
 
 var _exception2 = _interopRequireDefault(_exception);
 
@@ -43168,11 +43253,11 @@ var _utils = __webpack_require__(3);
 
 var Utils = _interopRequireWildcard(_utils);
 
-var _exception = __webpack_require__(130);
+var _exception = __webpack_require__(129);
 
 var _exception2 = _interopRequireDefault(_exception);
 
-var _base = __webpack_require__(133);
+var _base = __webpack_require__(132);
 
 function checkRevision(compilerInfo) {
   var compilerRevision = compilerInfo && compilerInfo[0] || 1,
@@ -43485,73 +43570,34 @@ module.exports = exports['default'];
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
-/* 155 */,
-/* 156 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/**
- * Created by bobby on 12/31/17.
- */
-
-let Handlebars = __webpack_require__(131);
-let $ = __webpack_require__(1);
-let template = __webpack_require__(157);
-let User = __webpack_require__(137);
-
-const Sub = function (sub, currentUser) {
-    User.call(this, sub.user);
-    this.currentUser = currentUser;
-    this.isCurrentUser = this.id === this.currentUser.id;
-    this.sessionEvent = sub.session_event;
-    this.$dom = this.getDOM();
-};
-
-// All users have the same template and getDOM function();
-Sub.prototype.template = template;
-Sub.prototype.getDOM = function () {
-    return $(this.template({ sub: this }));
-};
-
-Sub.prototype.constructor = Sub;
-module.exports = Sub;
-
-/***/ }),
-/* 157 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var Handlebars = __webpack_require__(139);
+var Handlebars = __webpack_require__(131);
 function __default(obj) { return obj && (obj.__esModule ? obj["default"] : obj); }
 module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return "            <form class=\"pull-right session-button\" action=\""
-    + container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.sessionEvent : stack1)) != null ? stack1.unregisterUrl : stack1), depth0))
-    + "\">\n                <input type=\"submit\" value=\"Unregister\">\n            </form>\n";
+    return "            <button class=\"session-button pull-right\" type=\"button\" href=\""
+    + container.escapeExpression(container.lambda((depth0 != null ? depth0.sessionEventRegisterUrl : depth0), depth0))
+    + "\">Invite\n            </button>\n";
 },"3":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.currentUser : stack1)) != null ? stack1.isCaptain : stack1),{"name":"if","hash":{},"fn":container.program(4, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
-},"4":function(container,depth0,helpers,partials,data) {
-    var stack1, alias1=container.lambda, alias2=container.escapeExpression;
-
-  return "                <button class=\"invite-button session-button pull-right\" type=\"button\" href=\"/invites/session-events/"
-    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.sessionEvent : stack1)) != null ? stack1.id : stack1), depth0))
-    + "/subs/"
-    + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.id : stack1), depth0))
-    + "/\">Invite\n                </button>\n";
+    return "            <form class=\"pull-right session-button\" action=\""
+    + container.escapeExpression(container.lambda((depth0 != null ? depth0.sessionEventUnregisterUrl : depth0), depth0))
+    + "\">\n                <input type=\"submit\" value=\"Unregister\">\n            </form>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    var stack1, alias1=container.lambda, alias2=container.escapeExpression;
+    var stack1, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : (container.nullContext || {});
 
   return "<div class=\"panel panel-default\">\n    <div class=\"panel-body\">\n        <div class=\"pull-left\">\n            <a href=\""
-    + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.url : stack1), depth0))
-    + "\">\n                <img class=\"img-circle\" width=\"50px\" height=\"50px\" style=\"margin-right:8px; margin-top:-5px;\"\n                     src=\""
-    + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.thumbnailUrl : stack1), depth0))
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.user : depth0)) != null ? stack1.url : stack1), depth0))
+    + "\">\n                <img class=\"img-circle\" width=\"50px\" height=\"50px\" style=\"margin-right:8px; margin-top:-5px;\" src=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.user : depth0)) != null ? stack1.thumbnail_url : stack1), depth0))
     + "\">\n            </a>\n        </div>\n        <h4 class=\"pull-left\"><a href=\""
-    + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.url : stack1), depth0))
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.user : depth0)) != null ? stack1.url : stack1), depth0))
     + "\" style=\"text-decoration:none;\"><strong>"
-    + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.username : stack1), depth0))
-    + "</strong></a>\n        </h4>\n\n"
-    + ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.isCurrentUser : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
+    + alias2(alias1((depth0 != null ? depth0.username : depth0), depth0))
+    + "</strong></a></h4>\n\n"
+    + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.currentUserisCaptain : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers["if"].call(alias3,((stack1 = (depth0 != null ? depth0.user : depth0)) != null ? stack1.isCurrentUser : stack1),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    </div>\n</div>\n";
 },"useData":true});
 

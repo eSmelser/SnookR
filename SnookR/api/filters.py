@@ -1,7 +1,7 @@
 from substitutes.models import Division, Session, SessionEvent, Sub
 from accounts.models import CustomUser
 from teams.models import Team
-from invites.models import TeamInvite
+from invites.models import TeamInvite, SessionEventInvite
 import rest_framework_filters as filters
 
 character_filters = ['exact', 'contains', 'icontains', 'startswith']
@@ -83,3 +83,12 @@ class SubFilter(filters.FilterSet):
     class Meta:
         model = Sub
         fields = ['user', 'session_event']
+
+
+class SessionEventInviteFilter(filters.FilterSet):
+    invitee = filters.RelatedFilter(SubFilter, name='invitee', queryset=Sub.objects.all())
+    event = filters.RelatedFilter(SessionEventFilter, name='event', queryset=SessionEvent.objects.all())
+
+    class Meta:
+        model = SessionEventInvite
+        fields = ['invitee', 'event']

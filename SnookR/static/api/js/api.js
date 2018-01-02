@@ -174,7 +174,7 @@ const api = (function () {
         return $.get({
             dataType: 'json',
             url: '/api/sessions',
-            data: data,
+            data: JSON.stringify(data),
         });
     };
 
@@ -182,15 +182,15 @@ const api = (function () {
         return $.get({
             dataType: 'json',
             url: '/api/subs',
-            data: data,
+            data: JSON.stringify(data),
         })
     };
 
     const getSessionEventList = function (data) {
         return $.get({
             dataType: 'json',
-            url: '/api/session-events',
-            data: data,
+            url: '/api/session-events/',
+            data: JSON.stringify(data),
         });
     };
 
@@ -198,9 +198,32 @@ const api = (function () {
     const searchForUser = function(data) {
         return $.get({
             dataType: 'json',
-            url: '/api/search-user',
-            data: data,
+            url: '/api/search-user/',
+            data: JSON.stringify(data),
         });
+    };
+
+    const getSessionEventInviteList = function(data) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/session-event-invites/',
+            data: JSON.stringify(data),
+        })
+    };
+
+    const getSessionEventInvite = function(id) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/session-event-invites/' + id,
+        })
+    };
+
+    const postSessionEventInvite = function(data) {
+        return $.post({
+            dataType: 'json',
+            url: '/api/session-event-invites/',
+            data: JSON.stringify(data),
+        })
     };
 
     // Return public methods for API
@@ -216,6 +239,9 @@ const api = (function () {
         getSessionEventList,
         getSubList,
         searchForUser,
+        getSessionEventInviteList,
+        getSessionEventInvite,
+        postSessionEventInvite
     }
 })();
 

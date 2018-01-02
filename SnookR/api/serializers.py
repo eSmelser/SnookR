@@ -1,9 +1,10 @@
 from rest_framework import serializers
 
 import accounts.models
+from accounts.models import CustomUser
 from substitutes import models as main_models
 from teams.models import Team
-from invites.models import TeamInvite
+from invites.models import TeamInvite, SessionEventInvite
 
 
 def must_have_id(data):
@@ -118,6 +119,42 @@ class SessionEventSerializer(serializers.Serializer):
         return rep
 
 
-class SubSerializer(serializers.Serializer):
-    user = CustomUserSerializer()
-    session_event = SessionEventSerializer()
+class SubSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer(required=False)
+    session_event = SessionEventSerializer(required=False)
+    id = serializers.ReadOnlyField()
+
+    class Meta:
+        model = main_models.Sub
+        fields = ['user', 'session_event', 'id']
+
+
+class SessionEventWritableSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=True)
+
+
+class SubWritableSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer(required=False)
+    session_event = SessionEventWritableSerializer(required=True)
+    id = serializers.IntegerField(required=True)
+
+    class Meta:
+        model = main_models.Sub
+        fields = ['user', 'session_event', 'id']
+
+
+class SessionEventInviteSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField()
+    sub = SubWritableSerializer()
+    captain = CustomUserSerializer()
+
+    class Meta:
+        model = SessionEventInvite
+        fields = ['sub', 'captain', 'id']
+
+    def create(self, validated_data):
+        sub = validated_data.get('sub', {})
+        sub = main_models.Sub.objects.get(id=sub.get('id'))
+        captain = validated_data.get('captain')
+        captain = CustomUser.objects.get(username=captain.get('username'))
+        return SessionEventInvite.objects.create(sub=sub, captain=captain)

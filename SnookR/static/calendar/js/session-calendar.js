@@ -33,11 +33,11 @@ let substitutes = {
     },
 
     bindEvents: function () {
-        this.$rightColumn.on('click', '.invite-button', this.goToHref);
+        this.$rightColumn.on('click', '.invite-button', this.createInvite);
     },
 
-    goToHref: function() {
-        window.location.href = $(this).attr('href');
+    createInvite: function() {
+        $(this)
     },
 
     getSub: function (subJson) {
@@ -51,6 +51,7 @@ let substitutes = {
 
     render: function () {
         this.$subList.empty();
+        console.log('-=---')
         this.subs
             .filter(sub => !sub.isCurrentUser)
             .map(sub => this.$subList.append(sub.$dom));
