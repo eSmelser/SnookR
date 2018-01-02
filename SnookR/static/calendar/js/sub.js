@@ -10,7 +10,8 @@ let api = require('../../api/js/api');
 
 const Sub = function (sub, currentUser) {
     User.call(this, sub.user);
-    console.log('Sub!');
+    console.log('sub', sub);
+    this.id = sub.id;
     this.currentUser = currentUser;
     this.isCurrentUser = this.id === this.currentUser.id;
     this.sessionEvent = sub.session_event;
@@ -31,22 +32,29 @@ Sub.prototype.cacheDom = function() {
 };
 
 Sub.prototype.bindEvents = function() {
-    console.log('here');
     this.$inviteButton.click(this.createInvite.bind(this))
 };
 
 Sub.prototype.createInvite = function(event) {
     event.preventDefault();
-    console.log('id', this.id);
-    let data = { invitee: this, event: this.sessionEvent };
-    console.log('data', data);
-    api.postSessionEventInvite(data)
+    self = this;
+    api.postSessionEventInvite(this.getPostData())
     .done(function(data) {
         console.log('success!', data);
-        this.displaySuccessfulInvite();
+        self.displaySuccessfulInvite();
     }).fail(function(data) {
         console.log('error!', data);
     });
+};
+
+Sub.prototype.getPostData = function() {
+    return {
+        sub: {
+            id: this.id,
+            session_event: { id: this.sessionEvent.id },
+        },
+        captain: { username: this.currentUser.username }
+    };
 };
 
 Sub.prototype.displaySuccessfulInvite = function() {

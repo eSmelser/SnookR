@@ -153,7 +153,9 @@ class SessionEventInviteSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['sub', 'captain', 'id']
 
     def create(self, validated_data):
+        print(validated_data)
         sub = validated_data.get('sub', {})
+        print('sub=', sub)
         sub = main_models.Sub.objects.get(id=sub.get('id'))
         captain = validated_data.get('captain')
         captain = CustomUser.objects.get(username=captain.get('username'))

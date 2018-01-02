@@ -423,7 +423,7 @@ const api = (function () {
         return $.get({
             dataType: 'json',
             url: '/api/subs',
-            data: JSON.stringify(data),
+            data: data,
         })
     };
 
@@ -459,6 +459,22 @@ const api = (function () {
         })
     };
 
+    /*
+    postSessionEventInvite() POST a session invite, return an AJAX promise
+
+    POST data should be in the format:
+        {
+            sub: {
+                id: id,
+                session_event: {
+                    id: number
+                }
+            },
+            captain: {
+                username: string
+            }
+        }
+     */
     const postSessionEventInvite = function(data) {
         return $.post({
             dataType: 'json',
@@ -42489,7 +42505,6 @@ let substitutes = {
 
     render: function () {
         this.$subList.empty();
-        console.log('-=---')
         this.subs
             .filter(sub => !sub.isCurrentUser)
             .map(sub => this.$subList.append(sub.$dom));
@@ -42530,6 +42545,7 @@ let substitutes = {
         api.getSubList({
             session_event__id: this.currentSessionEvent.id
         }).done(subArray => {
+            subArray.map( e => console.log('e.session_event', e.session_event))
             this.subs = subArray.map(sub => this.getSub(sub));
             self.render();
         });
@@ -42579,7 +42595,8 @@ let api = __webpack_require__(4);
 
 const Sub = function (sub, currentUser) {
     User.call(this, sub.user);
-    console.log('Sub!');
+    console.log('sub', sub);
+    this.id = sub.id;
     this.currentUser = currentUser;
     this.isCurrentUser = this.id === this.currentUser.id;
     this.sessionEvent = sub.session_event;
@@ -42600,22 +42617,29 @@ Sub.prototype.cacheDom = function() {
 };
 
 Sub.prototype.bindEvents = function() {
-    console.log('here');
     this.$inviteButton.click(this.createInvite.bind(this))
 };
 
 Sub.prototype.createInvite = function(event) {
     event.preventDefault();
-    console.log('id', this.id);
-    let data = { invitee: this, event: this.sessionEvent };
-    console.log('data', data);
-    api.postSessionEventInvite(data)
+    self = this;
+    api.postSessionEventInvite(this.getPostData())
     .done(function(data) {
         console.log('success!', data);
-        this.displaySuccessfulInvite();
+        self.displaySuccessfulInvite();
     }).fail(function(data) {
         console.log('error!', data);
     });
+};
+
+Sub.prototype.getPostData = function() {
+    return {
+        sub: {
+            id: this.id,
+            session_event: { id: this.sessionEvent.id },
+        },
+        captain: { username: this.currentUser.username }
+    };
 };
 
 Sub.prototype.displaySuccessfulInvite = function() {

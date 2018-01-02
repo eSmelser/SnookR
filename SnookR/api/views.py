@@ -86,10 +86,6 @@ class SubListView(ListAPIView):
     queryset = Sub.objects.all()
     filter_class = SubFilter
 
-    def get_queryset(self):
-        self.request.query_params.get('next')
-        return super().get_queryset()
-
 
 class SessionEventListView(ListAPIView):
     queryset = SessionEvent.objects.all()

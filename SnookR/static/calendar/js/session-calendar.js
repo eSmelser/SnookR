@@ -51,7 +51,6 @@ let substitutes = {
 
     render: function () {
         this.$subList.empty();
-        console.log('-=---')
         this.subs
             .filter(sub => !sub.isCurrentUser)
             .map(sub => this.$subList.append(sub.$dom));
@@ -92,6 +91,7 @@ let substitutes = {
         api.getSubList({
             session_event__id: this.currentSessionEvent.id
         }).done(subArray => {
+            subArray.map( e => console.log('e.session_event', e.session_event))
             this.subs = subArray.map(sub => this.getSub(sub));
             self.render();
         });

@@ -182,7 +182,7 @@ const api = (function () {
         return $.get({
             dataType: 'json',
             url: '/api/subs',
-            data: JSON.stringify(data),
+            data: data,
         })
     };
 
@@ -218,6 +218,22 @@ const api = (function () {
         })
     };
 
+    /*
+    postSessionEventInvite() POST a session invite, return an AJAX promise
+
+    POST data should be in the format:
+        {
+            sub: {
+                id: id,
+                session_event: {
+                    id: number
+                }
+            },
+            captain: {
+                username: string
+            }
+        }
+     */
     const postSessionEventInvite = function(data) {
         return $.post({
             dataType: 'json',
