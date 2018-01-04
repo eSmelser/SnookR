@@ -42594,7 +42594,7 @@ let substitutes = {
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay,listWeek'
             },
-            defaultDate: new Date().toISOString(),
+            defaultDate: new Date(this.currentSessionEvent.date).toISOString(),
             navLinks: true, // can click day/week names to navigate views
             editable: false,
             eventLimit: true, // allow "more" link when too many events
