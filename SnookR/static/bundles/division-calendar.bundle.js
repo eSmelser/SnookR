@@ -353,6 +353,13 @@ const api = (function () {
         })
     };
 
+    /*
+     * Data format:
+     *    {
+     *        session_event: { id: number },
+    *         user: { username: string }
+     *    }
+     */
     const postSub = function(data) {
       return $.post({
           dataType: 'json',
@@ -376,7 +383,8 @@ const api = (function () {
         searchForUser,
         getSessionEventInviteList,
         getSessionEventInvite,
-        postSessionEventInvite
+        postSessionEventInvite,
+        postSub,
     }
 })();
 

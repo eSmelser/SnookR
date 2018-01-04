@@ -36,14 +36,21 @@ let substitutes = {
     },
 
     bindEvents: function () {
-        this.$rightColumn.on('click', '.invite-button', this.createInvite);
-        this.$currentUserRegisterButton.click(function() {
-
-        });
+        this.$currentUserRegisterButton.click(this.registerCurrentUser.bind(this));
     },
 
-    createInvite: function() {
-        $(this)
+    registerCurrentUser: function() {
+        self = this;
+        api.postSub({
+          session_event: { id: this.currentSessionEvent.id },
+          user: { username: this.currentUser.username },
+        }).done(function(data) {
+          self.subs.push(self.getSub(data));
+          self.currentUserSub = self.getCurrentUserSub();
+          self.render()
+        }).fail(function(data) {
+          console.log('registerCurrentUser failed:', data);
+        });
     },
 
     getSub: function (subJson) {
@@ -96,6 +103,7 @@ let substitutes = {
 
     changeSessionEvent: function (calEvent, jsEvent, view) {
         this.currentSessionEvent = calEvent.sessionEvent;
+        console.log('changes', this.currentSessionEvent);
         this.setUrl(this.currentSessionEvent);
         let self = this;
         api.getSubList({
