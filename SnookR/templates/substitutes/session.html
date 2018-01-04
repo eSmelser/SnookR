@@ -1,4 +1,4 @@
-<!-- 
+<!--
      Copyright &copy; 2017 Evan Smelser
       This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 -->
@@ -24,8 +24,11 @@
             <div id="calendar"></div>
         </div>
         <div id="right-column" class="col-md-6">
+          {% if not user_registered %}
+          {% endif %}
             {# These are placeholders rendered in session-calendar.js #}
-            <h3 id="current-user-header" style="display:none">You Available for <span class="session-name">{{session_event.session.name}}</span> on <span class="session-date">{{ session_event.date }}</span></h3>
+            <button id="current-user-register-button" type="button" class="btn btn-default" name="button">Register for <span class="session-name">{{session_event.session.name}}</span> on <span class="session-date">{{ session_event.date }}</button>
+            <h3 id="current-user-header" style="display:none">You are available for <span class="session-name">{{session_event.session.name}}</span> on <span class="session-date">{{ session_event.date }}</span></h3>
             <div id="current-user-panel"></div>
             <h3 id="sub-list-header">Subs Available for <span class="session-name">{{session_event.session.name}}</span> on <span class="session-date">{{ session_event.date }}</span></h3>
             <div id='sub-list' class="post-content"></div>
@@ -44,6 +47,7 @@
         context.initialSubArray = JSON.parse('{{ json.subs | escapejs }}');
         context.SESSION_SLUG = "{{ session.slug|escapejs|safe }}";
         context.currentUser = JSON.parse('{{ json.current_user | escapejs }}');
+        context.currentUserPreviousInvites = JSON.parse('{{ json.current_user_previous_invites | escapejs }}');
     </script>
     {% render_bundle 'session-calendar' %}
 {% endblock %}

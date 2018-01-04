@@ -257,6 +257,12 @@ class SubListTestCase(APITestCase):
     def add_user_to_session_as_sub(self, user):
         sub = Sub.objects.create(user=user, date=timezone.now(), session_event=self.session_event)
 
+    def test_post(self):
+        self.client.login(username=self.username, password=self.password)
+        url = reverse('api:sub_list')
+        data = { 'session_event': { 'id': self.session_event.id }, 'user': {'username': self.username}}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
 
 class SessionEventTestCase(APITestCase):
     def setUp(self):

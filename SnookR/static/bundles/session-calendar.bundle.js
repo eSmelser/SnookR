@@ -483,6 +483,14 @@ const api = (function () {
         })
     };
 
+    const postSub = function(data) {
+      return $.post({
+          dataType: 'json',
+          url: '/api/subs/',
+          data: JSON.stringify(data),
+      })
+    }
+
     // Return public methods for API
     return {
         baseURL,
@@ -503,6 +511,7 @@ const api = (function () {
 })();
 
 module.exports = api;
+
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(1)))
 
 /***/ }),
@@ -42469,8 +42478,10 @@ let substitutes = {
         this.currentUser = new User(context.currentUser);
         this.currentSessionEvent = context.initialSessionEvent;
         this.sessionEvents = context.initialSessionEvents;
-        this.subs = context.initialSubArray.map(sub => this.getSub(sub));
         this.sessionName = context.sessionName;
+        this.currentUserPreviousInvites = context.currentUserPreviousInvites;
+        this.subs = context.initialSubArray.map(sub => this.getSub(sub));
+        this.currentUserSub = this.getCurrentUserSub();
         this.cacheDom();
         this.render();
         this.bindEvents();
@@ -42484,10 +42495,14 @@ let substitutes = {
         this.$sessionDate = this.$rightColumn.find('.session-date');
         this.$currentUserPanel = this.$rightColumn.find('#current-user-panel');
         this.$currentUserHeader = this.$rightColumn.find('#current-user-header');
+        this.$currentUserRegisterButton = this.$rightColumn.find('#current-user-register-button');
     },
 
     bindEvents: function () {
         this.$rightColumn.on('click', '.invite-button', this.createInvite);
+        this.$currentUserRegisterButton.click(function() {
+
+        });
     },
 
     createInvite: function() {
@@ -42495,7 +42510,9 @@ let substitutes = {
     },
 
     getSub: function (subJson) {
-        return new Sub(subJson, this.currentUser);
+        let id = subJson.id;
+        let alreadyInvited = this.currentUserPreviousInvites.filter( invite => invite.sub.id === id ).length > 0;
+        return new Sub(subJson, this.currentUser, alreadyInvited);
     },
 
     getCurrentUserSub: function () {
@@ -42509,12 +42526,14 @@ let substitutes = {
             .filter(sub => !sub.isCurrentUser)
             .map(sub => this.$subList.append(sub.$dom));
 
-        let currentUserSub = this.getCurrentUserSub();
         this.$currentUserPanel.empty();
-        this.$currentUserHeader.hide();
-        if (currentUserSub) {
-            this.$currentUserPanel.append(currentUserSub.$dom);
+        if (this.currentUserSub) {
+            this.$currentUserPanel.append(this.currentUserSub.$dom);
             this.$currentUserHeader.show()
+            this.$currentUserRegisterButton.hide();
+        } else {
+          this.$currentUserHeader.hide();
+            this.$currentUserRegisterButton.show();
         }
         this.$sessionName.text(this.currentSessionEvent.name);
         this.$sessionDate.text(this.currentSessionEvent.date);
@@ -42547,6 +42566,7 @@ let substitutes = {
         }).done(subArray => {
             subArray.map( e => console.log('e.session_event', e.session_event))
             this.subs = subArray.map(sub => this.getSub(sub));
+            this.currentUserSub = this.getCurrentUserSub();
             self.render();
         });
     },
@@ -42593,22 +42613,24 @@ let template = __webpack_require__(139);
 let User = __webpack_require__(133);
 let api = __webpack_require__(4);
 
-const Sub = function (sub, currentUser) {
-    User.call(this, sub.user);
-    console.log('sub', sub);
+const Sub = function (sub, currentUser, alreadyInvited = false) {
     this.id = sub.id;
+    this.user = new User(sub.user);
     this.currentUser = currentUser;
-    this.isCurrentUser = this.id === this.currentUser.id;
+    this.isCurrentUser = this.user.id === this.currentUser.id;
+    console.log('sub', this);
     this.sessionEvent = sub.session_event;
+    this.alreadyInvited = alreadyInvited;
     this.cacheDom();
     this.bindEvents();
+    this.render();
 };
 
 // All users have the same template and getDOM function();
 Sub.prototype.template = template;
 
 Sub.prototype.getDOM = function () {
-    return $(this.template({ sub: this }));
+    return $('<div>').append( $(this.template({ sub: this })) );
 };
 
 Sub.prototype.cacheDom = function() {
@@ -42616,17 +42638,24 @@ Sub.prototype.cacheDom = function() {
     this.$inviteButton = this.$dom.find('.invite-button');
 };
 
+
+Sub.prototype.render = function() {
+  this.$dom.replaceWith(this.getDOM());
+  this.bindEvents();
+}
+
 Sub.prototype.bindEvents = function() {
     this.$inviteButton.click(this.createInvite.bind(this))
 };
 
 Sub.prototype.createInvite = function(event) {
+  console.log('createInvite')
     event.preventDefault();
     self = this;
     api.postSessionEventInvite(this.getPostData())
     .done(function(data) {
-        console.log('success!', data);
-        self.displaySuccessfulInvite();
+        self.alreadyInvited = true
+        self.render();
     }).fail(function(data) {
         console.log('error!', data);
     });
@@ -42642,12 +42671,9 @@ Sub.prototype.getPostData = function() {
     };
 };
 
-Sub.prototype.displaySuccessfulInvite = function() {
-    this.$inviteButton.replaceWith(`<strong>Successful Invite!</strong>`);
-};
-
 Sub.prototype.constructor = Sub;
 module.exports = Sub;
+
 
 /***/ }),
 /* 139 */
@@ -42656,30 +42682,38 @@ module.exports = Sub;
 var Handlebars = __webpack_require__(131);
 function __default(obj) { return obj && (obj.__esModule ? obj["default"] : obj); }
 module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
+    return "            <small>Invited!</small>\n";
+},"3":function(container,depth0,helpers,partials,data) {
     var stack1;
 
   return "            <form class=\"pull-right session-button\" action=\""
     + container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.sessionEvent : stack1)) != null ? stack1.unregisterUrl : stack1), depth0))
     + "\">\n                <input type=\"submit\" value=\"Unregister\">\n            </form>\n";
-},"3":function(container,depth0,helpers,partials,data) {
+},"5":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.currentUser : stack1)) != null ? stack1.isCaptain : stack1),{"name":"if","hash":{},"fn":container.program(4, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
-},"4":function(container,depth0,helpers,partials,data) {
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.currentUser : stack1)) != null ? stack1.isCaptain : stack1),{"name":"if","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+},"6":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers.unless.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.alreadyInvited : stack1),{"name":"unless","hash":{},"fn":container.program(7, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+},"7":function(container,depth0,helpers,partials,data) {
     return "                <button class=\"invite-button session-button pull-right\" type=\"button\">Invite</button>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    var stack1, alias1=container.lambda, alias2=container.escapeExpression;
+    var stack1, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : (container.nullContext || {});
 
   return "<div class=\"panel panel-default\">\n    <div class=\"panel-body\">\n        <div class=\"pull-left\">\n            <a href=\""
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.url : stack1), depth0))
     + "\">\n                <img class=\"img-circle\" width=\"50px\" height=\"50px\" style=\"margin-right:8px; margin-top:-5px;\"\n                     src=\""
-    + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.thumbnailUrl : stack1), depth0))
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.user : stack1)) != null ? stack1.thumbnailUrl : stack1), depth0))
     + "\">\n            </a>\n        </div>\n        <h4 class=\"pull-left\"><a href=\""
-    + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.url : stack1), depth0))
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.user : stack1)) != null ? stack1.url : stack1), depth0))
     + "\" style=\"text-decoration:none;\"><strong>"
-    + alias2(alias1(((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.username : stack1), depth0))
-    + "</strong></a>\n        </h4>\n\n"
-    + ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.isCurrentUser : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.user : stack1)) != null ? stack1.username : stack1), depth0))
+    + "</strong></a>\n"
+    + ((stack1 = helpers["if"].call(alias3,((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.alreadyInvited : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "        </h4>\n\n"
+    + ((stack1 = helpers["if"].call(alias3,((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.isCurrentUser : stack1),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.program(5, data, 0),"data":data})) != null ? stack1 : "")
     + "    </div>\n</div>\n";
 },"useData":true});
 

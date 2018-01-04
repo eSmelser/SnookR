@@ -16,7 +16,7 @@ from rest_framework.renderers import JSONRenderer
 from accounts.models import CustomUser
 from api import serializers
 from substitutes.models import Division, Session, SessionEvent, Sub
-
+from invites.models import SessionEventInvite
 
 class DivisionListView(TemplateView):
     template_name = 'substitutes/divisions.html'
@@ -77,6 +77,10 @@ class SessionViewMixin(TemplateView):
             user = CustomUser.objects.get(id=self.request.user.id)
             custom_user_serializer = serializers.CustomUserSerializer(user, context={'request': self.request})
             context['json']['current_user'] = JSONRenderer().render(custom_user_serializer.data)
+
+            invites = SessionEventInvite.objects.filter(captain=self.request.user)
+            invites_serializer = serializers.SessionEventInviteSerializer(invites, many=True)
+            context['json']['current_user_previous_invites'] = JSONRenderer().render(invites_serializer.data)
 
         context['json']['session_event'] = JSONRenderer().render(event_serializer.data)
         context['json']['session_events'] = JSONRenderer().render(events_serializer.data)

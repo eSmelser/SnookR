@@ -242,6 +242,14 @@ const api = (function () {
         })
     };
 
+    const postSub = function(data) {
+      return $.post({
+          dataType: 'json',
+          url: '/api/subs/',
+          data: JSON.stringify(data),
+      })
+    }
+
     // Return public methods for API
     return {
         baseURL,

@@ -10933,6 +10933,14 @@ const api = (function () {
         })
     };
 
+    const postSub = function(data) {
+      return $.post({
+          dataType: 'json',
+          url: '/api/subs/',
+          data: JSON.stringify(data),
+      })
+    }
+
     // Return public methods for API
     return {
         baseURL,
@@ -10953,6 +10961,7 @@ const api = (function () {
 })();
 
 module.exports = api;
+
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(1)))
 
 /***/ })

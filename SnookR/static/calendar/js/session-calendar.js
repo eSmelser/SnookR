@@ -15,8 +15,10 @@ let substitutes = {
         this.currentUser = new User(context.currentUser);
         this.currentSessionEvent = context.initialSessionEvent;
         this.sessionEvents = context.initialSessionEvents;
-        this.subs = context.initialSubArray.map(sub => this.getSub(sub));
         this.sessionName = context.sessionName;
+        this.currentUserPreviousInvites = context.currentUserPreviousInvites;
+        this.subs = context.initialSubArray.map(sub => this.getSub(sub));
+        this.currentUserSub = this.getCurrentUserSub();
         this.cacheDom();
         this.render();
         this.bindEvents();
@@ -30,10 +32,14 @@ let substitutes = {
         this.$sessionDate = this.$rightColumn.find('.session-date');
         this.$currentUserPanel = this.$rightColumn.find('#current-user-panel');
         this.$currentUserHeader = this.$rightColumn.find('#current-user-header');
+        this.$currentUserRegisterButton = this.$rightColumn.find('#current-user-register-button');
     },
 
     bindEvents: function () {
         this.$rightColumn.on('click', '.invite-button', this.createInvite);
+        this.$currentUserRegisterButton.click(function() {
+
+        });
     },
 
     createInvite: function() {
@@ -41,7 +47,9 @@ let substitutes = {
     },
 
     getSub: function (subJson) {
-        return new Sub(subJson, this.currentUser);
+        let id = subJson.id;
+        let alreadyInvited = this.currentUserPreviousInvites.filter( invite => invite.sub.id === id ).length > 0;
+        return new Sub(subJson, this.currentUser, alreadyInvited);
     },
 
     getCurrentUserSub: function () {
@@ -55,12 +63,14 @@ let substitutes = {
             .filter(sub => !sub.isCurrentUser)
             .map(sub => this.$subList.append(sub.$dom));
 
-        let currentUserSub = this.getCurrentUserSub();
         this.$currentUserPanel.empty();
-        this.$currentUserHeader.hide();
-        if (currentUserSub) {
-            this.$currentUserPanel.append(currentUserSub.$dom);
+        if (this.currentUserSub) {
+            this.$currentUserPanel.append(this.currentUserSub.$dom);
             this.$currentUserHeader.show()
+            this.$currentUserRegisterButton.hide();
+        } else {
+          this.$currentUserHeader.hide();
+            this.$currentUserRegisterButton.show();
         }
         this.$sessionName.text(this.currentSessionEvent.name);
         this.$sessionDate.text(this.currentSessionEvent.date);
@@ -93,6 +103,7 @@ let substitutes = {
         }).done(subArray => {
             subArray.map( e => console.log('e.session_event', e.session_event))
             this.subs = subArray.map(sub => this.getSub(sub));
+            this.currentUserSub = this.getCurrentUserSub();
             self.render();
         });
     },

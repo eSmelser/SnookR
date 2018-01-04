@@ -3,6 +3,7 @@ from rest_framework import serializers
 import accounts.models
 from accounts.models import CustomUser
 from substitutes import models as main_models
+from substitutes.models import SessionEvent, Sub
 from teams.models import Team
 from invites.models import TeamInvite, SessionEventInvite
 
@@ -105,10 +106,10 @@ class SessionSerializer(serializers.Serializer):
 
 
 class SessionEventSerializer(serializers.Serializer):
-    session = SessionSerializer()
-    date = serializers.DateField()
-    start_time = serializers.TimeField()
-    id = serializers.ReadOnlyField()
+    session = SessionSerializer(required=False)
+    date = serializers.DateField(required=False)
+    start_time = serializers.TimeField(required=False)
+    id = serializers.IntegerField()
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -127,6 +128,14 @@ class SubSerializer(serializers.ModelSerializer):
     class Meta:
         model = main_models.Sub
         fields = ['user', 'session_event', 'id']
+
+    def create(self, validated_data):
+        event = validated_data.get('session_event')
+        event = SessionEvent.objects.get(id=event.get('id'))
+        user = validated_data.get('user')
+        user = CustomUser.objects.get(username=user.get('username'))
+        return Sub.objects.create(session_event=event, user=user)
+
 
 
 class SessionEventWritableSerializer(serializers.Serializer):
@@ -153,9 +162,7 @@ class SessionEventInviteSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['sub', 'captain', 'id']
 
     def create(self, validated_data):
-        print(validated_data)
         sub = validated_data.get('sub', {})
-        print('sub=', sub)
         sub = main_models.Sub.objects.get(id=sub.get('id'))
         captain = validated_data.get('captain')
         captain = CustomUser.objects.get(username=captain.get('username'))

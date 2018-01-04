@@ -81,7 +81,7 @@ class SessionListView(ListAPIView):
     filter_fields = tuple(['division'] + list(SessionFilter.Meta.fields.keys()))
 
 
-class SubListView(ListAPIView):
+class SubListView(ListCreateAPIView):
     serializer_class = SubSerializer
     queryset = Sub.objects.all()
     filter_class = SubFilter
