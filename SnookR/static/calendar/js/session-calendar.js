@@ -9,7 +9,6 @@ let api = require('../../api/js/api.js');
 let Sub = require('./sub');
 let User = require('../../accounts/js/user');
 
-
 let substitutes = {
     init: function () {
         this.currentUser = new User(context.currentUser);
@@ -65,7 +64,6 @@ let substitutes = {
         return this.subs.find(sub => sub.isCurrentUser) || null;
     },
 
-
     render: function () {
         this.$subList.empty();
         this.subs
@@ -86,18 +84,6 @@ let substitutes = {
         this.$subListHeader.show();
         this.$dateHeader.show();
         this.renderCalendar();
-        console.log('user sub', this.currentUserSub);
-    },
-
-    getMinTime: function (sessionEvents) {
-        let times = sessionEvents.map(event => new Date(event.date + 'T' + event.start_time).getTime());
-        return new Date(Math.min(...times)).getHours() - 2 + ':00:00';
-    },
-
-    getMaxTime: function (sessionEvents) {
-        let times = sessionEvents.map(event => new Date(event.date + 'T' + event.start_time).getTime());
-        let minTime = new Date(Math.min(...times)).getHours() - 2 + ':00:00';
-        return maxTime;
     },
 
     setUrl: function (sessionEvent) {

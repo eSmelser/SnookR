@@ -42480,7 +42480,6 @@ let api = __webpack_require__(4);
 let Sub = __webpack_require__(138);
 let User = __webpack_require__(133);
 
-
 let substitutes = {
     init: function () {
         this.currentUser = new User(context.currentUser);
@@ -42536,7 +42535,6 @@ let substitutes = {
         return this.subs.find(sub => sub.isCurrentUser) || null;
     },
 
-
     render: function () {
         this.$subList.empty();
         this.subs
@@ -42557,18 +42555,6 @@ let substitutes = {
         this.$subListHeader.show();
         this.$dateHeader.show();
         this.renderCalendar();
-        console.log('user sub', this.currentUserSub);
-    },
-
-    getMinTime: function (sessionEvents) {
-        let times = sessionEvents.map(event => new Date(event.date + 'T' + event.start_time).getTime());
-        return new Date(Math.min(...times)).getHours() - 2 + ':00:00';
-    },
-
-    getMaxTime: function (sessionEvents) {
-        let times = sessionEvents.map(event => new Date(event.date + 'T' + event.start_time).getTime());
-        let minTime = new Date(Math.min(...times)).getHours() - 2 + ':00:00';
-        return maxTime;
     },
 
     setUrl: function (sessionEvent) {
@@ -42637,7 +42623,6 @@ const Sub = function (sub, currentUser, alreadyInvited = false) {
     this.user = new User(sub.user);
     this.currentUser = currentUser;
     this.isCurrentUser = this.user.id === this.currentUser.id;
-    console.log('sub', this);
     this.sessionEvent = sub.session_event;
     this.alreadyInvited = alreadyInvited;
     this.cacheDom();
@@ -42717,7 +42702,7 @@ module.exports = (Handlebars["default"] || Handlebars).template({"1":function(co
 
   return ((stack1 = helpers.unless.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.alreadyInvited : stack1),{"name":"unless","hash":{},"fn":container.program(7, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"7":function(container,depth0,helpers,partials,data) {
-    return "                <button class=\"invite-button session-button pull-right\" type=\"button\">Invite</button>\n";
+    return "                <button class=\"invite-button session-button pull-right btn btn-default\" type=\"button\">Invite</button>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : (container.nullContext || {});
 

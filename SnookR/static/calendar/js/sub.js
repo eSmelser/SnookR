@@ -13,7 +13,6 @@ const Sub = function (sub, currentUser, alreadyInvited = false) {
     this.user = new User(sub.user);
     this.currentUser = currentUser;
     this.isCurrentUser = this.user.id === this.currentUser.id;
-    console.log('sub', this);
     this.sessionEvent = sub.session_event;
     this.alreadyInvited = alreadyInvited;
     this.cacheDom();
