@@ -42504,6 +42504,8 @@ let substitutes = {
         this.$currentUserPanel = this.$rightColumn.find('#current-user-panel');
         this.$currentUserHeader = this.$rightColumn.find('#current-user-header');
         this.$currentUserRegisterButton = this.$rightColumn.find('#current-user-register-button');
+        this.$subListHeader = this.$rightColumn.find('#sub-list-header');
+        this.$dateHeader = this.$rightColumn.find('#date-header');
     },
 
     bindEvents: function () {
@@ -42547,12 +42549,15 @@ let substitutes = {
             this.$currentUserHeader.show()
             this.$currentUserRegisterButton.hide();
         } else {
-          this.$currentUserHeader.hide();
+            this.$currentUserHeader.hide();
             this.$currentUserRegisterButton.show();
         }
         this.$sessionName.text(this.currentSessionEvent.name);
         this.$sessionDate.text(this.currentSessionEvent.date);
+        this.$subListHeader.show();
+        this.$dateHeader.show();
         this.renderCalendar();
+        console.log('user sub', this.currentUserSub);
     },
 
     getMinTime: function (sessionEvents) {
@@ -42574,13 +42579,11 @@ let substitutes = {
 
     changeSessionEvent: function (calEvent, jsEvent, view) {
         this.currentSessionEvent = calEvent.sessionEvent;
-        console.log('changes', this.currentSessionEvent);
         this.setUrl(this.currentSessionEvent);
         let self = this;
         api.getSubList({
             session_event__id: this.currentSessionEvent.id
         }).done(subArray => {
-            subArray.map( e => console.log('e.session_event', e.session_event))
             this.subs = subArray.map(sub => this.getSub(sub));
             this.currentUserSub = this.getCurrentUserSub();
             self.render();

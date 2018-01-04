@@ -24,13 +24,14 @@
             <div id="calendar"></div>
         </div>
         <div id="right-column" class="col-md-6">
+          <h3 id="date-header" style="display:none"><span class="session-name">{{session_event.session.name}}</span> <small class="session-date">{{ session_event.date }}</small></h3>
           {% if not user_registered %}
+            <button id="current-user-register-button" type="button" class="btn btn-default" name="button">Register</button>
           {% endif %}
             {# These are placeholders rendered in session-calendar.js #}
-            <button id="current-user-register-button" type="button" class="btn btn-default" name="button">Register for <span class="session-name">{{session_event.session.name}}</span> on <span class="session-date">{{ session_event.date }}</button>
-            <h3 id="current-user-header" style="display:none">You are available for <span class="session-name">{{session_event.session.name}}</span> on <span class="session-date">{{ session_event.date }}</span></h3>
+            <h3 id="current-user-header" style="display:none">You are available</h3>
             <div id="current-user-panel"></div>
-            <h3 id="sub-list-header">Subs Available for <span class="session-name">{{session_event.session.name}}</span> on <span class="session-date">{{ session_event.date }}</span></h3>
+            <h3 id="sub-list-header" style="display:none">Subs Available</h3>
             <div id='sub-list' class="post-content"></div>
             <div class="col-md-2"></div>
         </div>
