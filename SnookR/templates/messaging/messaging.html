@@ -1,5 +1,19 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-  Sanity
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+        Sanity
+        {% for message in messages %}
+
+        {% endfor %}
+        <form>
+          <div class="form-group">
+            <input type="text" class="form-control" id="text-input" placeholder="Type a message...">
+          </div>
+        </form
+      </div>
+    </div>
+  </div>
 {% endblock %}
