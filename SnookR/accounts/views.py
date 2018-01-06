@@ -1,13 +1,13 @@
 from django.contrib.auth import views as auth_views, authenticate, login
 from django.shortcuts import render, get_object_or_404, redirect
-
-# Create your views here.
+from django.core.mail import send_mail
+from django.conf import settings
 from django.urls import reverse_lazy, reverse
 from django.views.generic import FormView, TemplateView, RedirectView
 
 from accounts.forms import CustomUserLoginForm, CustomUserChangeForm, CustomUserForm, UploadThumbnailForm
 from accounts.models import CustomUser, UserProfile
-
+from accounts.emails import send_confirmation_email
 
 class LoginView(auth_views.LoginView):
     authentication_form = CustomUserLoginForm
@@ -103,8 +103,13 @@ def signup(request):
             phone_number = form.cleaned_data.get('phone_number')
             user = authenticate(username=username, password=raw_password, email=email, first_name=first_name,
                                 last_name=last_name)
-            login(request, user)
-            UserProfile.objects.create(user=user, phone_number=phone_number)
+
+            send_confirmation_email(user)
+
+            if settings.DEBUG:
+                login(request, user)
+
+            UserProfile.objects.create(user=user, phone_number=phone_number if phone_number else None)
             return redirect('home')
     else:
         form = CustomUserForm()
