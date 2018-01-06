@@ -1,4 +1,3 @@
-import functools
 import hashlib
 
 from rest_framework.generics import ListCreateAPIView, UpdateAPIView, ListAPIView, RetrieveAPIView, CreateAPIView
@@ -6,8 +5,9 @@ from django.core.cache import caches
 from rest_framework.response import Response
 from substitutes.models import Session, SessionEvent, Sub
 from accounts.models import CustomUser
-from django.db.models import Q
-from teams.models import Team, TeamInvite, NonUserPlayer
+from teams.models import Team, NonUserPlayer
+from invites.models import SessionEventInvite, TeamInvite
+
 from api.serializers import (
     TeamInviteSerializer,
     TeamInviteUpdateSerializer,
@@ -17,9 +17,11 @@ from api.serializers import (
     SessionSerializer,
     SessionEventSerializer,
     SubSerializer,
+    SessionEventInviteSerializer,
 )
 from api.permissions import TeamPermission, TeamInvitePermission
-from api.filters import TeamFilter, TeamInviteFilter, UserFilter, SessionFilter, SessionEventFilter, SubFilter
+from api.filters import TeamFilter, TeamInviteFilter, UserFilter, SessionFilter, SessionEventFilter, SubFilter, \
+    SessionEventInviteFilter
 
 
 class UserView(RetrieveAPIView):
@@ -35,7 +37,8 @@ class UserSearchView(ListAPIView):
     queryset = CustomUser.objects.all()
 
     def list(self, request, *args, **kwargs):
-        import pdb;pdb.set_trace()
+        import pdb;
+        pdb.set_trace()
 
 
 class UserListView(ListAPIView):
@@ -78,14 +81,10 @@ class SessionListView(ListAPIView):
     filter_fields = tuple(['division'] + list(SessionFilter.Meta.fields.keys()))
 
 
-class SubListView(ListAPIView):
+class SubListView(ListCreateAPIView):
     serializer_class = SubSerializer
     queryset = Sub.objects.all()
     filter_class = SubFilter
-
-    def get_queryset(self):
-        self.request.query_params.get('next')
-        return super().get_queryset()
 
 
 class SessionEventListView(ListAPIView):
@@ -102,7 +101,19 @@ class SearchUserView(ListAPIView):
         objs = cache.get(key)
         if objs is None:
             objs = CustomUser.objects.search(query)
-            cache.set(key, objs, 60 * 10)
+            cache.set(key, objs, 60 * 3)
 
         serializer = CustomUserSerializer(objs, many=True)
         return Response(serializer.data)
+
+
+class SessionEventInviteListView(ListCreateAPIView):
+    queryset = SessionEventInvite.objects.all()
+    serializer_class = SessionEventInviteSerializer
+    filter_class = SessionEventInviteFilter
+
+
+class SessionEventInviteView(RetrieveAPIView):
+    queryset = SessionEventInvite.objects.all()
+    serializer_class = SessionEventInviteSerializer
+    filter_class = SessionEventInviteFilter

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load render_bundle from webpack_loader %}
+
+{% block title %}{{ session_event.session.name }} Subs on {{ session_event.date }}{% endblock %}
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="page-header">
+        <h1>Step 5 <small>Created</small></h1>
+      </div>
+      <div class="col-md-8 col-md-offset-4">
+        <h3>Successfully created invites!</h3>
+        <h4>Team</h4>
+        <span>{{ team.name }}</span>
+        <h4>Session</h4>
+        <span>{{ session.name }}</span>
+        <h4>Date</h4>
+        <span>{{ date }}</span>
+        <h4>Players</h4>
+        {% for sub in subs %}
+          <div class="panel panel-default">
+              <div class="panel-body">
+                  <div class="pull-left">
+                      <a href="{{ sub.user.profile.get_absolute_url }}">
+                          <img class="img-circle" width="50px" height="50px" style="margin-right:8px; margin-top:-5px;"
+                               src="{{ sub.user.profile.thumbnail.url }}">
+                      </a>
+                  </div>
+                  <h4 class="pull-left"><a href="{{ sub.user.profile.get_absolute_url }}" style="text-decoration:none;"><strong>{{ sub.user.username }}</strong></a></h4>
+              </div>
+          </div>
+          {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block footer_scripts %}
+{% endblock %}

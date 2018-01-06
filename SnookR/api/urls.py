@@ -12,4 +12,6 @@ urlpatterns = [
     url(r'^session-events/$', views.SessionEventListView.as_view(), name='session_events'),
     url(r'^subs/$', views.SubListView.as_view(), name='sub_list'),
     url(r'^search-user/$', views.SearchUserView.as_view(), name='search_user'),
+    url(r'^session-event-invites/$', views.SessionEventInviteListView.as_view(), name='session_event_invite_list'),
+    url(r'^session-event-invites/(?P<pk>[0-9]+)/$', views.SessionEventInviteView.as_view(), name='session_event_invite'),
 ]

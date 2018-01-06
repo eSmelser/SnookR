@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load render_bundle from webpack_loader %}
+
+{% block title %}{{ session_event.session.name }} Subs on {{ session_event.date }}{% endblock %}
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="page-header">
+        <h1>Step 2 <small>Choose your session</small></h1>
+      </div>
+      <div class="col-md-2">
+
+      </div>
+      <div class="col-md-5">
+          {% for group in groups %}
+          <div class="list-group">
+
+            {% ifchanged %}<h3>{{ group.division }}</h3>{% endifchanged %}
+            {% for session in group.sessions %}
+              <a href="{% url 'invites:session-event:event-select' team_id=view.kwargs.team_id session_id=session.id %}" class="list-group-item">{{ session.name }}</a>
+              {% empty %}
+              <strong>No sessions in this division</strong>
+            {% endfor %}
+          </div>
+
+          {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

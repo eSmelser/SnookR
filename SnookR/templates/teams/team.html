@@ -1,9 +1,9 @@
-<!-- 
+<!--
      Copyright &copy; 2017 Evan Smelser
       This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 -->
 
-{% extends 'core/base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 {% load render_bundle from webpack_loader %}
 {% block title %}Teams{% endblock %}
@@ -40,7 +40,7 @@
                 <div id="players-div">
                     <h3>Players</h3>
                     {% for team in teams %}
-                        <div class="list-group player-group" id="player-group-{{ team.id }}" style="display:none">
+                        <div class="list-group player-group player-group-{{ team.id }}" style="display:none">
                             {% for player in players %}
                                 {% if team == player.team %}
                                     <div class="panel panel-default">
@@ -63,20 +63,38 @@
 
                                 {% endif %}
                             {% endfor %}
+
+                            <h3>Unregistered Players</h3>
+                            <div class="list-group player-group player-group-{{ team.id }}" style="display:none">
+                              {% for player in unregistered_players %}
+                                {% if team == player.team %}
+                                  <li class="list-item">{{ player.name }}</li>
+                                {% endif %}
+                              {% endfor %}
+                            </div>
                         </div>
                     {% endfor %}
-                </div>
+                    </div>
                 <div id="team-creator-div" style="display:none">
                     <h3>Create a new team</h3>
                     <form id="team-form" action="{% url 'create_team' %}" method="post">
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="team-name">Team Name</label>
-                            <input type="text" class="form-control" id="team-name" name="name"
+                            <input type="text" class="form-control" id="team-name" name="team-name"
                                    placeholder="Team name..."/>
                         </div>
 
-                        <h2>Added players</h2>
+                        <div class="form-group" id="unregistered-players">
+                          <label id="unregistered-players-label">Unregistered Players (not a SnookR user)</label>
+                            <ol id="unregistered-players-list">
+
+                            </ol>
+                            <input id="unregistered-player-text-input" class="form-control" type="text" placeholder="Type in a name for your placeholder player">
+                            <button id="unregistered-player-add-button" type="button" class="btn btn-default">Add</button>
+                        </div>
+
+                        <h3>Added players</h3>
                         <div id="added-players">
                             {# Use verbatim so Django doesn't render the text/template for Handlebars.js #}
                             {% verbatim %}
@@ -99,9 +117,9 @@
                             </script>
                             {% endverbatim %}
                         </div>
-
                         <button id="submit" type="submit" class="btn btn-default">Submit</button>
                     </form>
+
                     <form action="">
                         <div class="form-group">
                             <label for="player-search">Search</label>
@@ -126,4 +144,3 @@
 {% block footer_scripts %}
     {% render_bundle 'teams' %}
 {% endblock %}
-

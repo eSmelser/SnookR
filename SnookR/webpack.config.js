@@ -4,13 +4,15 @@ var BundleTracker = require('webpack-bundle-tracker');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
-    // context: path.resolve(__dirname, 'static'),
     entry: {
         teams: './static/teams/js/teams.js',
         'division-calendar': './static/calendar/js/division-calendar.js',
         'session-calendar': './static/calendar/js/session-calendar.js',
         'session-event-calendar': './static/calendar/js/session-event-calendar.js',
+        'session-event': './static/substitutes/js/session-event.js',
+        'session-event-select': './static/substitutes/js/session-event-select.js',
     },
+
     output: {
         filename: '[name].bundle.js',
         path: path.resolve(__dirname, './static/bundles')
@@ -25,10 +27,11 @@ module.exports = {
     ],
 
     module: {
-        loaders: [
-            {test: /\.css$/, loader: "style-loader!css-loader"},
-            {test: require.resolve('jquery'), loader: 'expose-loader?$!expose-loader?jQuery'},
-            {test: require.resolve('moment'), loader: 'expose-loader?moment'}
+       rules: [
+            {test: /\.css$/, use: "style-loader!css-loader"},
+            {test: require.resolve('jquery'), use: 'expose-loader?$!expose-loader?jQuery'},
+            {test: require.resolve('moment'), use: 'expose-loader?moment'},
+            {test: /\.handlebars$/, use: "handlebars-loader" }
         ],
     },
 

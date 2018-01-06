@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load render_bundle from webpack_loader %}
+
+{% block title %}{{ session_event.session.name }} Subs on {{ session_event.date }}{% endblock %}
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="page-header">
+        <h1>Step 3 <small>Choose the date</small></h1>
+      </div>
+      <div class="col-md-5">
+        <div id="calendar"></div>
+      </div>
+      <div class="col-md-7">
+        <button id="submit" type="button" class="btn btn-default" href="{% url 'invites:session-event:confirm' %}" name="button">Submit</button>
+        <div class="substitutes-div"></div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block footer_scripts %}
+  <script type="text/javascript">
+    const context = {};
+    context.sessionEvents = JSON.parse('{{ session_events | escapejs }}');
+    context.teamId = JSON.parse("{{ view.kwargs.team_id | escapejs }}")
+  </script>
+  <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
+  <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.print.css' %}" rel='stylesheet' media='print'/>
+  {% render_bundle 'session-event-select' %}
+{% endblock %}

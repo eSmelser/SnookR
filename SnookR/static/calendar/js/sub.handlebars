@@ -1,0 +1,27 @@
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="pull-left">
+            <a href="{{ sub.url }}">
+                <img class="img-circle" width="50px" height="50px" style="margin-right:8px; margin-top:-5px;"
+                     src="{{ sub.user.thumbnailUrl }}">
+            </a>
+        </div>
+        <h4 class="pull-left"><a href="{{ sub.user.url }}" style="text-decoration:none;"><strong>{{ sub.user.username }}</strong></a>
+          {{#if sub.alreadyInvited}}
+            <small>Invited!</small>
+          {{/if}}
+        </h4>
+
+        {{#if sub.isCurrentUser}}
+            <form class="pull-right session-button" action="{{ sub.sessionEvent.unregisterUrl }}">
+                <input type="submit" value="Unregister">
+            </form>
+        {{else}}
+            {{#if sub.currentUser.isCaptain}}
+              {{#unless sub.alreadyInvited}}
+                <button class="invite-button session-button pull-right btn btn-default" type="button">Invite</button>
+              {{/unless}}
+            {{/if}}
+        {{/if}}
+    </div>
+</div>

@@ -1,8 +1,12 @@
 from rest_framework import serializers
 
 import accounts.models
+from accounts.models import CustomUser
 from substitutes import models as main_models
-from teams.models import Team, TeamInvite
+from substitutes.models import SessionEvent, Sub
+from teams.models import Team
+from invites.models import TeamInvite, SessionEventInvite
+
 
 def must_have_id(data):
     if 'id' not in data:
@@ -22,6 +26,13 @@ class CustomUserSerializer(serializers.Serializer):
         json = super().to_representation(instance)
         json['url'] = instance.get_absolute_url
         json['thumbnail_url'] = instance.profile.thumbnail.url if instance.profile else None
+        json['is_captain'] = instance.has_perm('teams.add_team')
+        request = self.context.get('request', False)
+        if request:
+            json['is_current_user'] = request.user.id == instance.id
+
+        json['invite_url'] = self.context.get('invite_url', None)
+        json['unregister_url'] = self.context.get('unregister_url', None)
         return json
 
 
@@ -95,19 +106,64 @@ class SessionSerializer(serializers.Serializer):
 
 
 class SessionEventSerializer(serializers.Serializer):
-    session = SessionSerializer()
-    date = serializers.DateField()
-    start_time = serializers.TimeField()
-    id = serializers.ReadOnlyField()
+    session = SessionSerializer(required=False)
+    date = serializers.DateField(required=False)
+    start_time = serializers.TimeField(required=False)
+    id = serializers.IntegerField()
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        rep['register_url'] = instance.get_register_url
-        rep['unregister_url'] = instance.get_unregister_url
+        rep['registerUrl'] = instance.get_register_url
+        rep['unregisterUrl'] = instance.get_unregister_url
         rep['url'] = instance.get_absolute_url
+
         return rep
 
 
-class SubSerializer(serializers.Serializer):
-    user = CustomUserSerializer()
-    session_event = SessionEventSerializer()
+class SubSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer(required=False)
+    session_event = SessionEventSerializer(required=False)
+    id = serializers.ReadOnlyField()
+
+    class Meta:
+        model = main_models.Sub
+        fields = ['user', 'session_event', 'id']
+
+    def create(self, validated_data):
+        event = validated_data.get('session_event')
+        event = SessionEvent.objects.get(id=event.get('id'))
+        user = validated_data.get('user')
+        user = CustomUser.objects.get(username=user.get('username'))
+        return Sub.objects.create(session_event=event, user=user)
+
+
+
+class SessionEventWritableSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=True)
+
+
+class SubWritableSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer(required=False)
+    session_event = SessionEventWritableSerializer(required=True)
+    id = serializers.IntegerField(required=True)
+
+    class Meta:
+        model = main_models.Sub
+        fields = ['user', 'session_event', 'id']
+
+
+class SessionEventInviteSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField()
+    sub = SubWritableSerializer()
+    captain = CustomUserSerializer()
+
+    class Meta:
+        model = SessionEventInvite
+        fields = ['sub', 'captain', 'id']
+
+    def create(self, validated_data):
+        sub = validated_data.get('sub', {})
+        sub = main_models.Sub.objects.get(id=sub.get('id'))
+        captain = validated_data.get('captain')
+        captain = CustomUser.objects.get(username=captain.get('username'))
+        return SessionEventInvite.objects.create(sub=sub, captain=captain)

@@ -13,10 +13,11 @@ urlpatterns = [
     url(r'^divisions/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/$', views.SessionView.as_view(), name='session'),
     url(r'^divisions/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/date/(?P<date>\d{4}-\d{2}-\d{2}_\d{2}-\d{2})/unregister/$',
         views.SessionUnregisterView.as_view(),
-        name='session_unregister'),
+        name='session-unregister'),
     url(r'^search/(?P<search_type>substitute|session)/$', views.SearchView.as_view(), name='search'),
-    url(r'^session-events/(?P<pk>[0-9]+)/register/$', views.SessionEventRegisterView.as_view(), name='session_event_register'),
-    url(r'^session-events/(?P<pk>[0-9]+)/unregister/$', views.SessionEventUnregisterView.as_view(), name='session_event_unregister'),
+    url(r'^session-events/(?P<pk>[0-9]+)/register/$', views.SessionEventRegisterView.as_view(), name='session-event-register'),
+    url(r'^session-events/(?P<pk>[0-9]+)/unregister/$', views.SessionEventUnregisterView.as_view(), name='session-event-unregister'),
+    url(r'^session-events/(?P<pk>[0-9]+)/$', views.SessionEventView.as_view(), name='session-event'),
 
 ]
 

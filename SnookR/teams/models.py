@@ -3,6 +3,19 @@ from django.urls import reverse
 
 from autoslug import AutoSlugField
 
+from invites.models import SessionEventInvite, TeamInvite
+from substitutes.models import Sub
+
+
+class TeamManager(models.Manager):
+    def create_team(self, name, team_captain, players):
+        team = self.create(team_captain=team_captain, name=name)
+        for player in players:
+            TeamInvite.objects.create(invitee=player, team=team)
+
+        return team
+
+
 class Team(models.Model):
     '''
     A team can contain many players but should only ever exist in one division
@@ -14,10 +27,7 @@ class Team(models.Model):
     team_captain = models.ForeignKey('accounts.CustomUser', related_name="team_captain")
     players = models.ManyToManyField('accounts.CustomUser', blank=True)
 
-    class Meta:
-        permissions = (
-            ('create_team', 'Can create a team'),
-        )
+    objects = TeamManager()
 
     def __str__(self):
         return self.name
@@ -38,44 +48,21 @@ class Team(models.Model):
         for player in players:
             NonUserPlayer.objects.create(name=player['name'], team=self)
 
+    def session_event_invite_subs(self):
+        return Sub.objects.filter(session_event__in=SessionEventInvite.objects.filter(team=self))
 
-class TeamInvite(models.Model):
-    PENDING = 'P'
-    APPROVED = 'A'
-    DECLINED = 'D'
-    STATUS_CHOICES = (
-        (PENDING, 'Pending'),
-        (APPROVED, 'Approved'),
-        (DECLINED, 'Declined')
-    )
 
-    status = models.CharField(default=PENDING, max_length=1, choices=STATUS_CHOICES)
-    invitee = models.ForeignKey('accounts.CustomUser')
-    team = models.ForeignKey(Team)
+class NonUserPlayerManager(models.Manager):
+    def create_from_strings(self, strings, team):
+        return self.bulk_create([self.model(team=team, name=string) for string in strings])
 
-    def __str__(self):
-        return 'Invite from {} to {}'.format(self.team, self.invitee)
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.status == TeamInvite.APPROVED and \
-                not self.team.players.filter(username=self.invitee.username).exists():
-            self.team.players.add(self.invitee)
-
-    @property
-    def is_closed(self):
-        return self.status != TeamInvite.PENDING
-
-    @staticmethod
-    def human_readable_status(status):
-        for k, v in TeamInvite.STATUS_CHOICES:
-            if status == k:
-                return v
 
 class NonUserPlayer(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
     team = models.ForeignKey(Team)
+    
+    objects = NonUserPlayerManager()
 
     def __str__(self):
         return self.name

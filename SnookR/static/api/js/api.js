@@ -133,7 +133,7 @@ const api = (function () {
         return $.get({
             dataType: 'json',
             url: '/api/invites/',
-            data: JSON.stringify(data),
+            data: data,
         });
     };
     /* getLoggedInUser(): Returns a request with the data for the currently logged in user
@@ -189,7 +189,7 @@ const api = (function () {
     const getSessionEventList = function (data) {
         return $.get({
             dataType: 'json',
-            url: '/api/session-events',
+            url: '/api/session-events/',
             data: data,
         });
     };
@@ -198,10 +198,64 @@ const api = (function () {
     const searchForUser = function(data) {
         return $.get({
             dataType: 'json',
-            url: '/api/search-user',
+            url: '/api/search-user/',
             data: data,
         });
     };
+
+    const getSessionEventInviteList = function(data) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/session-event-invites/',
+            data: data,
+        })
+    };
+
+    const getSessionEventInvite = function(id) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/session-event-invites/' + id,
+        })
+    };
+
+    /*
+    postSessionEventInvite() POST a session invite, return an AJAX promise
+
+    POST data should be in the format:
+        {
+            sub: {
+                id: id,
+                session_event: {
+                    id: number
+                }
+            },
+            captain: {
+                username: string
+            }
+        }
+     */
+    const postSessionEventInvite = function(data) {
+        return $.post({
+            dataType: 'json',
+            url: '/api/session-event-invites/',
+            data: JSON.stringify(data),
+        })
+    };
+
+    /*
+     * Data format:
+     *    {
+     *        session_event: { id: number },
+    *         user: { username: string }
+     *    }
+     */
+    const postSub = function(data) {
+      return $.post({
+          dataType: 'json',
+          url: '/api/subs/',
+          data: JSON.stringify(data),
+      })
+    }
 
     // Return public methods for API
     return {
@@ -216,6 +270,10 @@ const api = (function () {
         getSessionEventList,
         getSubList,
         searchForUser,
+        getSessionEventInviteList,
+        getSessionEventInvite,
+        postSessionEventInvite,
+        postSub,
     }
 })();
 

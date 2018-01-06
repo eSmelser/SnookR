@@ -50,6 +50,14 @@ pip install -r requirements.txt
 
 ### Use Python and manage.py to make database migrations
 
+In order to use your local settings, put the following in your virtualenv postactivate script (found in /.virtualenv/SnookR/bin/postactivate):
+
+```
+export DJANGO_SETTINGS_MODULE='SnookR.settings.local'
+```
+
+### Use Python and manage.py to make database migrations
+
 ```
 python manage.py migrate
 ```
