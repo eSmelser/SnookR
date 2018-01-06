@@ -13,8 +13,8 @@ from rest_framework.renderers import JSONRenderer
 from teams.models import Team
 
 
-class TeamSelectView(TemplateView):
-    template_name = 'invites/team_select.html'
+class SessionEventStartView(TemplateView):
+    template_name = 'invites/session_event_start.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

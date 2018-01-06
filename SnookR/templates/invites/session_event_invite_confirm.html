@@ -13,7 +13,7 @@
         <p>Press "Confirm" to complete sending invitations.</p>
       </div>
       <div class="col-md-8 col-md-offset-2">
-        <form class="submit-form" action="{% url 'session-event-invite-create' %}" method="post">
+        <form class="submit-form" action="{% url 'invites:session-event:create' %}" method="post">
           {% csrf_token %}
           {% for sub in subs %}
               <input type="hidden" name="sub" value="{{ sub.id }}">

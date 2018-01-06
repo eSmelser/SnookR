@@ -18,7 +18,7 @@
 
             {% ifchanged %}<h3>{{ group.division }}</h3>{% endifchanged %}
             {% for session in group.sessions %}
-              <a href="{% url 'session-event-select' team_id=view.kwargs.team_id session_id=session.id %}" class="list-group-item">{{ session.name }}</a>
+              <a href="{% url 'invites:session-event:event-select' team_id=view.kwargs.team_id session_id=session.id %}" class="list-group-item">{{ session.name }}</a>
               {% empty %}
               <strong>No sessions in this division</strong>
             {% endfor %}

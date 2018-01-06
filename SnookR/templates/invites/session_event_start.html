@@ -21,7 +21,7 @@
       <div class="col-md-5">
         <div class="list-group">
           {% for team in teams %}
-            <a href="{% url 'session-select' team_id=team.id %}" class="list-group-item">{{ team.name }}</a>
+            <a href="{% url 'invites:session-event:session-select' team_id=team.id %}" class="list-group-item">{{ team.name }}</a>
           {% endfor %}
         </div>
       </div>

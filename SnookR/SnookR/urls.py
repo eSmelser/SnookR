@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^api/', include('api.urls', namespace='api')),
     url(r'^teams/', include('teams.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^invites/', include('invites.urls')),
+    url(r'^invites/', include('invites.urls', namespace='invites')),
     url(r'^accounts/', include('accounts.urls')),
     url(r'^substitutes/', include('substitutes.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

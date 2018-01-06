@@ -1,10 +1,14 @@
-from django.conf.urls import url
+from django.conf.urls import include, url
 from invites import views
 
+session_event_patterns = ([
+    url(r'^session-event/step-1/$', views.SessionEventStartView.as_view(), name='start'),
+    url(r'^session-event/step-2/team/(?P<team_id>\d+)/$', views.SessionSelectView.as_view(), name='session-select'),
+    url(r'^session-event/step-3/team/(?P<team_id>\d+)/session/(?P<session_id>\d+)/$', views.SessionEventSelectView.as_view(), name='event-select'),
+    url(r'^session-event/step-4/confirm/$', views.SessionEventInviteConfirmView.as_view(), name='confirm'),
+    url(r'^session-event/step-5/create/$', views.SessionEventInviteCreateView.as_view(), name='create'),
+], 'session-event')
+
 urlpatterns = [
-    url(r'^team-select/$', views.TeamSelectView.as_view(), name='team-select'),
-    url(r'^session-select/team/(?P<team_id>\d+)/$', views.SessionSelectView.as_view(), name='session-select'),
-    url(r'^session-event-select/team/(?P<team_id>\d+)/session/(?P<session_id>\d+)/$', views.SessionEventSelectView.as_view(), name='session-event-select'),
-    url(r'^session-event-invite-confirm/$', views.SessionEventInviteConfirmView.as_view(), name='session-event-invite-confirm'),
-    url(r'^session-event-invite-create/$', views.SessionEventInviteCreateView.as_view(), name='session-event-invite-create'),
+    url(r'^session-event/', include(session_event_patterns)),
 ]

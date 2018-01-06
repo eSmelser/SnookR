@@ -1,4 +1,4 @@
-<!-- 
+<!--
      Copyright &copy; 2017 Evan Smelser
       This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 -->
@@ -64,7 +64,9 @@
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        {% if user.is_authenticated %}
+                        {% if user.is_authenticated and perms.teams.add_team %}
+                        <li><a href="{% url 'invites:session-event:start' %}">Invite a Sub</a></li>
+                        
                         <li><a href="{% url 'invites' %}" id="id_invites_link">Invites <span class="badge"
                                                                                              id="id_invites_badge">{{ user.pending_invites.count }}</span></a>
                         </li>
