@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     'core',
     'accounts',
     'invites',
+    'messaging',
 ]
 
 MIDDLEWARE = [
@@ -117,7 +118,6 @@ TEMPLATES = [
     },
 ]
 
-print(TEMPLATES[0]['DIRS'])
 WSGI_APPLICATION = 'SnookR.wsgi.application'
 
 REST_FRAMEWORK = {
