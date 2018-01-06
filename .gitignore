@@ -1,3 +1,5 @@
+# Webpack bundles
+*.bundle.js
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
