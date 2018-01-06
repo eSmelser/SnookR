@@ -3,6 +3,8 @@ from django.urls import reverse
 
 from autoslug import AutoSlugField
 
+from invites.models import SessionEventInvite
+from substitutes.models import Sub
 
 class Team(models.Model):
     '''
@@ -39,6 +41,8 @@ class Team(models.Model):
         for player in players:
             NonUserPlayer.objects.create(name=player['name'], team=self)
 
+    def session_event_invite_subs(self):
+        return Sub.objects.filter(session_event__in=SessionEventInvite.objects.filter(team=self))
 
 class NonUserPlayer(models.Model):
     name = models.CharField(max_length=200)

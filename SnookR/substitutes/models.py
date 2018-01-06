@@ -31,7 +31,7 @@ class Division(models.Model):
 class Session(models.Model):
     '''
     Sessions are generally named after a season (summer, fall, etc), they have an associated game and
-    division, as well as a start date and an end date. 
+    division, as well as a start date and an end date.
     Session -> Division : 1 .. 1
     '''
     date_format = '%Y-%m-%d_%H-%M'
@@ -82,11 +82,11 @@ class SessionEvent(models.Model):
 
     @property
     def get_register_url(self):
-        return reverse('session_event_register', kwargs={'pk': self.id})
+        return reverse('session-event-register', kwargs={'pk': self.id})
 
     @property
     def get_unregister_url(self):
-        return reverse('session_event_unregister', kwargs={'pk': self.id})
+        return reverse('session-event-unregister', kwargs={'pk': self.id})
 
     @property
     def get_absolute_url(self):
@@ -97,7 +97,7 @@ class SessionEvent(models.Model):
 class Sub(models.Model):
     '''
     Subs are a "tuple-ish" construction tying a player and a date together to indicate what date they are
-    willing to sub in a Division. 
+    willing to sub in a Division.
 
     Note: Eventually, I'd like players to be able to select a particular date that they could sub in a
     Division, OR, put themselves down for an entire session, in which case, we will likely need a model for

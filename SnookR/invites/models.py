@@ -43,7 +43,10 @@ class TeamInvite(AbstractInvite, models.Model):
 
 class SessionEventInvite(AbstractInvite, models.Model):
     sub = models.ForeignKey('substitutes.Sub')
-    captain = models.ForeignKey('accounts.CustomUser')
+    team = models.ForeignKey('teams.Team')
+
+    class Meta:
+        unique_together = ('sub', 'team')
 
     def __str__(self):
-        return '{} from {} to {}'.format(self.__class__.__name__, self.captain, self.sub)
+        return '{} from {} to {}'.format(self.__class__.__name__, self.team, self.sub)

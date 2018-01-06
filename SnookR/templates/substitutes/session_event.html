@@ -1,0 +1,83 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load render_bundle from webpack_loader %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'substitutes/css/session.css' %}">
+{% endblock %}
+
+{% block title %}{{ session_event.session.name }} Subs on {{ session_event.date }}{% endblock %}
+{% block content %}
+
+<div class="container" id="main-content">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2 text-center">
+      <h2>{{ session_event.session.name }} <br><small>{{ session_event.date }}</small></h2>
+      {% if current_user_sub and not teams %}
+        <h3>You are available</h3>
+          <div class="panel panel-default">
+              <div class="panel-body">
+                  <div class="pull-left">
+                      <a href="{{ current_user_sub.user.profile.get_absolute_url }}">
+                          <img class="img-circle" width="50px" height="50px" style="margin-right:8px; margin-top:-5px;"
+                               src="{{ current_user_sub.user.profile.thumbnail.url }}">
+                      </a>
+                  </div>
+                  <h4 class="pull-left"><a href="{{ sub.user.url }}" style="text-decoration:none;"><strong>{{ sub.user.username }}</strong></a>
+                    {% if current_user_sub.invited %}
+                      <small>Invited!</small>
+                    {% endif %}
+                  </h4>
+                      <form class="pull-right session-button" action="{{ sub.session_event.get_unregister_url }}">
+                          <input class="btn btn-default" type="submit" value="Unregister">
+                      </form>
+              </div>
+          </div>
+      {% endif %}
+
+      {% if teams %}
+      <h3>Invite a sub</h3>
+
+      <form id="invites-form" class="" action="." method="post">
+        <label for="team-select">Choose your team
+          <select id="team-select" class="form-control">
+            {% for team in teams %}
+              <option>{{ team.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </form>
+      {% else %}
+        <strong>You have no teams created</strong>
+      {% endif %}
+
+      <h3>Which sub?</h3>
+        {% for sub in subs %}
+        <div class="panel panel-default sub-panel" data-sub-id={{sub.id}}>
+            <div class="panel-body">
+                <div class="pull-left">
+                    <a href="{{ sub.user.profile.get_absolute_url }}">
+                        <img class="img-circle" width="50px" height="50px" style="margin-right:8px; margin-top:-5px;"
+                             src="{{ sub.user.profile.thumbnail.url }}">
+                    </a>
+                </div>
+                <h4 class="pull-left"><a href="{{ sub.user.url }}" style="text-decoration:none;"><strong>{{ sub.user.username }}</strong></a>
+                  {% if sub.invited %}
+                    <small id="small-invited">Invited!</small>
+                  {% endif %}
+                </h4>
+
+                {% if teams %}
+                    <input class="invite-toggle pull-right btn btn-default" data-sub-id={{ sub.id }} type="submit" value="Invite">
+                {% endif %}
+            </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block footer_scripts %}
+{% render_bundle 'session-event' %}
+
+{% endblock %}

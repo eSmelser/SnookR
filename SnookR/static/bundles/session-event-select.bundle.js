@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 156);
+/******/ 	return __webpack_require__(__webpack_require__.s = 160);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -43548,6 +43548,35 @@ module.exports = (Handlebars["default"] || Handlebars).template({"1":function(co
     + ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.sub : depth0)) != null ? stack1.invited : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
     + "    </div>\n</div>\n";
 },"useData":true});
+
+/***/ }),
+/* 159 */,
+/* 160 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function($) {__webpack_require__(156);
+let jQuery = __webpack_require__(1);
+
+$(document).ready(function() {
+  let invitedList = [];
+  let $parent = $('.substitutes-div');
+
+  const addToInvitedList = function(_, obj) {
+    let id = $(obj).attr('data-sub-id');
+    invitedList.push(id);
+  };
+
+  $('#submit').click(function() {
+    invitedList = [];
+    $parent.find('.invite-status[data-invited="true"]').each(addToInvitedList);
+    let params = jQuery.param({ sub: invitedList, teamId: context.teamId }, true);
+    let url = $(this).attr('href');
+    console.log(url + '?' + params);
+    window.location.href = url + '?' + params;
+  });
+});
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ })
 /******/ ]);

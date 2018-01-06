@@ -17,6 +17,7 @@ from accounts.models import CustomUser
 from api import serializers
 from substitutes.models import Division, Session, SessionEvent, Sub
 from invites.models import SessionEventInvite
+from teams.models import Team
 
 class DivisionListView(TemplateView):
     template_name = 'substitutes/divisions.html'
@@ -184,5 +185,25 @@ class SearchView(TemplateView):
             context['results'] = CustomUser.objects.filter(id__in=distinct_ids)
         else:
             raise Http404('Invalid URL kwargs: ' + str(kwargs))
+
+        return context
+
+
+class SessionEventView(TemplateView):
+    template_name = 'substitutes/session_event.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['session_event'] = get_object_or_404(SessionEvent, id=kwargs.get('pk'))
+        subs = Sub.objects.filter(session_event=context['session_event'])
+        if not self.request.user.is_authenticated():
+            context['subs'] = subs
+        else:
+            context['subs'] = subs.exclude(user=self.request.user)
+            context['teams'] = Team.objects.filter(team_captain=self.request.user)
+            try:
+                context['current_user_sub'] = subs.get(user=self.request.user)
+            except Sub.DoesNotExist:
+                context['current_user_sub'] = None
 
         return context

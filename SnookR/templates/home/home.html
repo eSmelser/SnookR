@@ -1,4 +1,4 @@
-<!-- 
+<!--
      Copyright &copy; 2017 Evan Smelser
       This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 -->
@@ -108,7 +108,8 @@
 {% block footer_scripts %}
     <script type="text/javascript">
         {% if session_events_json %}
-            const initialSessionEvents = JSON.parse('{{ session_events_json|escapejs|safe }}');
+            const context = {};
+            context.sessionEvents = JSON.parse('{{ session_events_json|escapejs|safe }}');
         {%  endif %}
         $(function () {
             $('.list-group-item').on('click', function () {
