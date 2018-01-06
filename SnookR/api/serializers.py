@@ -155,11 +155,11 @@ class SubWritableSerializer(serializers.ModelSerializer):
 class SessionEventInviteSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
     sub = SubWritableSerializer()
-    captain = CustomUserSerializer()
+    team = TeamSerializer()
 
     class Meta:
         model = SessionEventInvite
-        fields = ['sub', 'captain', 'id']
+        fields = ['sub', 'team', 'id']
 
     def create(self, validated_data):
         sub = validated_data.get('sub', {})

@@ -79,7 +79,7 @@ class SessionViewMixin(TemplateView):
             custom_user_serializer = serializers.CustomUserSerializer(user, context={'request': self.request})
             context['json']['current_user'] = JSONRenderer().render(custom_user_serializer.data)
 
-            invites = SessionEventInvite.objects.filter(captain=self.request.user)
+            invites = SessionEventInvite.objects.filter(team__team_captain=self.request.user)
             invites_serializer = serializers.SessionEventInviteSerializer(invites, many=True)
             context['json']['current_user_previous_invites'] = JSONRenderer().render(invites_serializer.data)
 
