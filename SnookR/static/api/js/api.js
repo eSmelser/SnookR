@@ -133,7 +133,7 @@ const api = (function () {
         return $.get({
             dataType: 'json',
             url: '/api/invites/',
-            data: JSON.stringify(data),
+            data: data,
         });
     };
     /* getLoggedInUser(): Returns a request with the data for the currently logged in user
@@ -174,7 +174,7 @@ const api = (function () {
         return $.get({
             dataType: 'json',
             url: '/api/sessions',
-            data: JSON.stringify(data),
+            data: data,
         });
     };
 
@@ -190,7 +190,7 @@ const api = (function () {
         return $.get({
             dataType: 'json',
             url: '/api/session-events/',
-            data: JSON.stringify(data),
+            data: data,
         });
     };
 
@@ -199,7 +199,7 @@ const api = (function () {
         return $.get({
             dataType: 'json',
             url: '/api/search-user/',
-            data: JSON.stringify(data),
+            data: data,
         });
     };
 
@@ -207,7 +207,7 @@ const api = (function () {
         return $.get({
             dataType: 'json',
             url: '/api/session-event-invites/',
-            data: JSON.stringify(data),
+            data: data,
         })
     };
 

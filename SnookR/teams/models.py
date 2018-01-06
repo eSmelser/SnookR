@@ -3,8 +3,18 @@ from django.urls import reverse
 
 from autoslug import AutoSlugField
 
-from invites.models import SessionEventInvite
+from invites.models import SessionEventInvite, TeamInvite
 from substitutes.models import Sub
+
+
+class TeamManager(models.Manager):
+    def create_team(self, name, team_captain, players):
+        team = self.create(team_captain=team_captain, name=name)
+        for player in players:
+            TeamInvite.objects.create(invitee=player, team=team)
+
+        return team
+
 
 class Team(models.Model):
     '''
@@ -17,10 +27,7 @@ class Team(models.Model):
     team_captain = models.ForeignKey('accounts.CustomUser', related_name="team_captain")
     players = models.ManyToManyField('accounts.CustomUser', blank=True)
 
-    class Meta:
-        permissions = (
-            ('create_team', 'Can create a team'),
-        )
+    objects = TeamManager()
 
     def __str__(self):
         return self.name
@@ -44,10 +51,18 @@ class Team(models.Model):
     def session_event_invite_subs(self):
         return Sub.objects.filter(session_event__in=SessionEventInvite.objects.filter(team=self))
 
+
+class NonUserPlayerManager(models.Manager):
+    def create_from_strings(self, strings, team):
+        return self.bulk_create([self.model(team=team, name=string) for string in strings])
+
+
 class NonUserPlayer(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
     team = models.ForeignKey(Team)
+    
+    objects = NonUserPlayerManager()
 
     def __str__(self):
         return self.name

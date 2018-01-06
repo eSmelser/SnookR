@@ -101,7 +101,7 @@ class SearchUserView(ListAPIView):
         objs = cache.get(key)
         if objs is None:
             objs = CustomUser.objects.search(query)
-            cache.set(key, objs, 60 * 10)
+            cache.set(key, objs, 60 * 3)
 
         serializer = CustomUserSerializer(objs, many=True)
         return Response(serializer.data)

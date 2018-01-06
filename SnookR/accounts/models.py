@@ -17,6 +17,7 @@ class CustomUserQuerySet(models.QuerySet):
         for term in string.split():
             query |= Q(username__startswith=term) | Q(first_name__startswith=term) | Q(last_name__startswith=term)
 
+        print('string', string)
         return self.filter(query)
 
 
