@@ -100,16 +100,15 @@ def signup(request):
             email = form.cleaned_data.get('email')
             first_name = form.cleaned_data.get('first_name')
             last_name = form.cleaned_data.get('last_name')
-            phone_number = form.cleaned_data.get('phone_number')
+            phone_number = form.cleaned_data.get('phone_number') or None
             user = authenticate(username=username, password=raw_password, email=email, first_name=first_name,
                                 last_name=last_name)
-
-            send_confirmation_email(user)
+            UserProfile.objects.create(user=user, phone_number=phone_number)
+            send_confirmation_email(CustomUser.objects.get(id=user.id))
 
             if settings.DEBUG:
                 login(request, user)
 
-            UserProfile.objects.create(user=user, phone_number=phone_number if phone_number else None)
             return redirect('home')
     else:
         form = CustomUserForm()

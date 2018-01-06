@@ -26,3 +26,12 @@ class SignupTestCase(TestCase):
     def test_email_sent(self):
         request = self.client.post(reverse('signup'), self.data)
         self.assertEqual(len(mail.outbox), 1)
+
+    def test_email_content(self):
+        request = self.client.post(reverse('signup'), self.data)
+        user = CustomUser.objects.get(username=self.data['username'])
+        email = mail.outbox.pop()
+        self.assertIn(user.username, email.body)
+        self.assertIn(user.first_name, email.body)
+        self.assertIn(user.profile.activation_key, email.body)
+        self.assertIn(str(user.profile.key_expires), email.body)

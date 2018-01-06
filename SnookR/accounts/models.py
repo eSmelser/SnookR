@@ -1,8 +1,11 @@
+import random
+from datetime import timedelta
 from django.contrib.auth.models import UserManager, User
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils import timezone
 
 from substitutes.models import Session
 
@@ -75,6 +78,13 @@ class CustomUser(User):
         return reverse('profile', kwargs={'username': self.username})
 
 
+
+def generate_expiration():
+    return timezone.now() + timedelta(minutes=20)
+
+def generate_key():
+    return ''.join(str(random.randint(0, 9)) for _ in range(6))
+
 class UserProfile(models.Model):
     """User profiles are used to extend the User model with more fields, but not to change
     the User model.  Sometimes altered user models conflict with other third-party apps, and
@@ -86,6 +96,8 @@ class UserProfile(models.Model):
     )
     phone_number = models.IntegerField(blank=True, null=True)
     thumbnail = models.ImageField(upload_to=thumbnail_path, null=True)
+    activation_key = models.CharField(max_length=6, default=generate_key)
+    key_expires = models.DateTimeField(default=generate_expiration)
 
     def __str__(self):
         return self.user.username + "'s Profile"
@@ -93,3 +105,8 @@ class UserProfile(models.Model):
     @property
     def get_absolute_url(self):
         return reverse('profile', kwargs={'username': self.user.username})
+
+    def reset_key(self):
+        self.activation_key = self.generate_key()
+        self.key_expires = self.generate_expiration()
+        self.save()
