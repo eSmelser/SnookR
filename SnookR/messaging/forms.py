@@ -12,7 +12,6 @@ class MessageForm(forms.Form):
         sender = self.cleaned_data['sender']
         receiver = self.cleaned_data['receiver']
         text = self.cleaned_data['text']
-
         sender = CustomUser.objects.get(id=sender)
         receiver = CustomUser.objects.get(id=receiver)
         return Message.objects.create(sender=sender, receiver=receiver, text=text)
