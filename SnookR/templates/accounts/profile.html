@@ -13,7 +13,7 @@
         </div>
         <div class="col-md-10">
             <h2>{{ player.username }}</h2>
-            <a id="send-message-button" class="button btn btn-default">Message  <span class="glyphicon glyphicon-send"></span></a>
+            <a id="send-message-button" class="button btn btn-default" href="{% url 'messaging:messaging' username=player.username %}">Message  <span class="glyphicon glyphicon-send"></span></a>
         </div>
     </div>
     <div class="row">
