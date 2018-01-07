@@ -43,10 +43,10 @@ class MessagingView(FormView):
 
         return context
 
-    def get_messages(self, me, friend):
-        messages = Message.objects.select_related('sender', 'receiver').filter(Q(sender=me, receiver=friend) | Q(sender=friend, receiver=me)).order_by('timestamp')
-        messages.filter(receiver=me).update(receiver_has_seen=True)
-        messages.filter(sender=me).update(sender_has_seen=True)
+    def get_messages(self, user, friend):
+        messages = Message.objects.select_related('sender', 'receiver').filter(Q(sender=user, receiver=friend) | Q(sender=friend, receiver=user)).order_by('timestamp')
+        messages.filter(receiver=user).update(receiver_has_seen=True)
+        messages.filter(sender=user).update(sender_has_seen=True)
         return messages
 
     def get_initial(self):
@@ -110,7 +110,7 @@ class MessageCreateView(FormView):
         context['messages'] = [self.get_message()]
         return context
 
-    def get_message(self, data, receiver, sender):
+    def get_message(self):
         data = self.get_data()
         sender = self.get_sender(data)
         receiver = self.get_receiver(data)
