@@ -3,65 +3,76 @@ let api = require('../../api/js/api.js')
 let Turbolinks = require("turbolinks");
 Turbolinks.start()
 
-
-let text = '';
-
-document.addEventListener("turbolinks:before-visit", function() {
-  text = $('#id_text').val();
-  console.log(text);
-})
-
 document.addEventListener("turbolinks:load", function() {
+let messaging = (function() {
+  // Cache dom
+  const $recentMessageItems = $('.recent-message-item');
+  const $messageTextForm = $('#message-text-form');
+  const $messagesList = $('#messages-list');
+  const $textInput = $messageTextForm.find('#id_text');
 
-    let userId = $('#user-id').val();
-    let friendId = $('#friend-id').val();
+  // Init
+  let scheduledUpdates = [];
+  let userId = $('#user-id').val();
+  let friendId = $('#friend-id').val();
 
-    const scrollDownMessageList = function() {
-      let dom = document.getElementById('messages-list');
-      let scrollHeight = dom.scrollHeight;
+  $textInput.focus();
 
-      let $dom = $(dom);
-      $dom.scrollTop(scrollHeight);
+  const scrollDownMessageList = function() {
+    let dom = document.getElementById('messages-list');
+    let scrollHeight = dom.scrollHeight;
 
-      if($dom.css('opacity') != '1') {
-        $dom.fadeTo(500, 1);
-      }
-    }
+    let $dom = $(dom);
+    $dom.scrollTop(scrollHeight);
+  }
 
-    scrollDownMessageList();
-    $('#id_text').focus();
+  const update = function() {
+    let username = $('#friend-name').attr('data-friend-username');
+    api.getNewMessage({ username: username }).done(function(data) {
+       $('#messages-list').append($(data));
+       scrollDownMessageList();
+     }).fail(function(data) {
+       console.log('fail', data);
+     });
+     scheduledUpdate = setTimeout(update, 5000);
+     scheduledUpdates.push(scheduledUpdate);
+  };
 
-    $('.recent-message-item').click(function() {
-      let href = $(this).attr('href');
-      Turbolinks.visit(href);
-    });
+  const unscheduleUpdates = function() {
+    scheduledUpdates.map( id => clearTimeout(id) );
+  };
 
-    $('#message-text-form').submit(function(event) {
-      event.preventDefault();
-      let data = {
-        sender: userId,
-        receiver: friendId,
-        text: $(this).find('#id_text').val()
-      };
-      console.log('sending...', data);
-      api.postMessage(data)
-      .done(function(data) {
-        $('#messages-list').append($(data));
-      }).fail(function(data) {
+  const goToConversation = function() {
+    let href = $(this).attr('href');
+    Turbolinks.visit(href);
+  };
 
-      });
-    });
-
-    const update = function() {
-      let username = $('#friend-name').attr('data-friend-username');
-      api.getNewMessage({ username: username }).done(function(data) {
-         $('#messages-list').append($(data));
-         scrollDownMessageList();
-       }).fail(function(data) {
-         console.log('fail', data);
-       });
-       setTimeout(update, 5000);
+  const sendMessage = function(event) {
+    event.preventDefault();
+    let data = {
+      sender: userId,
+      receiver: friendId,
+      text: $textInput.val()
     };
-    update();
-    //setInterval(function(){ persist += 1; console.log(persist) }, 1000);
+
+    api.postMessage(data)
+        .done(function(data) {
+          $messagesList.append($(data));
+          scrollDownMessageList()
+          $textInput.val('');
+        }).fail(function(data) {
+    });
+  };
+
+  // Bind events
+  $recentMessageItems.click(goToConversation);
+  $messageTextForm.submit(sendMessage);
+
+  document.addEventListener("turbolinks:before-visit", function() {
+    unscheduleUpdates();
+  });
+
+  scrollDownMessageList()
+  update();
+})()
 });
