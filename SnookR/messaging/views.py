@@ -29,30 +29,33 @@ class MessagingView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = self.get_form()
-        me, myfriend = self.get_users()
-        context['messages'] = self.get_messages(me, myfriend)
-        context['recent_messages'] = self.get_recent_messages()
-        context['friend'] = myfriend
+        print('gtd')
+        if 'username' in self.request.GET:
+            print('in if')
+            context['form'] = self.get_form()
+            me, myfriend = self.get_users()
+            context['messages'] = self.get_messages(me, myfriend)
+            context['recent_messages'] = self.get_recent_messages()
+            context['friend'] = myfriend
 
         return context
 
     def get_messages(self, me, myfriend):
         messages = Message.objects.select_related('sender', 'receiver').filter(Q(sender=me, receiver=myfriend) | Q(sender=myfriend, receiver=me)).order_by('timestamp')
-        before = time.time()
         messages.filter(receiver=me).update(receiver_has_seen=True)
         messages.filter(sender=me).update(sender_has_seen=True)
-        elapsed = time.time() - before
-        print('elapsed', elapsed)
         return messages
 
     def get_initial(self):
-        sender, receiver = self.get_users()
-        return dict(sender=sender.id, receiver=receiver.id)
+        if 'username' in self.request.GET:
+            sender, receiver = self.get_users()
+            return dict(sender=sender.id, receiver=receiver.id)
+        else:
+            return dict()
 
     def get_users(self):
         sender = CustomUser.objects.get(id=self.request.user.id)
-        receiver = get_object_or_404(CustomUser, username=self.kwargs.get('username', None))
+        receiver = get_object_or_404(CustomUser, username=self.request.GET.get('username'))
         return sender, receiver
 
     def form_valid(self, form):

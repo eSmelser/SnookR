@@ -16,6 +16,7 @@
           {% endfor %}
         </div>
       </div>
+      {% if messages %}
       <div class="col-md-6 full-height bordered">
         <h1 id="friend-name" data-friend-username="{{ friend.username }}">{{ friend.get_full_name }}</h1>
         <ul class="list-group .turbolinks-disable-scroll" id="messages-list">
@@ -51,6 +52,7 @@
           </p>
         </div>
       </div>
+      {% endif %}
     </div>
   </div>
 {% endblock %}
