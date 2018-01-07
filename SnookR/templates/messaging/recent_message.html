@@ -1,0 +1,11 @@
+<button class="list-group-item recent-message-item" href={% url 'messaging:messaging' username=message.friend %}>
+  <a href="{{ message.friend.profile.get_absolute_url }}" class="pull-{{ orientation }}">
+      <img class="img-circle" src="{{ message.friend.profile.thumbnail.url }}">
+  </a>
+
+  <div class="">
+      <small class="list-group-item-heading text-muted pull-{{ orientation}}">{{ message.friend.get_full_name }}</small>
+      <small class="timestamp text-muted pull-{% if orientation == 'left' %}right{% elif  orientation == 'right' %}left{% endif %}">{{ message.timestamp }}</small>
+  </div>
+  <p class="message-text">{% if message.sender == user %}You: {% endif %}{{ message.text }}</p>
+</button>

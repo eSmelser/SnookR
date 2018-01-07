@@ -1,15 +1,29 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block styles %}
+  <link href="{% static 'messaging/css/messaging.css' %}" rel='stylesheet'/>
+{% endblock %}
 {% block content %}
-  <div class="container">
+  <div class="container" id="main-content">
     <div class="row">
-      <div class="col-md-8 col-md-offset-2">
-        Sanity
+      <div class="col-md-4">
+        <div class="list-group" id="recent-messages-group">
+          <h4>Previous messages</h4>
+          {% for message in recent_messages %}
+            {% include 'messaging/recent_message.html' with message=message orientation='left' %}
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col-md-6">
         <ul class="list-group">
           {% for message in messages %}
-            <li class="list-group-item {% if message.sender == user %}text-left{% else %}text-right{% endif %}">
-              {{ message.text }}
-            </li>
+            {% if message.sender == user %}
+              {% include 'messaging/message.html' with message=message orientation='left' %}
+            {% elif message.receiver == user %}
+              {% include 'messaging/message.html' with message=message orientation='right' %}
+              {% else %}
+                <strong style="color:red">Error!</strong>
+            {% endif %}
           {% endfor %}
         </ul>
 
@@ -22,4 +36,11 @@
       </div>
     </div>
   </div>
+{% endblock %}
+{% block footer_scripts %}
+<script type="text/javascript">
+  $('.recent-message-item').click(function() {
+    window.location.href = $(this).attr('href');
+  })
+</script>
 {% endblock %}

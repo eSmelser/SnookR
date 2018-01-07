@@ -77,7 +77,8 @@ class CustomUser(User):
     def get_absolute_url(self):
         return reverse('profile', kwargs={'username': self.username})
 
-
+    def get_full_name(self):
+        return str(self.first_name) + ' ' + str(self.last_name)
 
 def generate_expiration():
     return timezone.now() + timedelta(minutes=20)

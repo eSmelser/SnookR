@@ -1,0 +1,44 @@
+.fc-unthemed td.fc-today {
+  background-color: #eea236; }
+
+/*# sourceMappingURL=calendar.css.map */
+.list-group-item {
+  display:inline-block;
+  width: 100%;
+}
+
+img {
+  margin-right: 8px;
+  margin-top: -5px;
+  width: 50px;
+  height: 50px;
+}
+
+.message-text {
+  margin-top: 25px;
+}
+
+#recent-messages-group .message-text {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  color: grey;
+}
+
+#recent-messages-group .recent-message-item {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  height: 60px;
+  width: 110%;
+  left: -20px;
+  transform: scale(0.8, 0.8);
+  -ms-transform: scale(0.8, 0.8); /* IE 9 */
+  -webkit-transform: scale(0.8, 0.8); /* Safari and Chrome */
+  -o-transform: scale(0.8, 0.8); /* Opera */
+  -moz-transform: scale(0.8, 0.8); /* Firefox */
+}
+
+#main-content {
+  margin-left: 5px;
+}

@@ -1,0 +1,11 @@
+<li class="list-group-item">
+  <a href="{{ message.sender.profile.get_absolute_url }}" class="pull-{{ orientation }}">
+      <img class="img-circle" src="{{ message.sender.profile.thumbnail.url }}">
+  </a>
+
+  <div class="">
+      <small class="list-group-item-heading text-muted pull-{{ orientation}}">{{ message.sender.get_full_name }}</small>
+      <small class="timestamp text-muted pull-{% if orientation == 'left' %}right{% elif  orientation == 'right' %}left{% endif %}">{{ message.timestamp }}</small>
+  </div>
+  <p class="message-text">{{ message.text }}</p>
+</li>

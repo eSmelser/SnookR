@@ -1,6 +1,8 @@
+from collections import OrderedDict
+
 from django.views.generic import FormView
 from django.shortcuts import get_object_or_404, reverse
-from django.db.models import Q
+from django.db.models import Q, OuterRef, Subquery
 from messaging.forms import MessageForm
 from messaging.models import Message
 from accounts.models import CustomUser
@@ -18,6 +20,7 @@ class MessagingView(FormView):
         context['form'] = self.get_form()
         me, myfriend = self.get_users()
         context['messages'] = Message.objects.filter(Q(sender=me, receiver=myfriend) | Q(sender=myfriend, receiver=me)).order_by('timestamp')
+        context['recent_messages'] = self.get_recent_messages()
         return context
 
     def get_initial(self):
@@ -25,10 +28,17 @@ class MessagingView(FormView):
         return dict(sender=sender.id, receiver=receiver.id)
 
     def get_users(self):
-        sender = self.request.user
+        sender = CustomUser.objects.get(id=self.request.user.id)
         receiver = get_object_or_404(CustomUser, username=self.kwargs.get('username', None))
         return sender, receiver
 
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+    def get_recent_messages(self):
+        messages = Message.objects.last_message_per_user(self.request.user)
+        for message in messages:
+            message.friend = message.receiver if message.receiver != self.request.user else message.sender
+
+        return messages
