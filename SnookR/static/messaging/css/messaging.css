@@ -1,10 +1,24 @@
-.fc-unthemed td.fc-today {
-  background-color: #eea236; }
+html,
+body {
+  height: 100%;
+}
 
-/*# sourceMappingURL=calendar.css.map */
+.navbar {
+  margin-bottom: 0px;
+  margin-left: 15px;
+}
+
+.bordered {
+  border: 1px solid rgba(0, 0, 0, .10);
+}
+
 .list-group-item {
   display:inline-block;
   width: 100%;
+}
+
+.full-height {
+  height: 100%;
 }
 
 img {
@@ -16,6 +30,10 @@ img {
 
 .message-text {
   margin-top: 25px;
+}
+
+#right-column-thumbnail {
+  margin-top: 10px;
 }
 
 #recent-messages-group .message-text {
@@ -40,5 +58,16 @@ img {
 }
 
 #main-content {
-  margin-left: 5px;
+  height: 100%;
+  width: 100%;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+#main-content h1 {
+	text-align: center;
+}
+
+.main-row {
+  width: 100%;
 }

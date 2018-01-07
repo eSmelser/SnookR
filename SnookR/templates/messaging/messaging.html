@@ -5,8 +5,8 @@
 {% endblock %}
 {% block content %}
   <div class="container" id="main-content">
-    <div class="row">
-      <div class="col-md-4">
+    <div class="row full-height main-row">
+      <div class="col-md-4 full-height bordered">
         <div class="list-group" id="recent-messages-group">
           <h4>Previous messages</h4>
           {% for message in recent_messages %}
@@ -14,7 +14,8 @@
           {% endfor %}
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-6 full-height bordered">
+        <h1>{{ friend.get_full_name }}</h1>
         <ul class="list-group">
           {% for message in messages %}
             {% if message.sender == user %}
@@ -33,6 +34,29 @@
           {{ form.sender }}
           {{ form.receiver }}
         </form>
+      </div>
+      <div class="col-md-2 right-column full-height bordered">
+        <div class="text-center">
+          <img id="right-column-thumbnail"class="img-circle text-center" src="{{ friend.profile.thumbnail.url }}" href="{{ friend.profile.get_absolute_url }}">
+          <h1><a href="{{ friend.profile.get_absolute_url }}">{{ friend.get_full_name }}</a></h1>
+          {% if friend.managed_teams.all %}<small><h4>Team Captain</h4></small>{% endif %}
+          <p>
+            <ol style="list-style-type:none" class="text-center">
+              {% for team in friend.managed_teams.all %}
+                <li class="right-column-team-item">{{ team }}</li>
+              {% endfor %}
+            </ol>
+          </p>
+
+          <h4>Team Member</h4>
+          <p>
+            <ol style="list-style-type:none" class="text-center">
+              {% for team in friend.team_set.all %}
+                <li class="right-column-team-item">{{ team }}</li>
+              {% endfor %}
+            </ol>
+          </p>
+        </div>
       </div>
     </div>
   </div>

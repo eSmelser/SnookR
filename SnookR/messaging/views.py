@@ -21,6 +21,7 @@ class MessagingView(FormView):
         me, myfriend = self.get_users()
         context['messages'] = Message.objects.filter(Q(sender=me, receiver=myfriend) | Q(sender=myfriend, receiver=me)).order_by('timestamp')
         context['recent_messages'] = self.get_recent_messages()
+        context['friend'] = myfriend
         return context
 
     def get_initial(self):

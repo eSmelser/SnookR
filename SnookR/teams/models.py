@@ -24,8 +24,8 @@ class Team(models.Model):
     '''
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
-    team_captain = models.ForeignKey('accounts.CustomUser', related_name="team_captain")
-    players = models.ManyToManyField('accounts.CustomUser', blank=True)
+    team_captain = models.ForeignKey('accounts.CustomUser', related_name='managed_teams')
+    players = models.ManyToManyField('accounts.CustomUser', blank=True, related_name='team_set')
 
     objects = TeamManager()
 
@@ -61,7 +61,7 @@ class NonUserPlayer(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
     team = models.ForeignKey(Team)
-    
+
     objects = NonUserPlayerManager()
 
     def __str__(self):
