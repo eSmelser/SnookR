@@ -11,6 +11,7 @@ module.exports = {
         'session-event-calendar': './static/calendar/js/session-event-calendar.js',
         'session-event': './static/substitutes/js/session-event.js',
         'session-event-select': './static/substitutes/js/session-event-select.js',
+        'messaging': './static/messaging/js/messaging.js',
     },
 
     output: {

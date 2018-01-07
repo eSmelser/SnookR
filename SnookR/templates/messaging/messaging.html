@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
+{% load render_bundle from webpack_loader %}
 {% load static %}
 {% block styles %}
+  {% render_bundle 'messaging' %}
   <link href="{% static 'messaging/css/messaging.css' %}" rel='stylesheet'/>
 {% endblock %}
 {% block content %}
@@ -15,20 +17,11 @@
         </div>
       </div>
       <div class="col-md-6 full-height bordered">
-        <h1>{{ friend.get_full_name }}</h1>
-        <ul class="list-group">
-          {% for message in messages %}
-            {% if message.sender == user %}
-              {% include 'messaging/message.html' with message=message orientation='left' %}
-            {% elif message.receiver == user %}
-              {% include 'messaging/message.html' with message=message orientation='right' %}
-              {% else %}
-                <strong style="color:red">Error!</strong>
-            {% endif %}
-          {% endfor %}
+        <h1 id="friend-name" data-friend-username="{{ friend.username }}">{{ friend.get_full_name }}</h1>
+        <ul class="list-group .turbolinks-disable-scroll" id="messages-list">
+          {% include 'messaging/message_list_elements.html' %}
         </ul>
-
-        <form action='.' method='post'>
+        <form action='.' method='post' data-turbolinks-permanent id="message-text-form">
           {% csrf_token %}
           {{ form.text }}
           {{ form.sender }}
@@ -62,9 +55,6 @@
   </div>
 {% endblock %}
 {% block footer_scripts %}
-<script type="text/javascript">
-  $('.recent-message-item').click(function() {
-    window.location.href = $(this).attr('href');
-  })
-</script>
+  <input type="hidden" id="user-id" name="name" value="{{ user.id }}">
+  <input type="hidden" id="friend-id" name="name" value="{{ friend.id }}">
 {% endblock %}

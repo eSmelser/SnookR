@@ -1,0 +1,9 @@
+{% for message in messages %}
+  {% if message.sender == user %}
+    {% include 'messaging/message.html' with message=message orientation='left' %}
+  {% elif message.receiver == user %}
+    {% include 'messaging/message.html' with message=message orientation='right' %}
+    {% else %}
+      <strong style="color:red">Error!</strong>
+  {% endif %}
+{% endfor %}

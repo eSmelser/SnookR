@@ -23,6 +23,8 @@ class MessageManager(models.Manager):
 class Message(models.Model):
     sender = models.ForeignKey('accounts.CustomUser', related_name='sender')
     receiver = models.ForeignKey('accounts.CustomUser', related_name='receiver')
+    sender_has_seen = models.BooleanField(default=False)
+    receiver_has_seen = models.BooleanField(default=False)
     text = models.TextField()
     timestamp = models.DateTimeField(auto_now=True, null=False)
 

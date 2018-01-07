@@ -1,5 +1,6 @@
 import hashlib
 
+from django.views.generic import TemplateView
 from rest_framework.generics import ListCreateAPIView, UpdateAPIView, ListAPIView, RetrieveAPIView, CreateAPIView
 from django.core.cache import caches
 from rest_framework.response import Response

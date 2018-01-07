@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from api import views
+from messaging import views as messaging_views
 
 urlpatterns = [
     url(r'^auth/user/$', views.UserView.as_view(), name='user'),
@@ -14,4 +15,6 @@ urlpatterns = [
     url(r'^search-user/$', views.SearchUserView.as_view(), name='search_user'),
     url(r'^session-event-invites/$', views.SessionEventInviteListView.as_view(), name='session_event_invite_list'),
     url(r'^session-event-invites/(?P<pk>[0-9]+)/$', views.SessionEventInviteView.as_view(), name='session_event_invite'),
+    url(r'^messaging/message/new/$', messaging_views.MessageNewView.as_view(), name='new_message'),
+    url(r'^messaging/message/$', messaging_views.MessageCreateView.as_view(), name='message-detail-create'),
 ]

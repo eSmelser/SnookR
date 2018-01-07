@@ -257,6 +257,24 @@ const api = (function () {
       })
     }
 
+    const getNewMessage = function(data) {
+      return $.get({
+          dataType: 'html',
+          url: '/api/messaging/message/new',
+          data: data,
+      });
+    }
+
+
+    const postMessage = function(data) {
+      return $.post({
+          dataType: 'html',
+          url: '/api/messaging/message/',
+          data: JSON.stringify(data),
+          contentType: 'application/json; charset=utf-8',
+      });
+    }
+
     // Return public methods for API
     return {
         baseURL,
@@ -274,6 +292,8 @@ const api = (function () {
         getSessionEventInvite,
         postSessionEventInvite,
         postSub,
+        getNewMessage,
+        postMessage,
     }
 })();
 
