@@ -1,13 +1,23 @@
 import time
+import json
 
-from collections import OrderedDict
-
-from django.views.generic import FormView, TemplateView
+from django.views.generic import FormView, TemplateView, RedirectView
 from django.shortcuts import get_object_or_404, reverse
 from django.db.models import Q, OuterRef, Subquery
 from messaging.forms import MessageForm
 from messaging.models import Message
 from accounts.models import CustomUser
+
+
+class MessagingRootView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        most_recent = Message.objects.all_related(self.request.user).order_by('-timestamp')
+        if most_recent.exists():
+            most_recent = most_recent[0]
+            friend = most_recent.get_not_user(self.request.user)
+            return reverse('messaging:messaging', kwargs={'username': friend.username})
+        else:
+            return
 
 
 class MessagingView(FormView):
@@ -56,6 +66,7 @@ class MessagingView(FormView):
 
         return messages
 
+
 class MessageNewView(TemplateView):
     template_name = 'messaging/message_list_elements.html'
 
@@ -78,29 +89,42 @@ class MessageNewView(TemplateView):
         context['messages'] = temp
         return context
 
+
 class MessageCreateView(FormView):
     template_name = 'messaging/message_list_elements.html'
     form_class = MessageForm
 
     def post(self, request, *args, **kwargs):
-        ret = super().post(request, *args, **kwargs)
-        form = self.get_form()
-        form_kwargs = self.get_form_kwargs()
-        import json
-        data = json.loads(self.request.body.decode('utf8'))
-        sender = int(data['sender'])
-        sender = CustomUser.objects.get(id=sender)
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['messages'] = [self.get_message()]
+        return context
+
+    def get_message(self, data, receiver, sender):
+        data = self.get_data()
+        sender = self.get_sender(data)
+        receiver = self.get_receiver(data)
+        message = Message.objects.create(sender=sender, receiver=receiver, text=data['text'], sender_has_seen=True)
+        return message
+
+    def get_receiver(self, data):
         receiver = int(data['receiver'])
         receiver = CustomUser.objects.get(id=receiver)
-        message = Message.objects.create(sender=sender, receiver=receiver, text=data['text'], sender_has_seen=True)
-        
-        context = super().get_context_data(**kwargs)
-        context['messages'] = [message]
-        return self.render_to_response(context, **kwargs)
+        return receiver
+
+    def get_sender(self, data):
+        sender = int(data['sender'])
+        sender = CustomUser.objects.get(id=sender)
+        return sender
+
+    def get_data(self):
+        return json.loads(self.request.body.decode('utf8'))
 
     def form_valid(self, form):
         context = super().get_context_data(**self.kwargs)
         instance = form.save()
         context['messages'] = [instance]
-        print('form_valid()')
         return self.render_to_response(context, **self.kwargs)

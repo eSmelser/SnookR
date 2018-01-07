@@ -29,3 +29,9 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True, null=False)
 
     objects = MessageManager()
+
+    def get_not_user(self, user):
+        return {
+            self.sender: self.sender,
+            self.receiver: self.receiver
+        }.get(user, None)
