@@ -1,3 +1,5 @@
+import time
+
 from collections import OrderedDict
 
 from django.views.generic import FormView, TemplateView
@@ -22,18 +24,16 @@ class MessagingView(FormView):
         context['messages'] = self.get_messages(me, myfriend)
         context['recent_messages'] = self.get_recent_messages()
         context['friend'] = myfriend
+
         return context
 
     def get_messages(self, me, myfriend):
-        messages = Message.objects.filter(Q(sender=me, receiver=myfriend) | Q(sender=myfriend, receiver=me)).order_by('timestamp')
-        for message in messages:
-            if message.receiver == me:
-                message.receiver_has_seen = True
-                message.save()
-            elif message.sender == me:
-                message.sender_has_seen = True
-                message.save()
-
+        messages = Message.objects.select_related('sender', 'receiver').filter(Q(sender=me, receiver=myfriend) | Q(sender=myfriend, receiver=me)).order_by('timestamp')
+        before = time.time()
+        messages.filter(receiver=me).update(receiver_has_seen=True)
+        messages.filter(sender=me).update(sender_has_seen=True)
+        elapsed = time.time() - before
+        print('elapsed', elapsed)
         return messages
 
     def get_initial(self):
@@ -56,7 +56,6 @@ class MessagingView(FormView):
 
         return messages
 
-
 class MessageNewView(TemplateView):
     template_name = 'messaging/message_list_elements.html'
 
@@ -64,7 +63,7 @@ class MessageNewView(TemplateView):
         context = super().get_context_data(**kwargs)
         user = CustomUser.objects.get(id=self.request.user.id)
         friend = self.request.GET.get('username')
-        messages = Message.objects.filter(Q(sender=user, receiver__username=friend) | Q(sender__username=friend, receiver=user)).order_by('timestamp')
+        messages = Message.objects.select_related('sender', 'receiver').filter(Q(sender=user, receiver__username=friend) | Q(sender__username=friend, receiver=user)).order_by('timestamp')
         temp = []
         for message in messages:
             if message.receiver == user and not message.receiver_has_seen:
