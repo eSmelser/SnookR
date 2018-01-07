@@ -1,4 +1,4 @@
-<button class="list-group-item recent-message-item" href={% url 'messaging:messaging' username=message.friend %}>
+<button class="list-group-item recent-message-item" href="{% url 'messaging:messaging' %}?username={{ message.friend }}">
   <a href="{{ message.friend.profile.get_absolute_url }}" class="pull-{{ orientation }}">
       <img class="img-circle" src="{{ message.friend.profile.thumbnail.url }}">
   </a>

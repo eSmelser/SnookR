@@ -32,6 +32,6 @@ class Message(models.Model):
 
     def get_not_user(self, user):
         return {
-            self.sender: self.sender,
-            self.receiver: self.receiver
+            self.sender: self.receiver,
+            self.receiver: self.sender
         }.get(user, None)

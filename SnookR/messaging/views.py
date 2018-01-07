@@ -1,61 +1,65 @@
-import time
 import json
 
 from django.views.generic import FormView, TemplateView, RedirectView
-from django.shortcuts import get_object_or_404, reverse
-from django.db.models import Q, OuterRef, Subquery
+from django.shortcuts import get_object_or_404, reverse, redirect
+from django.db.models import Q
+
 from messaging.forms import MessageForm
 from messaging.models import Message
 from accounts.models import CustomUser
-
-
-class MessagingRootView(RedirectView):
-    def get_redirect_url(self, *args, **kwargs):
-        most_recent = Message.objects.all_related(self.request.user).order_by('-timestamp')
-        if most_recent.exists():
-            most_recent = most_recent[0]
-            friend = most_recent.get_not_user(self.request.user)
-            return reverse('messaging:messaging', kwargs={'username': friend.username})
-        else:
-            return
 
 
 class MessagingView(FormView):
     template_name = 'messaging/messaging.html'
     form_class = MessageForm
 
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        if 'redirect_param' in context:
+            url = reverse('messaging:messaging') + '?username=' + context['redirect_param']
+            return redirect(url)
+
+        return super().get(request, *args, **kwargs)
+
     def get_success_url(self):
-        return reverse('messaging:messaging', kwargs=self.kwargs)
+        return reverse('messaging:messaging')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print('gtd')
-        if 'username' in self.request.GET:
-            print('in if')
+
+        username = self.request.GET.get('username', False)
+        context['recent_messages'] = self.get_recent_messages()
+        if username:
             context['form'] = self.get_form()
-            me, myfriend = self.get_users()
-            context['messages'] = self.get_messages(me, myfriend)
-            context['recent_messages'] = self.get_recent_messages()
-            context['friend'] = myfriend
+            user, friend = self.get_users(username)
+            context['messages'] = self.get_messages(user, friend)
+            context['friend'] = friend
+        elif context['recent_messages']:
+            username = context['recent_messages'][0].get_not_user(self.request.user).username
+            context['redirect_param'] = username
+        else:
+            print(self.__class__.__name__, 'No messages found')
+            pass
 
         return context
 
-    def get_messages(self, me, myfriend):
-        messages = Message.objects.select_related('sender', 'receiver').filter(Q(sender=me, receiver=myfriend) | Q(sender=myfriend, receiver=me)).order_by('timestamp')
+    def get_messages(self, me, friend):
+        messages = Message.objects.select_related('sender', 'receiver').filter(Q(sender=me, receiver=friend) | Q(sender=friend, receiver=me)).order_by('timestamp')
         messages.filter(receiver=me).update(receiver_has_seen=True)
         messages.filter(sender=me).update(sender_has_seen=True)
         return messages
 
     def get_initial(self):
-        if 'username' in self.request.GET:
-            sender, receiver = self.get_users()
+        username = self.request.GET.get('username', False)
+        if username:
+            sender, receiver = self.get_users(username)
             return dict(sender=sender.id, receiver=receiver.id)
         else:
             return dict()
 
-    def get_users(self):
+    def get_users(self, username):
         sender = CustomUser.objects.get(id=self.request.user.id)
-        receiver = get_object_or_404(CustomUser, username=self.request.GET.get('username'))
+        receiver = get_object_or_404(CustomUser, username=username)
         return sender, receiver
 
     def form_valid(self, form):
