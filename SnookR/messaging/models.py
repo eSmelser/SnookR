@@ -26,6 +26,6 @@ class Message(models.Model):
     sender_has_seen = models.BooleanField(default=False)
     receiver_has_seen = models.BooleanField(default=False)
     text = models.TextField()
-    timestamp = models.DateTimeField(auto_now=True, null=False)
+    timestamp = models.DateTimeField(auto_now_add=True, null=False)
 
     objects = MessageManager()
