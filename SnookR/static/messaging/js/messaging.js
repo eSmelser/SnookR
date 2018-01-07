@@ -15,6 +15,7 @@ let messaging = (function() {
   let scheduledUpdates = [];
   let userId = $('#user-id').val();
   let friendId = $('#friend-id').val();
+  let username = $('#friend-name').attr('data-friend-username');
 
   $textInput.focus();
 
@@ -27,12 +28,13 @@ let messaging = (function() {
   }
 
   const update = function() {
-    let username = $('#friend-name').attr('data-friend-username');
     api.getNewMessage({ username: username }).done(function(data) {
-       $('#messages-list').append($(data));
-       scrollDownMessageList();
+       if (data) {
+         $messagesList.append($(data));
+         scrollDownMessageList();
+       }
      }).fail(function(data) {
-       console.log('fail', data);
+       console.log('update failed', data);
      });
      scheduledUpdate = setTimeout(update, 5000);
      scheduledUpdates.push(scheduledUpdate);
@@ -67,6 +69,12 @@ let messaging = (function() {
   // Bind events
   $recentMessageItems.click(goToConversation);
   $messageTextForm.submit(sendMessage);
+  $messagesList.scroll(function(event) {
+    // Stick to bottom when new messages come up if user has scrolled to bottom manually
+    let scrollDiff = this.scrollHeight - $(this).scrollTop();
+    let height = $(this).outerHeight();
+    let scrolledToBottom = scrollDiff == Math.floor(height);
+  })
 
   document.addEventListener("turbolinks:before-visit", function() {
     unscheduleUpdates();

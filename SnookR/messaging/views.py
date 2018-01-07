@@ -93,6 +93,7 @@ class MessageCreateView(FormView):
         receiver = int(data['receiver'])
         receiver = CustomUser.objects.get(id=receiver)
         message = Message.objects.create(sender=sender, receiver=receiver, text=data['text'], sender_has_seen=True)
+        
         context = super().get_context_data(**kwargs)
         context['messages'] = [message]
         return self.render_to_response(context, **kwargs)
