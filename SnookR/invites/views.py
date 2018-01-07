@@ -89,4 +89,9 @@ class SessionEventInviteCreateView(TemplateResponseMixin, ContextMixin, ProcessF
                 # needs to be done
                 pass
 
-        return self.render_to_response(self.get_context_data(team=team, subs=subs, **kwargs))
+        context = self.get_context_data(**kwargs)
+        context['team'] = team
+        context['subs'] = subs
+        context['session'] = subs[0].session_event.session
+        context['date'] = subs[0].session_event.date
+        return self.render_to_response(context, **kwargs)
