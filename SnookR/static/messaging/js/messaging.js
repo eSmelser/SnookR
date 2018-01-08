@@ -10,6 +10,7 @@ let messaging = (function() {
   const $messageTextForm = $('#message-text-form');
   const $messagesList = $('#messages-list');
   const $textInput = $messageTextForm.find('#id_text');
+  const $recentMessageGroup = $('#recent-messages-group');
 
   // Init
   let scheduledUpdates = [];
@@ -42,11 +43,21 @@ let messaging = (function() {
 
   const unscheduleUpdates = function() {
     scheduledUpdates.map( id => clearTimeout(id) );
+    scheduledUpdates = [];
   };
 
   const goToConversation = function() {
     let href = $(this).attr('href');
     Turbolinks.visit(href);
+  };
+
+  const moveCurrentConversationToTopOfRecent = function() {
+    let $friendRecent = $recentMessageGroup.find(`[data-friend-id=${friendId}]`);
+    let $header = $recentMessageGroup.find('#recent-header');
+
+    $friendRecent.detach();
+    $header.detach();
+    $recentMessageGroup.prepend($friendRecent).prepend($header);
   };
 
   const sendMessage = function(event) {
@@ -59,12 +70,25 @@ let messaging = (function() {
 
     api.postMessage(data)
         .done(function(data) {
+          console.log('done', data);
           $messagesList.append($(data));
           scrollDownMessageList()
           $textInput.val('');
+          //moveCurrentConversationToTopOfRecent();
         }).fail(function(data) {
     });
   };
+
+  const unbindEvents = function() {
+    $recentMessageItems.unbind();
+    $messageTextForm.unbind();
+    $messagesList.unbind();
+  };
+
+  const destroy = function() {
+    unscheduleUpdates();
+    unbindEvents();
+  }
 
   // Bind events
   $recentMessageItems.click(goToConversation);
@@ -75,10 +99,7 @@ let messaging = (function() {
     let height = $(this).outerHeight();
     let scrolledToBottom = scrollDiff == Math.floor(height);
   })
-
-  document.addEventListener("turbolinks:before-visit", function() {
-    unscheduleUpdates();
-  });
+  document.addEventListener("turbolinks:before-visit", destroy);
 
   scrollDownMessageList()
   update();

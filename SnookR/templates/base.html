@@ -65,6 +65,8 @@
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
                         {% if user.is_authenticated %}
+                        <li><a data-turbolinks="false" href="{% url 'messaging:messaging' %}">Messages</a></li>
+
                         {% if perms.teams.add_team %}
                         <li><a data-turbolinks="false" href="{% url 'invites:session-event:start' %}">Invite a Sub</a></li>
 

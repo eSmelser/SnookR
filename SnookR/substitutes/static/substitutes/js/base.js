@@ -28,7 +28,7 @@ $(document).ready(function() {
         const option = $('#id_selected_option').val();
         const searchTerm = $('#id_search_field').val();
         const baseURL = window.location.origin;
-        const requestURL = baseURL + '/search/' + option + '?query=';
+        const requestURL = baseURL + '/substitutes/search/' + option + '?query=';
 
         if (searchTerm) {
             window.location.href = requestURL + searchTerm.replace(/ /g, '+');
