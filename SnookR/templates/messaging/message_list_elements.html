@@ -3,7 +3,7 @@
     {% include 'messaging/message.html' with message=message orientation='left' %}
   {% elif message.receiver == user %}
     {% include 'messaging/message.html' with message=message orientation='right' %}
-    {% else %}
+  {% else %}
       <strong style="color:red">Error!</strong>
   {% endif %}
 {% endfor %}

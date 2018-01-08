@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import FormView, TemplateView, RedirectView
 from django.shortcuts import get_object_or_404, reverse, redirect
 from django.db.models import Q
@@ -9,39 +10,39 @@ from messaging.models import Message
 from accounts.models import CustomUser
 
 
-class MessagingView(FormView):
+class MessagingView(LoginRequiredMixin, FormView):
     template_name = 'messaging/messaging.html'
     form_class = MessageForm
 
     def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        if 'redirect_param' in context:
-            url = reverse('messaging:messaging') + '?username=' + context['redirect_param']
-            return redirect(url)
-
-        return super().get(request, *args, **kwargs)
-
-    def get_success_url(self):
-        return reverse('messaging:messaging')
-
-    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         username = self.request.GET.get('username', False)
-        context['recent_messages'] = self.get_recent_messages()
         if username:
             context['form'] = self.get_form()
             user, friend = self.get_users(username)
             context['messages'] = self.get_messages(user, friend)
             context['friend'] = friend
-        elif context['recent_messages']:
-            username = context['recent_messages'][0].get_not_user(self.request.user).username
-            context['redirect_param'] = username
+        elif self.has_previous_messages():
+            return self.redirect_to_most_recent_conversation()
         else:
-            print(self.__class__.__name__, 'No messages found')
-            pass
+            context['has_previous_messages'] = False
 
-        return context
+        context['recent_messages'] = self.get_recent_messages()
+
+        return self.render_to_response(context, **kwargs)
+
+    def has_previous_messages(self):
+        return Message.objects.select_related('sender', 'receiver').filter(Q(sender=self.request.user) | Q(receiver=self.request.user)).order_by('timestamp').exists()
+
+    def redirect_to_most_recent_conversation(self):
+        url = self.recent_conversation_url()
+        return redirect(url)
+
+    def recent_conversation_url(self):
+        return reverse('messaging:messaging') + '?username=' + Message.objects.most_recent_friend_of(self.request.user).username
+
+    def get_success_url(self):
+        return reverse('messaging:messaging')
 
     def get_messages(self, user, friend):
         messages = Message.objects.select_related('sender', 'receiver').filter(Q(sender=user, receiver=friend) | Q(sender=friend, receiver=user)).order_by('timestamp')
@@ -61,10 +62,6 @@ class MessagingView(FormView):
         sender = CustomUser.objects.get(id=self.request.user.id)
         receiver = get_object_or_404(CustomUser, username=username)
         return sender, receiver
-
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
 
     def get_recent_messages(self):
         messages = Message.objects.last_message_per_user(self.request.user)

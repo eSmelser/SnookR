@@ -19,6 +19,11 @@ class MessageManager(models.Manager):
     def all_related(self, user):
         return self.select_related('sender', 'receiver').filter(Q(sender=user) | Q(receiver=user))
 
+    def most_recent_friend_of(self, user):
+        messages = self.last_message_per_user(user)
+        if messages:
+            return messages[0].get_not_user(user)
+
 
 class Message(models.Model):
     sender = models.ForeignKey('accounts.CustomUser', related_name='sender')
