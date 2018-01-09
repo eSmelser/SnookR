@@ -347,3 +347,11 @@ class MessageGetFilter(APITestCase):
         json = response.json()
         self.assertEqual(json[0]['id'], 1)
         self.assertEqual(json[-1]['id'], len(self.messages))
+
+    def test_get_range(self):
+        """Passes if the return JSON is ordered by timestamp"""
+        self.client.login(username=self.user1.username, password='password')
+        url = reverse('api:message-list')
+        response = self.client.get(url, data={'id__gt': 1, 'id__lt': 5})
+        json = response.json()
+        self.assertEqual(len(json), 3)

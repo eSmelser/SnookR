@@ -94,9 +94,12 @@ class SessionEventInviteFilter(filters.FilterSet):
         model = SessionEventInvite
         fields = ['invitee', 'event']
 
+
 class MessageFilter(filters.FilterSet):
     sender = filters.RelatedFilter(UserFilter, name='sender', queryset=CustomUser.objects.all())
     receiver = filters.RelatedFilter(UserFilter, name='receiver', queryset=CustomUser.objects.all())
+    id__gt = filters.NumberFilter(name='id', lookup_expr='gt')
+    id__lt = filters.NumberFilter(name='id', lookup_expr='lt')
 
     class Meta:
         model = Message

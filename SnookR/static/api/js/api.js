@@ -275,6 +275,14 @@ const api = (function () {
       });
     }
 
+    const getMessages = function(data) {
+          return $.get({
+          dataType: 'json',
+          url: '/api/messages/',
+          data: data,
+      });
+    };
+
     // Return public methods for API
     return {
         baseURL,
@@ -294,6 +302,7 @@ const api = (function () {
         postSub,
         getNewMessage,
         postMessage,
+        getMessages,
     }
 })();
 

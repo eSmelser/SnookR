@@ -127,6 +127,9 @@ class MessageListView(ListCreateAPIView):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     filter_class = MessageFilter
+    #filter_fields = ('sender', 'receiver', 'id', 'timestamp')
+
+
 
     def get_queryset(self):
         return super().get_queryset().filter(Q(sender=self.request.user) | Q(receiver=self.request.user))
