@@ -1,4 +1,4 @@
-<li class="list-group-item">
+<li class="list-group-item message-item" id="message-{{ message.id }}">
   <a href="{{ message.sender.profile.get_absolute_url }}" class="pull-{{ orientation }}">
       <img class="img-circle" src="{{ message.sender.profile.thumbnail.url }}">
   </a>

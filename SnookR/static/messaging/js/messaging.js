@@ -11,6 +11,8 @@ let messaging = (function() {
   const $messagesList = $('#messages-list');
   const $textInput = $messageTextForm.find('#id_text');
   const $recentMessageGroup = $('#recent-messages-group');
+  const $firstMessage = $messagesList.find('.message-item').first()
+  const $loader = $('#loader').hide();
 
   // Init
   let scheduledUpdates = [];
@@ -18,6 +20,8 @@ let messaging = (function() {
   let friendId = $('#friend-id').val();
   let username = $('#friend-name').attr('data-friend-username');
   let scrolledToBottom = true;
+  let firstMessageId = $firstMessage.attr('id').split('-').pop();
+  firstMessageId = parseInt(firstMessageId);
   $textInput.focus();
 
   const scrollDownMessageList = function() {
@@ -72,7 +76,6 @@ let messaging = (function() {
 
     api.postMessage(data)
         .done(function(data) {
-          console.log('done', data);
           $messagesList.append($(data));
           if(!scrolledToBottom) {
             scrollDownMessageList()
@@ -103,7 +106,39 @@ let messaging = (function() {
     let height = $(this).outerHeight();
     let scrolledToBottom = scrollDiff == Math.floor(height);
   })
+
   document.addEventListener("turbolinks:before-visit", destroy);
+  $messagesList.scroll(function(event) {
+    if ($(this).scrollTop() === 0) {
+      $loader.show();
+
+      let userSent = {
+        'sender__id': userId,
+        'receiver_id': friendId,
+        'id__lt': firstMessageId,
+        'id__gt': firstMessageId - 20,
+      };
+
+      let friendSent = {
+        'sender__id': friendId,
+        'receiver_id': userId,
+        'id__lt': firstMessageId,
+        'id__gt': firstMessageId - 20,
+      };
+
+      api.getMessages(userSent).done(function(userSentMessages) {
+          api.getMessages(friendSent).done(function(friendSentMessages) {
+            $loader.hide();
+
+            let messages = userSentMessages.concat(friendSentMessages);
+            messages.sort( (a, b) => a.id - b.id );
+            console.log('meseages', messages);
+          });
+      });
+    }
+  });
+
+  // Setup
   scrollDownMessageList()
   update();
 })()

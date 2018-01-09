@@ -24,6 +24,8 @@
           {% if not friend %}
             <li><strong>No messages!</strong></li>
           {% else %}
+            <div id="loader" class="text-center" style="display:none"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
+
             {% include 'messaging/message_list_elements.html' %}
           {% endif %}
         </ul>

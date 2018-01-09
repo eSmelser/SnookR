@@ -45,10 +45,13 @@ class MessagingView(LoginRequiredMixin, FormView):
         return reverse('messaging:messaging')
 
     def get_messages(self, user, friend):
-        messages = Message.objects.select_related('sender', 'receiver').filter(Q(sender=user, receiver=friend) | Q(sender=friend, receiver=user)).order_by('timestamp')
+        messages = Message.objects\
+            .select_related('sender', 'receiver')\
+            .filter(Q(sender=user, receiver=friend) | Q(sender=friend, receiver=user))\
+            .order_by('timestamp')
         messages.filter(receiver=user).update(receiver_has_seen=True)
         messages.filter(sender=user).update(sender_has_seen=True)
-        return messages
+        return messages[:20]
 
     def get_initial(self):
         username = self.request.GET.get('username', False)
@@ -78,7 +81,10 @@ class MessageNewView(TemplateView):
         context = super().get_context_data(**kwargs)
         user = CustomUser.objects.get(id=self.request.user.id)
         friend = self.request.GET.get('username')
-        messages = Message.objects.select_related('sender', 'receiver').filter(Q(sender=user, receiver__username=friend) | Q(sender__username=friend, receiver=user)).order_by('timestamp')
+        messages = Message.objects\
+            .select_related('sender', 'receiver')\
+            .filter(Q(sender=user, receiver__username=friend) | Q(sender__username=friend, receiver=user))\
+            .order_by('timestamp')
         temp = []
         for message in messages:
             if message.receiver == user and not message.receiver_has_seen:
