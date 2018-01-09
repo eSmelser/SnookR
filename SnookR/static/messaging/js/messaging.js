@@ -17,7 +17,7 @@ let messaging = (function() {
   let userId = $('#user-id').val();
   let friendId = $('#friend-id').val();
   let username = $('#friend-name').attr('data-friend-username');
-
+  let scrolledToBottom = true;
   $textInput.focus();
 
   const scrollDownMessageList = function() {
@@ -32,7 +32,9 @@ let messaging = (function() {
     api.getNewMessage({ username: username }).done(function(data) {
        if (data) {
          $messagesList.append($(data));
-         scrollDownMessageList();
+         if(!scrolledToBottom) {
+           scrollDownMessageList()
+         }
        }
      }).fail(function(data) {
        console.log('update failed', data);
@@ -72,7 +74,9 @@ let messaging = (function() {
         .done(function(data) {
           console.log('done', data);
           $messagesList.append($(data));
-          scrollDownMessageList()
+          if(!scrolledToBottom) {
+            scrollDownMessageList()
+          }
           $textInput.val('');
           //moveCurrentConversationToTopOfRecent();
         }).fail(function(data) {
@@ -101,6 +105,7 @@ let messaging = (function() {
   })
   document.addEventListener("turbolinks:before-visit", destroy);
 
+  console.log('here')
   scrollDownMessageList()
   update();
 })()
