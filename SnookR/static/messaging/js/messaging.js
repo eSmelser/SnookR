@@ -18,25 +18,60 @@ let messaging = (function() {
   let scheduledUpdates = [];
   let userId = $('#user-id').val();
   let friendId = $('#friend-id').val();
-  let username = $('#friend-name').attr('data-friend-username');
+  const friendUsername = $('#friend-username').val();
+  const userUsername = $('#user-username').val();
+  const userFullname = $('#user-name').val();
+  const friendFullname = $('#friend-name').val();
+  const userThumbnailUrl = $('#user-thumbnail-url').val();
+  const userProfileUrl = $('#user-profile-url').val();
+  const friendThumbnailUrl = $('#friend-thumbnail-url').val();
+  const friendProfileUrl = $('#friend-profile-url').val();
   let scrolledToBottom = true;
   let firstMessageId = $firstMessage.attr('id').split('-').pop();
+  let messageTemplate = $('#message-template').html();
   firstMessageId = parseInt(firstMessageId);
   $textInput.focus();
+
+  const createMessageDom = function(message) {
+    let $dom = $(messageTemplate);
+    $dom.find('.message-item').attr('id', `message-${message.id}`)
+    let senderIsFriend = message.id === friendId;
+    let href, thumbnailUrl, fullName, pullClass, timestampPullClass;
+    if (senderIsFriend) {
+      href = friendProfileUrl;
+      thumbnailUrl = friendThumbnailUrl;
+      fullName = friendFullname;
+      pullClass = 'pull-right';
+      timestampPullClass = 'pull-left';
+    } else {
+      href = userProfileUrl;
+      thumbnailUrl = userThumbnailUrl
+      fullName = userFullname;
+      pullClass = 'pull-left'
+      timestampPullClass = 'pull-right';
+    }
+    $dom.find('a').attr('href', href).addClass(pullClass);
+    $dom.find('img').attr('src', thumbnailUrl);
+    $dom.find('.message-fullname').append(fullName);
+    $dom.find('.message-fullname').addClass(pullClass);
+    $dom.find('.message-timestamp').addClass(timestampPullClass).append(message.timestamp);
+    $dom.find('.message-text').append(message.text);
+    return $dom;
+  };
 
   const scrollDownMessageList = function() {
     let dom = document.getElementById('messages-list');
     let scrollHeight = dom.scrollHeight;
-
     let $dom = $(dom);
     $dom.scrollTop(scrollHeight);
   }
 
   const update = function() {
-    api.getNewMessage({ username: username }).done(function(data) {
+    api.getNewMessage({ username: friendUsername }).done(function(data) {
        if (data) {
          $messagesList.append($(data));
-         if(!scrolledToBottom) {
+
+         if(scrolledToBottom) {
            scrollDownMessageList()
          }
        }
@@ -77,7 +112,8 @@ let messaging = (function() {
     api.postMessage(data)
         .done(function(data) {
           $messagesList.append($(data));
-          if(!scrolledToBottom) {
+          console.log('postMessage:scrolledToBottom', scrolledToBottom);
+          if(scrolledToBottom) {
             scrollDownMessageList()
           }
           $textInput.val('');
@@ -104,7 +140,7 @@ let messaging = (function() {
     // Stick to bottom when new messages come up if user has scrolled to bottom manually
     let scrollDiff = this.scrollHeight - $(this).scrollTop();
     let height = $(this).outerHeight();
-    let scrolledToBottom = scrollDiff == Math.floor(height);
+    scrolledToBottom = scrollDiff == Math.floor(height);
   })
 
   document.addEventListener("turbolinks:before-visit", destroy);
@@ -114,14 +150,14 @@ let messaging = (function() {
 
       let userSent = {
         'sender__id': userId,
-        'receiver_id': friendId,
+        'receiver__id': friendId,
         'id__lt': firstMessageId,
         'id__gt': firstMessageId - 20,
       };
 
       let friendSent = {
         'sender__id': friendId,
-        'receiver_id': userId,
+        'receiver__id': userId,
         'id__lt': firstMessageId,
         'id__gt': firstMessageId - 20,
       };
@@ -131,8 +167,14 @@ let messaging = (function() {
             $loader.hide();
 
             let messages = userSentMessages.concat(friendSentMessages);
-            messages.sort( (a, b) => a.id - b.id );
-            console.log('meseages', messages);
+            messages.sort( (a, b) => b.id - a.id );
+            messages.map( m => {
+              $messagesList.prepend(createMessageDom(m))
+            });
+
+            if (messages) {
+              firstMessageId = messages[messages.length - 1].id;
+            }
           });
       });
     }
