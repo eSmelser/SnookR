@@ -170,6 +170,8 @@ class SessionEventInviteSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
+    'Jan. 8, 2018, 6:52 a.m.'
+    timestamp = serializers.DateTimeField(format='%b. %d, %Y, %I:%M %p')
     class Meta:
         model = Message
         fields = ['receiver', 'sender', 'text', 'timestamp', 'id']

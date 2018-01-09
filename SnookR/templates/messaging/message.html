@@ -4,8 +4,8 @@
   </a>
 
   <div class="">
-      <small class="list-group-item-heading text-muted pull-{{ orientation}}">{{ message.sender.get_full_name }}</small>
-      <small class="timestamp text-muted pull-{% if orientation == 'left' %}right{% elif  orientation == 'right' %}left{% endif %}">{{ message.timestamp }}</small>
+      <small class="list-group-item-heading message-fullname text-muted pull-{{ orientation }}">{{ message.sender.get_full_name }}</small>
+      <small class="message-timestamp text-muted pull-{% if orientation == 'left' %}right{% elif  orientation == 'right' %}left{% endif %}">{{ message.timestamp }}</small>
   </div>
   <p class="message-text">{{ message.text }}</p>
 </li>

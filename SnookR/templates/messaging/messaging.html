@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="col-md-6 full-height bordered">
-        <h1 id="friend-name" data-friend-username="{{ friend.username }}">{{ friend.get_full_name }}</h1>
+        <h1>{{ friend.get_full_name }}</h1>
         <ul class="list-group .turbolinks-disable-scroll" id="messages-list">
           {% if not friend %}
             <li><strong>No messages!</strong></li>
@@ -60,6 +60,21 @@
           </div>
         </div>
 
+      <script id="message-template" type="text/template">
+        <div>
+            <li class="list-group-item message-item" id="">
+              <a href="" class="">
+                  <img class="img-circle" src="">
+              </a>
+
+              <div class="">
+                  <small class="list-group-item-heading message-fullname text-muted"></small>
+                  <small class="message-timestamp text-muted"></small>
+              </div>
+            <p class="message-text"></p>
+      </li>
+      </div>
+      </script>
 
       {% else %}
         <h3>No messages sent or received yet (TODO: place help info here)</h3>
@@ -71,5 +86,14 @@
 {% endblock %}
 {% block footer_scripts %}
   <input type="hidden" id="user-id" name="name" value="{{ user.id }}">
+  <input type="hidden" id="user-name" name="name" value="{{ user.get_full_name }}">
+  <input type="hidden" id="friend-name" name="name" value="{{ friend.get_full_name }}">
+  <input type="hidden" id="friend-username" value="{{ friend.username }}">
+  <input type="hidden" id="user-username" value="{{ user.username }}">
+
   <input type="hidden" id="friend-id" name="name" value="{{ friend.id }}">
+  <input type="hidden" id="user-profile-url" name="name" value="{{ user.profile.get_absolute_url }}">
+  <input type="hidden" id="friend-profile-url" name="name" value="{{ friend.profile.get_absolute_url }}">
+  <input type="hidden" id="user-thumbnail-url" name="name" value="{{ user.profile.thumbnail.url }}">
+  <input type="hidden" id="friend-thumbnail-url" name="name" value="{{ friend.profile.thumbnail.url }}">
 {% endblock %}

@@ -48,10 +48,10 @@ class MessagingView(LoginRequiredMixin, FormView):
         messages = Message.objects\
             .select_related('sender', 'receiver')\
             .filter(Q(sender=user, receiver=friend) | Q(sender=friend, receiver=user))\
-            .order_by('timestamp')
+            .order_by('-timestamp')
         messages.filter(receiver=user).update(receiver_has_seen=True)
         messages.filter(sender=user).update(sender_has_seen=True)
-        return messages[:20]
+        return reversed(messages[:20])
 
     def get_initial(self):
         username = self.request.GET.get('username', False)
