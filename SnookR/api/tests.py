@@ -10,7 +10,7 @@ from accounts.models import CustomUser
 from teams.models import Team
 from invites.models import TeamInvite, SessionEventInvite
 from api.serializers import SessionEventInvite
-
+from messaging.models import Message
 
 class UserListTestCase(APITestCase):
     def setUp(self):
@@ -312,3 +312,38 @@ class SessionEventInviteTestCase(APITestCase):
         response = self.client.post(url, { 'sub': {'id': self.sub.id, 'session_event': { 'id': self.sub.session_event.id }}, 'captain': {'username': self.captain.username } }, format='json')
         print(response.json())
         self.assertEqual(response.status_code, 201)
+
+
+class MessageGetFilter(APITestCase):
+    def setUp(self):
+        self.user1 = CustomUser.objects.create_user(username='joe', password='password')
+        self.user2 = CustomUser.objects.create_user(username='sue', password='password')
+        self.messages = [Message.objects.create(text='text %s' % str(i), sender=self.user1, receiver=self.user2) for i in range(10)]
+
+    def test_filter0(self):
+        self.client.login(username=self.user1.username, password='password')
+        url = reverse('api:message-list')
+        response = self.client.get(url, data={'sender__username': self.user1.username})
+        self.assertEqual(len(response.json()), len(self.messages))
+
+    def test_filter1(self):
+        self.client.login(username=self.user1.username, password='password')
+        url = reverse('api:message-list')
+        response = self.client.get(url, data={'sender__username': self.user2.username})
+        self.assertEqual(len(response.json()), 0)
+
+    def test_permission_denied(self):
+        user3 = CustomUser.objects.create_user(username='jimmy', password='password')
+        self.client.login(username=user3.username, password='password')
+        url = reverse('api:message-list')
+        response = self.client.get(url, data={'sender__username': self.user1.username})
+        self.assertEqual(len(response.json()), 0)
+
+    def test_list_order(self):
+        """Passes if the return JSON is ordered by timestamp"""
+        self.client.login(username=self.user1.username, password='password')
+        url = reverse('api:message-list')
+        response = self.client.get(url, data={'sender__username': self.user1.username})
+        json = response.json()
+        self.assertEqual(json[0]['id'], 1)
+        self.assertEqual(json[-1]['id'], len(self.messages))

@@ -6,7 +6,7 @@ from substitutes import models as main_models
 from substitutes.models import SessionEvent, Sub
 from teams.models import Team
 from invites.models import TeamInvite, SessionEventInvite
-
+from messaging.models import Message
 
 def must_have_id(data):
     if 'id' not in data:
@@ -167,3 +167,9 @@ class SessionEventInviteSerializer(serializers.HyperlinkedModelSerializer):
         captain = validated_data.get('captain')
         captain = CustomUser.objects.get(username=captain.get('username'))
         return SessionEventInvite.objects.create(sub=sub, captain=captain)
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = ['receiver', 'sender', 'text', 'timestamp', 'id']

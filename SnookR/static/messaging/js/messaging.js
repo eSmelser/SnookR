@@ -104,8 +104,6 @@ let messaging = (function() {
     let scrolledToBottom = scrollDiff == Math.floor(height);
   })
   document.addEventListener("turbolinks:before-visit", destroy);
-
-  console.log('here')
   scrollDownMessageList()
   update();
 })()

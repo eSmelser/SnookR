@@ -1,5 +1,6 @@
 import hashlib
 
+from django.db.models import Q
 from django.views.generic import TemplateView
 from rest_framework.generics import ListCreateAPIView, UpdateAPIView, ListAPIView, RetrieveAPIView, CreateAPIView
 from django.core.cache import caches
@@ -8,6 +9,7 @@ from substitutes.models import Session, SessionEvent, Sub
 from accounts.models import CustomUser
 from teams.models import Team, NonUserPlayer
 from invites.models import SessionEventInvite, TeamInvite
+from messaging.models import Message
 
 from api.serializers import (
     TeamInviteSerializer,
@@ -19,10 +21,11 @@ from api.serializers import (
     SessionEventSerializer,
     SubSerializer,
     SessionEventInviteSerializer,
+    MessageSerializer,
 )
-from api.permissions import TeamPermission, TeamInvitePermission
+from api.permissions import TeamPermission, TeamInvitePermission, MessagePermission
 from api.filters import TeamFilter, TeamInviteFilter, UserFilter, SessionFilter, SessionEventFilter, SubFilter, \
-    SessionEventInviteFilter
+    SessionEventInviteFilter, MessageFilter
 
 
 class UserView(RetrieveAPIView):
@@ -57,7 +60,7 @@ class TeamView(ListCreateAPIView):
     filter_fields = ('id', 'name')
 
 
-class TeamInviteListView(ListCreateAPIView):
+class TeamInviteListView(ListAPIView):
     queryset = TeamInvite.objects.all()
     serializer_class = TeamInviteSerializer
     permission_classes = (TeamInvitePermission,)
@@ -118,3 +121,12 @@ class SessionEventInviteView(RetrieveAPIView):
     queryset = SessionEventInvite.objects.all()
     serializer_class = SessionEventInviteSerializer
     filter_class = SessionEventInviteFilter
+
+
+class MessageListView(ListCreateAPIView):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    filter_class = MessageFilter
+
+    def get_queryset(self):
+        return super().get_queryset().filter(Q(sender=self.request.user) | Q(receiver=self.request.user))

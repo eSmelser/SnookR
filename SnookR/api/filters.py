@@ -2,6 +2,7 @@ from substitutes.models import Division, Session, SessionEvent, Sub
 from accounts.models import CustomUser
 from teams.models import Team
 from invites.models import TeamInvite, SessionEventInvite
+from messaging.models import Message
 import rest_framework_filters as filters
 
 character_filters = ['exact', 'contains', 'icontains', 'startswith']
@@ -92,3 +93,11 @@ class SessionEventInviteFilter(filters.FilterSet):
     class Meta:
         model = SessionEventInvite
         fields = ['invitee', 'event']
+
+class MessageFilter(filters.FilterSet):
+    sender = filters.RelatedFilter(UserFilter, name='sender', queryset=CustomUser.objects.all())
+    receiver = filters.RelatedFilter(UserFilter, name='receiver', queryset=CustomUser.objects.all())
+
+    class Meta:
+        model = Message
+        fields = ['sender', 'receiver', 'timestamp', 'text', 'id']
