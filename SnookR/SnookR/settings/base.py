@@ -88,7 +88,6 @@ INSTALLED_APPS = [
     'accounts',
     'invites',
     'messaging',
-    'socialauth',
 ]
 
 MIDDLEWARE = [
