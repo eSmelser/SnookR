@@ -81,6 +81,7 @@ class SessionEventInviteCreateView(TemplateResponseMixin, ContextMixin, ProcessF
         sub_ids = self.request.POST.getlist('sub')
         team = Team.objects.get(id=team_id)
         subs = Sub.objects.filter(id__in=sub_ids)
+        print('subs', subs, 'ids', sub_ids)
         for sub in subs:
             try:
                 SessionEventInvite.objects.create(team=team, sub=sub)
@@ -88,6 +89,8 @@ class SessionEventInviteCreateView(TemplateResponseMixin, ContextMixin, ProcessF
                 # This captain already invited this player to this team on this day, nothing
                 # needs to be done
                 pass
+
+        print('sub=', sub)
 
         context = self.get_context_data(**kwargs)
         context['team'] = team

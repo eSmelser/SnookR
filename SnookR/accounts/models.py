@@ -11,6 +11,7 @@ from django.core.mail import send_mail
 from django.contrib.staticfiles.templatetags.staticfiles import static
 
 from substitutes.models import Session
+from invites.models import TeamInvite, SessionEventInvite
 
 
 def thumbnail_path(instance, filename):
@@ -84,6 +85,13 @@ class CustomUser(User):
     def full_name(self):
         return str(self.first_name) + ' ' + str(self.last_name)
 
+    @cached_property
+    def team_invites(self):
+        return TeamInvite.objects.filter(invitee=self)
+
+    @cached_property
+    def session_event_invites(self):
+        return SessionEventInvite.objects.filter(sub__user__username=self.username)
 
 def generate_expiration():
     return timezone.now() + timedelta(minutes=20)

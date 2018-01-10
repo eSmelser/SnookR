@@ -17,33 +17,49 @@ class AbstractInvite(models.Model):
         abstract = True
 
 
+    @property
+    def is_closed(self):
+        return self.status != AbstractInvite.PENDING
+
+    @staticmethod
+    def human_readable_status(status):
+        for k, v in AbstractInvite.STATUS_CHOICES:
+            if status == k:
+                return v
+
+
+class InviteQuerySet(models.QuerySet):
+    def pending(self):
+        return self.filter(status=AbstractInvite.PENDING)
+
+    def approved(self):
+        return self.filter(status=AbstractInvite.APPROVED)
+
+    def declined(self):
+        return self.filter(status=AbstractInvite.DECLINED)
+
+
 class TeamInvite(AbstractInvite, models.Model):
     invitee = models.ForeignKey('accounts.CustomUser')
     team = models.ForeignKey('teams.Team')
+
+    objects = InviteQuerySet.as_manager()
 
     def __str__(self):
         return 'Invite from {} to {}'.format(self.team, self.invitee)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if self.status == TeamInvite.APPROVED and \
+        if self.status == self.APPROVED and \
                 not self.team.players.filter(username=self.invitee.username).exists():
             self.team.players.add(self.invitee)
-
-    @property
-    def is_closed(self):
-        return self.status != TeamInvite.PENDING
-
-    @staticmethod
-    def human_readable_status(status):
-        for k, v in TeamInvite.STATUS_CHOICES:
-            if status == k:
-                return v
 
 
 class SessionEventInvite(AbstractInvite, models.Model):
     sub = models.ForeignKey('substitutes.Sub')
     team = models.ForeignKey('teams.Team')
+
+    objects = InviteQuerySet.as_manager()
 
     class Meta:
         unique_together = ('sub', 'team')
