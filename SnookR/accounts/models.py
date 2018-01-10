@@ -1,14 +1,16 @@
 import random
 from datetime import timedelta
+
 from django.contrib.auth.models import UserManager, User
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.contrib.staticfiles.templatetags.staticfiles import static
 
 from substitutes.models import Session
-import random
 
 
 def thumbnail_path(instance, filename):
@@ -104,6 +106,7 @@ class UserProfile(models.Model):
     thumbnail = models.ImageField(upload_to=thumbnail_path, null=True)
     activation_key = models.CharField(max_length=6, default=generate_key)
     key_expires = models.DateTimeField(default=generate_expiration)
+    image_url = models.URLField()
 
     def __str__(self):
         return self.user.username + "'s Profile"
@@ -116,3 +119,29 @@ class UserProfile(models.Model):
         self.activation_key = generate_key()
         self.key_expires = generate_expiration()
         self.save()
+
+    @property
+    def thumbnail_url(self):
+        """Returns user's thumbnail url.
+
+        Uploaded image takes precedence, followed by any image url saved (e.g, from social auth), followed by the
+        placeholder.
+        """
+        if self.thumbnail:
+            return self.thumbnail.url
+        elif self.image_url:
+            return self.image_url
+        else:
+            return static('substitutes/images/default_profile.jpg')
+
+    def send_confirmation_email(self):
+        activation_key = self.activation_key
+        key_expires = self.key_expires
+        dummy_message = '{} {} {} {}'.format(self.user.first_name, self.user.username, activation_key, key_expires)
+        send_mail(
+            'Subject here',
+            dummy_message,
+            'from@example.com',
+            [self.user.email],
+            fail_silently=False,
+        )

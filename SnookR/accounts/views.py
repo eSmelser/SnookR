@@ -109,8 +109,8 @@ def signup(request):
             phone_number = form.cleaned_data.get('phone_number') or None
             user = authenticate(username=username, password=raw_password, email=email, first_name=first_name,
                                 last_name=last_name)
-            UserProfile.objects.create(user=user, phone_number=phone_number)
-            send_confirmation_email(CustomUser.objects.get(id=user.id))
+            profile = UserProfile.objects.create(user=user, phone_number=phone_number)
+            profile.send_confirmation_email()
 
             if settings.DEBUG:
                 login(request, user)

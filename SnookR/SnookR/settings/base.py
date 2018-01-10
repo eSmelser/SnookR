@@ -78,8 +78,8 @@ INSTALLED_APPS = [
     'rest_framework_filters',
     'crispy_forms',
     'webpack_loader',
-#    'social_django'
     'social.apps.django_app.default',
+    'social_django',
     'substitutes',
     'home',
     'api',
@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     'accounts',
     'invites',
     'messaging',
+    'socialauth',
 ]
 
 MIDDLEWARE = [
@@ -210,3 +211,16 @@ SOCIAL_AUTH_GOOGLE_PLUS_SECRET = os.environ.get('SOCIAL_AUTH_GOOGLE_PLUS_SECRET'
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1009983052717-p0kkq51lb676cf6ecgjo0vum6lvlmvr3.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET', None)
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'socialauth.pipeline.save_profile',
+)
