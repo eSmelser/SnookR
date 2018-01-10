@@ -27,9 +27,13 @@ let messaging = (function() {
   const friendThumbnailUrl = $('#friend-thumbnail-url').val();
   const friendProfileUrl = $('#friend-profile-url').val();
   let scrolledToBottom = true;
-  let firstMessageId = $firstMessage.attr('id').split('-').pop();
+
+  let firstMessageId;
+  if ($firstMessage.length > 0) {
+    firstMessageId = $firstMessage.attr('id').split('-').pop();
+    firstMessageId = parseInt(firstMessageId);
+  }
   let messageTemplate = $('#message-template').html();
-  firstMessageId = parseInt(firstMessageId);
   $textInput.focus();
 
   const createMessageDom = function(message) {
@@ -172,7 +176,7 @@ let messaging = (function() {
               $messagesList.prepend(createMessageDom(m))
             });
 
-            if (messages) {
+            if (messages.length > 0) {
               firstMessageId = messages[messages.length - 1].id;
             }
           });

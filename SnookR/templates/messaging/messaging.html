@@ -9,7 +9,6 @@
   <div class="container" id="main-content">
     <div class="row full-height main-row">
     {% if friend %}
-
       <div class="col-md-4 full-height bordered">
         <div class="list-group" id="recent-messages-group">
           <h4 id="recent-header">Previous messages</h4>
@@ -38,7 +37,7 @@
       </div>
         <div class="col-md-2 right-column full-height bordered">
           <div class="text-center">
-            <img id="right-column-thumbnail"class="img-circle text-center" src="{{ friend.profile.thumbnail.url }}" href="{{ friend.profile.get_absolute_url }}">
+            <img id="right-column-thumbnail"class="img-circle text-center" src="{{ friend.profile.thumbnail_url }}" href="{{ friend.profile.get_absolute_url }}">
             <h1><a href="{{ friend.profile.get_absolute_url }}">{{ friend.get_full_name }}</a></h1>
             {% if friend.managed_teams.all %}<small><h4>Team Captain</h4></small>{% endif %}
             <p>
@@ -79,7 +78,6 @@
       {% else %}
         <h3>No messages sent or received yet (TODO: place help info here)</h3>
       {% endif %}
-
     </div>
 
   </div>
@@ -94,6 +92,6 @@
   <input type="hidden" id="friend-id" name="name" value="{{ friend.id }}">
   <input type="hidden" id="user-profile-url" name="name" value="{{ user.profile.get_absolute_url }}">
   <input type="hidden" id="friend-profile-url" name="name" value="{{ friend.profile.get_absolute_url }}">
-  <input type="hidden" id="user-thumbnail-url" name="name" value="{{ user.profile.thumbnail.url }}">
-  <input type="hidden" id="friend-thumbnail-url" name="name" value="{{ friend.profile.thumbnail.url }}">
+  <input type="hidden" id="user-thumbnail-url" name="name" value="{{ user.profile.thumbnail_url }}">
+  <input type="hidden" id="friend-thumbnail-url" name="name" value="{{ friend.profile.thumbnail_url }}">
 {% endblock %}
