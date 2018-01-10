@@ -82,12 +82,16 @@ class CustomUser(User):
     def full_name(self):
         return str(self.first_name) + ' ' + str(self.last_name)
 
-    def random_username(self):
+    @staticmethod
+    def random_username(first_name, last_name):
+        username = first_name + last_name
+        for _ in range(4):
+            num = random.randint(0, 9)
+            username += str(num)
+
         qs = CustomUser.objects.all()
-        numbers = ''.join(random.randint(0, 9) for _ in range(4))
-        username = ''.join(self.full_name.split()) + numbers
         if qs.filter(username=username).exists():
-            return self.random_username()
+            return CustomUser.random_username(first_name, last_name)
         else:
             return username
 

@@ -39,17 +39,8 @@
                 <input type="submit" value="login" id="id_submit_button" class="btn btn-default"/>
                 <input type="hidden" name="next" value="{{ next }}"/>
             </form>
-        <div id="google-plus-button">Google+ Sign In</div>
+       <a href="{% url 'social:begin' 'google-oauth2' %}?next={% url 'home' %}">Login with Google</a>
     </div>
     </div>
 </div>
-{% endblock %}
-
-{% block footer_scripts %}
-    <script src="https://apis.google.com/js/api:client.js"></script>
-    <script type="text/javascript">
-        const context = {};
-        context.SOCIAL_AUTH_GOOGLE_PLUS_KEY = '{{ SOCIAL_AUTH_GOOGLE_PLUS_KEY }}';
-    </script>
-    {% render_bundle 'google' %}
 {% endblock %}

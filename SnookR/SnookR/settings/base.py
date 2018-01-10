@@ -78,6 +78,8 @@ INSTALLED_APPS = [
     'rest_framework_filters',
     'crispy_forms',
     'webpack_loader',
+#    'social_django'
+    'social.apps.django_app.default',
     'substitutes',
     'home',
     'api',
@@ -114,6 +116,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
                 'accounts.context_processors.custom_user',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -181,7 +185,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # The url the user gets redirected to after logging in
-LOGIN_REDIRECT_URL = 'home'  # TODO:  Change this to something appropriate
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
 
 # django-crispy-forms settings
 CRISPY_TEMPLATE_PACK = 'bootstrap'
@@ -196,9 +201,13 @@ WEBPACK_LOADER = {
 }
 
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.google.GooglePlusAuth',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.google.GoogleOpenId',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 SOCIAL_AUTH_GOOGLE_PLUS_KEY = '60090028776-7jav6e3mngfdpeenfkk4172mjg0vhegn.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_PLUS_SECRET = os.environ.get('SOCIAL_AUTH_GOOGLE_PLUS_SECRET', None)
 
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1009983052717-p0kkq51lb676cf6ecgjo0vum6lvlmvr3.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET', None)
