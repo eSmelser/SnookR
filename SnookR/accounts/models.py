@@ -82,19 +82,6 @@ class CustomUser(User):
     def full_name(self):
         return str(self.first_name) + ' ' + str(self.last_name)
 
-    @staticmethod
-    def random_username(first_name, last_name):
-        username = first_name + last_name
-        for _ in range(4):
-            num = random.randint(0, 9)
-            username += str(num)
-
-        qs = CustomUser.objects.all()
-        if qs.filter(username=username).exists():
-            return CustomUser.random_username(first_name, last_name)
-        else:
-            return username
-
 
 def generate_expiration():
     return timezone.now() + timedelta(minutes=20)
@@ -126,6 +113,6 @@ class UserProfile(models.Model):
         return reverse('profile', kwargs={'username': self.user.username})
 
     def reset_key(self):
-        self.activation_key = self.generate_key()
-        self.key_expires = self.generate_expiration()
+        self.activation_key = generate_key()
+        self.key_expires = generate_expiration()
         self.save()
