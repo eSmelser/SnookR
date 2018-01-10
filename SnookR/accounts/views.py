@@ -9,9 +9,15 @@ from accounts.forms import CustomUserLoginForm, CustomUserChangeForm, CustomUser
 from accounts.models import CustomUser, UserProfile
 from accounts.emails import send_confirmation_email
 
+
 class LoginView(auth_views.LoginView):
     authentication_form = CustomUserLoginForm
     template_name = 'accounts/login.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['SOCIAL_AUTH_GOOGLE_PLUS_KEY'] = settings.SOCIAL_AUTH_GOOGLE_PLUS_KEY
+        return context
 
 
 class AccountView(FormView):

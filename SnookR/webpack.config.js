@@ -12,6 +12,7 @@ module.exports = {
         'session-event': './static/substitutes/js/session-event.js',
         'session-event-select': './static/substitutes/js/session-event-select.js',
         'messaging': './static/messaging/js/messaging.js',
+        'google': './static/socialauth/js/google.js',
     },
 
     output: {

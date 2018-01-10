@@ -86,6 +86,7 @@ INSTALLED_APPS = [
     'accounts',
     'invites',
     'messaging',
+    'socialauth',
 ]
 
 MIDDLEWARE = [
@@ -193,3 +194,11 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
     }
 }
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GooglePlusAuth',
+)
+
+SOCIAL_AUTH_GOOGLE_PLUS_KEY = '60090028776-7jav6e3mngfdpeenfkk4172mjg0vhegn.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_PLUS_SECRET = os.environ.get('SOCIAL_AUTH_GOOGLE_PLUS_SECRET', None)
+

@@ -8,6 +8,7 @@ from django.utils.functional import cached_property
 from django.utils import timezone
 
 from substitutes.models import Session
+import random
 
 
 def thumbnail_path(instance, filename):
@@ -77,14 +78,27 @@ class CustomUser(User):
     def get_absolute_url(self):
         return reverse('profile', kwargs={'username': self.username})
 
-    def get_full_name(self):
+    @cached_property
+    def full_name(self):
         return str(self.first_name) + ' ' + str(self.last_name)
+
+    def random_username(self):
+        qs = CustomUser.objects.all()
+        numbers = ''.join(random.randint(0, 9) for _ in range(4))
+        username = ''.join(self.full_name.split()) + numbers
+        if qs.filter(username=username).exists():
+            return self.random_username()
+        else:
+            return username
+
 
 def generate_expiration():
     return timezone.now() + timedelta(minutes=20)
 
+
 def generate_key():
     return ''.join(str(random.randint(0, 9)) for _ in range(6))
+
 
 class UserProfile(models.Model):
     """User profiles are used to extend the User model with more fields, but not to change

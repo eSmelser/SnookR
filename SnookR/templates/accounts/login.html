@@ -4,15 +4,16 @@
 -->
 
 {% extends 'base.html' %}
-
+{% block head %}
+  <meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
+{% endblock %}
 {% block title %}Login{% endblock %}
+{% load render_bundle from webpack_loader %}
 
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-md-2">
-        </div>
-        <div class="col-md-8"><h2>Login</h2>
+        <div class="col-md-8 col-md-offset2"><h2>Login</h2>
             {% if form.errors %}
             <p>Your username and password didn't match. Please try again.</p>
             {% endif %}
@@ -38,6 +39,17 @@
                 <input type="submit" value="login" id="id_submit_button" class="btn btn-default"/>
                 <input type="hidden" name="next" value="{{ next }}"/>
             </form>
-        </div>
+        <div id="google-plus-button">Google+ Sign In</div>
     </div>
-    {% endblock %}
+    </div>
+</div>
+{% endblock %}
+
+{% block footer_scripts %}
+    <script src="https://apis.google.com/js/api:client.js"></script>
+    <script type="text/javascript">
+        const context = {};
+        context.SOCIAL_AUTH_GOOGLE_PLUS_KEY = '{{ SOCIAL_AUTH_GOOGLE_PLUS_KEY }}';
+    </script>
+    {% render_bundle 'google' %}
+{% endblock %}
