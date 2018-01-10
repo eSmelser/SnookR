@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-md-2 pull-left">
             {% if player.profile.thumbnail %}
-                <img class="img-thumbnail img-circle" width=75 height=75 src="{{ player.profile.thumbnail.url }}">
+                <img class="img-thumbnail img-circle" width=75 height=75 src="{{ player.profile.thumbnail_url }}">
             {% else %}
                 <img class="img-thumbnail img-circle" width=75 height=75 src="{% static 'substitutes/images/default_profile.jpg' %}">
             {% endif %}

@@ -25,7 +25,7 @@ class CustomUserSerializer(serializers.Serializer):
         """Add the instance's URL to the returned json."""
         json = super().to_representation(instance)
         json['url'] = instance.get_absolute_url
-        json['thumbnail_url'] = instance.profile.thumbnail.url if instance.profile else None
+        json['thumbnail_url'] = instance.profile.thumbnail_url if instance.profile else None
         json['is_captain'] = instance.has_perm('teams.add_team')
         request = self.context.get('request', False)
         if request:
