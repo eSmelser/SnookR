@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^substitutes/', include('substitutes.urls')),
     url(r'^messaging/', include('messaging.urls', namespace='messaging')),
     url(r'^auth/', include('social_django.urls', namespace='social')),
+    url(r'^socialauth/', include('socialauth.urls', namespace='socialauth')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:

@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from django.http import HttpResponse
+from django.views.generic import View
 
-# Create your views here.
+
+class FacebookAuthView(View):
+    def post(self, request, *args, **kwargs):
+        print(self, request, args, kwargs)
+        print(request.POST)
+        return HttpResponse('Posted')
