@@ -1,18 +1,21 @@
-import random
-
-
 from django.db import models
 from accounts.models import CustomUser, UserProfile
 
 
-
 class FacebookAuthQuerySet(models.QuerySet):
-    def create_user(self, first_name, last_name, email, facebook_id, image_url):
-        username = CustomUser.unique_username(first_name, last_name)
-        user = CustomUser.objects.create(username=username, first_name=first_name, last_name=last_name, email=email)
-        profile = UserProfile.objects.create(user=user, image_url=image_url)
-        profile.send_confirmation_email()
-        return self.objects.create(user=user, facebook_id=facebook_id)
+    def get_or_create_user(self, first_name, last_name, email, facebook_id, image_url, phone_number, thumbnail):
+        try:
+            obj = self.get(facebook_id=facebook_id)
+            created = False
+        except FacebookAuth.DoesNotExist:
+            username = CustomUser.unique_username(first_name, last_name)
+            user = CustomUser.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=facebook_id)
+            profile = UserProfile.objects.create(user=user, image_url=image_url, phone_number=phone_number, thumbnail=thumbnail)
+            profile.send_confirmation_email()
+            obj = self.create(user=user, facebook_id=facebook_id)
+            created = True
+
+        return obj, created
 
 
 class FacebookAuth(models.Model):

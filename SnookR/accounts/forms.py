@@ -8,10 +8,22 @@ from django.contrib.auth.models import User
 from django.core import validators
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import CustomUser
+from accounts.models import CustomUser, UserProfile
 
 phone_regex = validators.RegexValidator(regex=r'^\d{9,15}$',
                                         message="Phone number must be entered in the format: '999999999'. Up to 15 digits allowed.")
+
+
+class CustomUserModelForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'email']
+
+
+class UserProfileModelForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['phone_number', 'thumbnail', 'image_url']
 
 
 class CustomPasswordInput(forms.PasswordInput):

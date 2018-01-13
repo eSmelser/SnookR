@@ -54,5 +54,4 @@ class HomeView(TemplateView):
             context['sessions_count'] = len(Session.objects.all())
 
         context['teams'] = Team.get_all_related(self.request.user)
-
         return context

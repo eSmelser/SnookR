@@ -14,6 +14,7 @@ module.exports = {
         'messaging': './static/messaging/js/messaging.js',
         'google': './static/socialauth/js/google.js',
         'facebook': './static/socialauth/js/facebook.js',
+        'base': './static/js/base.js',
     },
 
     output: {

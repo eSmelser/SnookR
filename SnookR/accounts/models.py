@@ -118,11 +118,11 @@ class UserProfile(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
     )
-    phone_number = models.IntegerField(blank=True, null=True)
-    thumbnail = models.ImageField(upload_to=thumbnail_path, null=True)
+    phone_number = models.CharField(blank=True, null=True, max_length=20)
+    thumbnail = models.ImageField(upload_to=thumbnail_path, null=True, blank=True)
     activation_key = models.CharField(max_length=6, default=generate_key)
     key_expires = models.DateTimeField(default=generate_expiration)
-    image_url = models.URLField()
+    image_url = models.URLField(null=True, blank=True)
 
     def __str__(self):
         return self.user.username + "'s Profile"
