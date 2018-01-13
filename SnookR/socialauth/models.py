@@ -16,7 +16,7 @@ class FacebookAuthQuerySet(models.QuerySet):
 
 
 class FacebookAuth(models.Model):
-    user = models.ForeignKey('accounts.CustomUser')
+    user = models.ForeignKey('accounts.CustomUser', null=False)
     facebook_id = models.CharField(blank=False, max_length=32)
 
     objects = FacebookAuthQuerySet.as_manager()
