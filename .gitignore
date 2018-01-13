@@ -2,6 +2,8 @@
 SnookR/static/bundles/*.bundle.js
 SnookR/webpack-stats.json
 
+webpack-stats.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
