@@ -8,37 +8,37 @@
             <h3>Session Invites</h3>
             <h4>Pending</h4>
             {% for invite in user.session_event_invites.pending %}
-                {{ invite }}
+            {{ invite }}
             {% endfor %}
             <h4>Approved</h4>
             {% for invite in user.session_event_invites.approved %}
-                {{ invite }}
+            {{ invite }}
             {% endfor %}
             <h4>Declined</h4>
             {% for invite in user.session_event_invites.declined %}
-                {{ invite }}
+            {{ invite }}
             {% endfor %}
         </div>
         <div class="col-md-2">
         </div>
     </div>
-        <div class="row">
+    <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <h3>Team Invites</h3>
             <h4>Pending</h4>
             {% for invite in user.team_invites.pending %}
-                {{ invite }}
+            {{ invite }}
             {% endfor %}
             <h4>Approved</h4>
             {% for invite in user.team_invites.approved %}
-                {{ invite }}
+            {{ invite }}
             {% endfor %}
             <h4>Declined</h4>
             {% for invite in user.team_invites.declined %}
-                {{ invite }}
+            {{ invite }}
             {% endfor %}
         </div>
-
+    </div>
 </div>
 {% endblock %}
 

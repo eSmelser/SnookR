@@ -1,16 +1,23 @@
-<!-- 
+<!--
  Copyright &copy; 2017 Evan Smelser
  This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 -->
 
 {% extends 'base.html' %}
+{% load static %}
 {% block head %}
   <meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
+{% endblock %}
+{% block styles %}
+  <link href="{% static 'accounts/css/login.css' %}" rel='stylesheet'/>
 {% endblock %}
 {% block title %}Login{% endblock %}
 {% load render_bundle from webpack_loader %}
 
 {% block content %}
+<script id="facebook-jssdk" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.11&appId=500234237042833"></script>
+{% render_bundle 'facebook' %}
+<div id="fb-root"></div>
 <div class="container">
     <div class="row">
         <div class="col-md-8 col-md-offset2"><h2>Login</h2>
@@ -39,8 +46,19 @@
                 <input type="submit" value="login" id="id_submit_button" class="btn btn-default"/>
                 <input type="hidden" name="next" value="{{ next }}"/>
             </form>
-       <a href="{% url 'social:begin' 'google-oauth2' %}?next={% url 'home' %}">Login with Google</a>
-    </div>
+            <a href="{% url 'social:begin' 'google-oauth2' %}?next={% url 'home' %}">Login with Google</a>
+            <div class="fb-login-button" style="display:none" data-max-rows="1" data-scope="public_profile,email" data-size="medium" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="true" data-use-continue-as="false"></div>
+            <span id="loader" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
+
+            <script>
+              var finished_rendering = function() {
+                console.log("finished rendering plugins");
+                $('#loader').hide();
+                $('.fb-login-button').show();
+              }
+              FB.Event.subscribe('xfbml.render', finished_rendering);
+            </script>
+            </div>
     </div>
 </div>
 {% endblock %}

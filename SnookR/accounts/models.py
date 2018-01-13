@@ -93,6 +93,14 @@ class CustomUser(User):
     def session_event_invites(self):
         return SessionEventInvite.objects.filter(sub__user__username=self.username)
 
+    @staticmethod
+    def unique_username(first_name, last_name):
+        username = first_name + last_name
+        while CustomUser.objects.filter(username=username).exists():
+            username = first_name + last_name + ''.join(random.randint(0, 9) for _ in range(4))
+
+        return username
+
 def generate_expiration():
     return timezone.now() + timedelta(minutes=20)
 

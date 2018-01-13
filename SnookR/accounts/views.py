@@ -17,6 +17,8 @@ class LoginView(auth_views.LoginView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['SOCIAL_AUTH_GOOGLE_PLUS_KEY'] = settings.SOCIAL_AUTH_GOOGLE_PLUS_KEY
+        context['SOCIAL_AUTH_FACEBOOK_KEY'] = settings.SOCIAL_AUTH_FACEBOOK_KEY
+        context['SOCIAL_AUTH_FACEBOOK_API_VERSION'] = settings.SOCIAL_AUTH_FACEBOOK_API_VERSION
         return context
 
 

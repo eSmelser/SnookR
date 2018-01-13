@@ -13,6 +13,7 @@ module.exports = {
         'session-event-select': './static/substitutes/js/session-event-select.js',
         'messaging': './static/messaging/js/messaging.js',
         'google': './static/socialauth/js/google.js',
+        'facebook': './static/socialauth/js/facebook.js',
     },
 
     output: {
