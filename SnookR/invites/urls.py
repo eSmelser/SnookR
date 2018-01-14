@@ -10,5 +10,6 @@ session_event_patterns = ([
 ], 'session-event')
 
 urlpatterns = [
+    url(r'^invites/$', views.InviteListView.as_view(), name='invites-list'),
     url(r'^session-event/', include(session_event_patterns)),
 ]

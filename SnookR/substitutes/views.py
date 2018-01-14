@@ -15,9 +15,10 @@ from rest_framework.renderers import JSONRenderer
 
 from accounts.models import CustomUser
 from api import serializers
-from substitutes.models import Division, Session, SessionEvent, Sub
 from invites.models import SessionEventInvite
+from substitutes.models import Division, Session, SessionEvent, Sub
 from teams.models import Team
+
 
 class DivisionListView(TemplateView):
     template_name = 'substitutes/divisions.html'
@@ -147,10 +148,6 @@ class SessionUnregisterView(RedirectView, SessionViewMixin):
         session = get_object_or_404(Session, slug=kwargs.get('session'), division__slug=kwargs.get('division'))
         session.remove_user_as_sub(self.request.user, date=date)
         return reverse('home')
-
-
-class InviteListView(TemplateView):
-    template_name = 'substitutes/invites.html'
 
 
 class SearchView(TemplateView):

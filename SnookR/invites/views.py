@@ -1,12 +1,17 @@
 import itertools
+
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.views import View
+from django.views.generic import TemplateView
 from django.views.generic.base import TemplateView
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse
-from django.views.generic.edit import ProcessFormView
+from django.urls import reverse, reverse_lazy
+from django.views.generic.edit import ProcessFormView, FormView
 from django.views.generic.base import TemplateResponseMixin, ContextMixin
 from django.db import IntegrityError
-from invites.models import SessionEventInvite
+
+from invites.forms import TeamInviteForm
+from invites.models import SessionEventInvite, TeamInvite
 from substitutes.models import SessionEvent, Sub, Session
 from api.serializers import SessionEventSerializer, SubSerializer
 from rest_framework.renderers import JSONRenderer
@@ -90,11 +95,44 @@ class SessionEventInviteCreateView(TemplateResponseMixin, ContextMixin, ProcessF
                 # needs to be done
                 pass
 
-        print('sub=', sub)
-
         context = self.get_context_data(**kwargs)
         context['team'] = team
         context['subs'] = subs
         context['session'] = subs[0].session_event.session
         context['date'] = subs[0].session_event.date
         return self.render_to_response(context, **kwargs)
+
+
+class InviteListView(FormView):
+    template_name = 'invites/invites_list.html'
+    success_url = reverse_lazy('invites:invites-list')
+
+    def get_form(self, form_class=None):
+        if self.request.method == 'GET':
+            return None
+
+        return super().get_form(form_class)
+
+    def form_valid(self, form):
+        model_class = self.get_model_class()
+        obj = model_class.objects.get(**form.cleaned_data)
+        obj.approve()
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return HttpResponseBadRequest('Bad post data')
+
+    def get_form_class(self):
+        print(self.request.POST)
+        if 'team' in self.request.POST:
+            return TeamInviteForm
+        if 'sub' in self.request.POST:
+            #return SessionEventInviteForm
+            pass
+
+    def get_model_class(self):
+        if 'team' in self.request.POST:
+            return TeamInvite
+        if 'sub' in self.request.POST:
+            return SessionEventInvite
+

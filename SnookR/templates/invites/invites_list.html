@@ -8,15 +8,15 @@
             <h3>Session Invites</h3>
             <h4>Pending</h4>
             {% for invite in user.session_event_invites.pending %}
-            {{ invite }}
+                {{ invite }}
             {% endfor %}
             <h4>Approved</h4>
             {% for invite in user.session_event_invites.approved %}
-            {{ invite }}
+                {{ invite }}
             {% endfor %}
             <h4>Declined</h4>
             {% for invite in user.session_event_invites.declined %}
-            {{ invite }}
+                {{ invite }}
             {% endfor %}
         </div>
         <div class="col-md-2">
@@ -27,15 +27,22 @@
             <h3>Team Invites</h3>
             <h4>Pending</h4>
             {% for invite in user.team_invites.pending %}
-            {{ invite }}
+                {{ invite }}
+                <form action="." method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="invite-type" value="team">
+                    <input type="hidden" name="team" value="{{ invite.team.id }}">
+                    <input type="hidden" name="invitee" value="{{ invite.invitee.id }}">
+                    <input class="btn btn-default" type="submit" name="submit" value="Accept">
+                </form>
             {% endfor %}
             <h4>Approved</h4>
             {% for invite in user.team_invites.approved %}
-            {{ invite }}
+                {{ invite }}
             {% endfor %}
             <h4>Declined</h4>
             {% for invite in user.team_invites.declined %}
-            {{ invite }}
+                {{ invite }}
             {% endfor %}
         </div>
     </div>
@@ -43,7 +50,4 @@
 {% endblock %}
 
 {% block footer_scripts %}
-<script src="{% static 'substitutes/js/utils.js' %}"></script>
-<script src="{% static 'api/js/api.js' %}"></script>
-<script src="{% static 'substitutes/js/invites.js' %}"></script>
 {% endblock %}

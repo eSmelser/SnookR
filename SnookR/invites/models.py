@@ -27,6 +27,10 @@ class AbstractInvite(models.Model):
             if status == k:
                 return v
 
+    def approve(self):
+        self.status = AbstractInvite.APPROVED
+        self.save()
+
 
 class InviteQuerySet(models.QuerySet):
     def pending(self):

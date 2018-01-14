@@ -4,10 +4,11 @@
 from django.conf.urls import url
 from django.conf import settings
 from django.conf.urls.static import static
+
+import invites.views
 from substitutes import views
 
 urlpatterns = [
-    url(r'^invites/$', views.InviteListView.as_view(), name='invites'),
     url(r'^divisions/$', views.DivisionListView.as_view(), name='divisions'),
     url(r'^divisions/(?P<division>[\w-]+)/$', views.DivisionView.as_view(), name='division'),
     url(r'^divisions/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/$', views.SessionView.as_view(), name='session'),
