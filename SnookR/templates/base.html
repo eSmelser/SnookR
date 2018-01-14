@@ -69,20 +69,17 @@
                         {% if user.is_authenticated %}
                         <li><a data-turbolinks="false" href="{% url 'messaging:messaging' %}">Messages</a></li>
 
-                        {% if perms.teams.add_team %}
-                        <li><a data-turbolinks="false" href="{% url 'invites:session-event:start' %}">Invite a Sub</a></li>
+                            {% if perms.teams.add_team %}
+                                <li><a data-turbolinks="false" href="{% url 'invites:session-event:start' %}">Invite a Sub</a></li>
+                            {% endif %}
 
-                        {% endif %}
-
-                        <li><a data-turbolinks="false" href="{% url 'invites:invites-list' %}" id="id_invites_link">Invites <span class="badge"
-                                                                                             id="id_invites_badge">{{ user.invites_count }}</span></a>
-                        </li>
-                        <li><a data-turbolinks="false" href="{% url 'divisions' %}" id="id_divisions_link">Divisions</a></li>
-                        <li><a data-turbolinks="false" href="{% url 'team' %}" id="id_teams_link">Teams</a></li>
-
-                        <li><a><em>Signed in as</em> <strong>{{ user.username }}</strong></a></li>
-                        <li><a data-turbolinks="false" id='id_logout_link' href="{% url 'logout' %}">Logout</a></li>
-                        <li><a data-turbolinks="false" id="id_account_link" href="{% url 'account' %}">My Account</a></li>
+                            <li><a data-turbolinks="false" href="{% url 'invites:invites-list' %}" id="id_invites_link">Invites <span class="badge"
+                                                                                                 id="id_invites_badge">{{ user.invites_count }}</span></a>
+                            </li>
+                            <li><a data-turbolinks="false" href="{% url 'divisions' %}" id="id_divisions_link">Divisions</a></li>
+                            <li><a data-turbolinks="false" href="{% url 'team' %}" id="id_teams_link">Teams</a></li>
+                            <li><a data-turbolinks="false" id='id_logout_link' href="{% url 'logout' %}">Logout</a></li>
+                            <li><a data-turbolinks="false" id="id_account_link" href="{% url 'account' %}">My Account</a></li>
                         {% else %}
                         <li><a data-turbolinks="false" id='id_login_link' href="{% url 'login' %}">Login</a></li>
                         <li><a data-turbolinks="false" id="id_signup_link" href="{% url 'signup' %}">Signup</a></li>

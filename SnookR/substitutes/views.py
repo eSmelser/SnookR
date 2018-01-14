@@ -216,6 +216,7 @@ class SessionEventDetailView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        print('getcon')
         context['session_event'] = get_object_or_404(SessionEvent, id=self.kwargs.get('session_event'))
         subs = Sub.objects.filter(session_event=context['session_event'])
         if not self.request.user.is_authenticated():
@@ -228,6 +229,7 @@ class SessionEventDetailView(FormView):
             except Sub.DoesNotExist:
                 context['current_user_sub'] = None
 
+        print(context)
         return context
 
     def form_valid(self, form):

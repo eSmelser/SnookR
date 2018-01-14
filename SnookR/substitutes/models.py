@@ -90,8 +90,8 @@ class SessionEvent(models.Model):
 
     @property
     def get_absolute_url(self):
-        kwargs = {'division': self.session.division.slug, 'session': self.session.slug}
-        return reverse('session', kwargs=kwargs) + '?sessionEventId=' + str(self.id)
+        kwargs = {'division': self.session.division.slug, 'session': self.session.slug, 'session_event': self.id}
+        return reverse('session-event-detail', kwargs=kwargs)
 
 
 class Sub(models.Model):
