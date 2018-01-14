@@ -93,6 +93,10 @@ class CustomUser(User):
     def session_event_invites(self):
         return SessionEventInvite.objects.filter(sub__user__username=self.username)
 
+    @property
+    def invites_count(self):
+        return self.session_event_invites.pending().count() + self.team_invites.pending().count()
+
     @staticmethod
     def unique_username(first_name, last_name):
         username = first_name + last_name

@@ -10,7 +10,7 @@ from django.views.generic.edit import ProcessFormView, FormView
 from django.views.generic.base import TemplateResponseMixin, ContextMixin
 from django.db import IntegrityError
 
-from invites.forms import TeamInviteForm
+from invites.forms import TeamInviteForm, SessionEventInviteForm
 from invites.models import SessionEventInvite, TeamInvite
 from substitutes.models import SessionEvent, Sub, Session
 from api.serializers import SessionEventSerializer, SubSerializer
@@ -107,12 +107,6 @@ class InviteListView(FormView):
     template_name = 'invites/invites_list.html'
     success_url = reverse_lazy('invites:invites-list')
 
-    def get_form(self, form_class=None):
-        if self.request.method == 'GET':
-            return None
-
-        return super().get_form(form_class)
-
     def form_valid(self, form):
         model_class = self.get_model_class()
         obj = model_class.objects.get(**form.cleaned_data)
@@ -120,19 +114,25 @@ class InviteListView(FormView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
+        print('form_invalid', form)
         return HttpResponseBadRequest('Bad post data')
+
+    def get_form(self, form_class=None):
+        if self.request.method == 'GET':
+            return None
+
+        return super().get_form(form_class)
 
     def get_form_class(self):
         print(self.request.POST)
-        if 'team' in self.request.POST:
+        if 'invitee' in self.request.POST:
             return TeamInviteForm
         if 'sub' in self.request.POST:
-            #return SessionEventInviteForm
-            pass
+            return SessionEventInviteForm
 
     def get_model_class(self):
-        if 'team' in self.request.POST:
+        if 'invitee' in self.request.POST:
             return TeamInvite
         if 'sub' in self.request.POST:
+            print('return session event invite')
             return SessionEventInvite
-
