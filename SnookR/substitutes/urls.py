@@ -19,7 +19,7 @@ urlpatterns = [
     url(r'^session-events/(?P<pk>[0-9]+)/register/$', views.SessionEventRegisterView.as_view(), name='session-event-register'),
     url(r'^session-events/(?P<pk>[0-9]+)/unregister/$', views.SessionEventUnregisterView.as_view(), name='session-event-unregister'),
     url(r'^session-events/(?P<pk>[0-9]+)/$', views.SessionEventView.as_view(), name='session-event'),
-
+    url(r'^divisions/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/session-events/(?P<session_event>[0-9]+)/$', views.SessionEventDetailView.as_view(), name='session-event-detail'),
 ]
 
 if settings.DEBUG:

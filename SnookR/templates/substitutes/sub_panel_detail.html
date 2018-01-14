@@ -1,0 +1,18 @@
+<div class="panel panel-default sub-panel" data-sub-id={{sub.id}}>
+    <div class="panel-body">
+        <div class="pull-left">
+            <a href="{{ sub.user.profile.get_absolute_url }}">
+                <img class="img-circle" width="50px" height="50px" style="margin-right:8px; margin-top:-5px;"
+                     src="{{ sub.user.profile.thumbnail_url }}">
+            </a>
+        </div>
+        <h4 class="pull-left"><a href="{{ sub.user.url }}" style="text-decoration:none;"><strong>{{ sub.user.username }}</strong></a>
+          {% if sub.invited %}
+            <small id="small-invited">Invited!</small>
+          {% endif %}
+        </h4>
+        {% if perms.teams.add_team %}
+        <a href="#"><input class="invite-toggle pull-right btn btn-default" data-sub-id={{ sub.id }} type="submit" value="Invite"></a>
+        {% endif %}
+    </div>
+</div>

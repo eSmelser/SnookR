@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.views.generic import FormView
 from django.views.generic.base import TemplateView, RedirectView
 from functools import reduce
 from rest_framework.renderers import JSONRenderer
@@ -16,6 +17,7 @@ from rest_framework.renderers import JSONRenderer
 from accounts.models import CustomUser
 from api import serializers
 from invites.models import SessionEventInvite
+from substitutes.forms import SubForm
 from substitutes.models import Division, Session, SessionEvent, Sub
 from teams.models import Team
 
@@ -204,3 +206,40 @@ class SessionEventView(TemplateView):
                 context['current_user_sub'] = None
 
         return context
+
+
+class SessionEventDetailView(FormView):
+    template_name = 'substitutes/session_event_detail.html'
+
+    def get_success_url(self):
+        return self.request.path
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['session_event'] = get_object_or_404(SessionEvent, id=self.kwargs.get('session_event'))
+        subs = Sub.objects.filter(session_event=context['session_event'])
+        if not self.request.user.is_authenticated():
+            context['subs'] = subs
+        else:
+            context['subs'] = subs.exclude(user=self.request.user)
+            context['teams'] = Team.objects.filter(team_captain=self.request.user)
+            try:
+                context['current_user_sub'] = subs.get(user=self.request.user)
+            except Sub.DoesNotExist:
+                context['current_user_sub'] = None
+
+        return context
+
+    def form_valid(self, form):
+        print('form_valid')
+        return super().form_valid(form)
+
+    def get_form(self, form_class=None):
+        if self.request.method == 'GET':
+            return None
+
+        if 'register' in self.request.POST:
+            return SubForm
+
+        return super().get_form(form_class)
+
