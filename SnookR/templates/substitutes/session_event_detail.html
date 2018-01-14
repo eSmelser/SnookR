@@ -22,8 +22,11 @@
             <div id="right-column" class="col-md-6">
               <h3 id="date-header" style="display:none"><span class="session-name">{{session_event.session.name}}</span> <small class="session-date">{{ session_event.date }}</small></h3>
               {% if not user_registered %}
-                <form action="." method="post"></form>
-                <button id="current-user-register-button" type="button" class="btn btn-default" name="button">Register</button>
+                <form action="." method="post">
+                    {%  csrf_token %}
+                    <input type="hidden" name="session-event-id" value="{{ session_event.id }}">
+                    <input id="register-button" type="submit" class="btn btn-default" name="register" value="Register"></input>
+                </form>
               {% endif %}
                 {# These are placeholders rendered in session-calendar.js #}
                 <h3 id="current-user-header" style="display:none">You are available</h3>
@@ -40,6 +43,11 @@
     </div>
 {% endblock %}
 {% block footer_scripts %}
-{% render_bundle 'session-event' %}
-
+    <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.css' %}" rel='stylesheet'/>
+    <link href="{% static 'calendar/js/fullcalendar-3.7.0/fullcalendar.print.css' %}" rel='stylesheet' media='print'/>
+    <script type="text/javascript">
+        const context = {};
+        context.sessionEvents = JSON.parse('{{ session_events|escapejs|safe }}')
+    </script>
+    {% render_bundle 'session-event-detail' %}
 {% endblock %}

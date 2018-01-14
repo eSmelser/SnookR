@@ -2,6 +2,7 @@
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 
 import itertools
+import functools
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -20,6 +21,8 @@ from invites.models import SessionEventInvite
 from substitutes.forms import SubForm
 from substitutes.models import Division, Session, SessionEvent, Sub
 from teams.models import Team
+
+from api.serializers import SessionEventSerializer
 
 
 class DivisionListView(TemplateView):
@@ -211,13 +214,15 @@ class SessionEventView(TemplateView):
 class SessionEventDetailView(FormView):
     template_name = 'substitutes/session_event_detail.html'
 
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
     def get_success_url(self):
         return self.request.path
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print('getcon')
-        context['session_event'] = get_object_or_404(SessionEvent, id=self.kwargs.get('session_event'))
+        context['session_event'] = self.get_session_event()
         subs = Sub.objects.filter(session_event=context['session_event'])
         if not self.request.user.is_authenticated():
             context['subs'] = subs
@@ -229,19 +234,55 @@ class SessionEventDetailView(FormView):
             except Sub.DoesNotExist:
                 context['current_user_sub'] = None
 
-        print(context)
+        context['session_events'] = self.get_session_events()
         return context
+
+    @functools.lru_cache(maxsize=None)
+    def get_session_event(self):
+        return get_object_or_404(SessionEvent, id=self.kwargs.get('session_event'))
+
+    def get_session_events(self):
+        event = self.get_session_event()
+        month = event.date.month
+        session = event.session
+        events = SessionEvent.objects.filter(session=session, date__month=month)
+        serializer = SessionEventSerializer(events, many=True)
+        return JSONRenderer().render(serializer.data)
 
     def form_valid(self, form):
         print('form_valid')
         return super().form_valid(form)
 
+    def form_invalid(self, form):
+        print('inval', self.request.POST)
+        print(form)
+        return super().form_invalid(form)
+
+    def get_form_kwargs(self):
+        ret = super().get_form_kwargs()
+        if self.is_register_post():
+            ret['data'] = self.get_register_form_data()
+
+        return ret
+
+    def get_register_form_data(self):
+        return {
+            'user': self.request.user.id,
+            'date': self.get_session_event().date,
+            'session_event': self.get_session_event().id,
+        }
+
+    def get_form_class(self):
+        if 'register' in self.request.POST:
+            return SubForm
+
+        return super().get_form_class()
+
     def get_form(self, form_class=None):
         if self.request.method == 'GET':
             return None
 
-        if 'register' in self.request.POST:
-            return SubForm
-
         return super().get_form(form_class)
 
+    def is_register_post(self):
+        return self.request.method == 'POST' and 'register' in self.request.POST

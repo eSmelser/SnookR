@@ -15,6 +15,7 @@ module.exports = {
         'google': './static/socialauth/js/google.js',
         'facebook': './static/socialauth/js/facebook.js',
         'base': './static/js/base.js',
+        'session-event-detail': './static/substitutes/js/session-event-detail.js',
     },
 
     output: {
