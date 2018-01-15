@@ -220,7 +220,6 @@ let Handlebars = require('handlebars');
         showSelectedPlayerGroup: function () {
             let selector = this.getPlayerGroupSelector();
             this.$teamPlayersDiv.find(selector).show();
-            this.$teamPlayersDiv.find(selector).show();
         },
 
         hideUnselectedPlayerGroups: function () {

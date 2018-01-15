@@ -2,7 +2,8 @@ from collections import namedtuple
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.urls import reverse
-from django.views.generic import TemplateView, CreateView, RedirectView
+from django.views.generic import TemplateView, CreateView, RedirectView, FormView
+from django.views.generic.edit import ProcessFormView
 
 from teams.forms import TeamForm
 from accounts.models import CustomUser
@@ -72,8 +73,20 @@ class CreateTeamView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         return CustomUser.objects.filter(id__in=self.request.POST.getlist('player'))
 
 
-class DeleteTeamView(RedirectView):
-    def get_redirect_url(self, *args, **kwargs):
-        team = Team.objects.get(slug=kwargs.get('team'), team_captain=self.request.user, id=kwargs.get('pk'))
-        team.delete()
-        return reverse('team')
+class DeleteTeamView(TemplateView, ProcessFormView):
+    template_name = 'teams/delete_team.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['team'] = self.get_team()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if 'confirm' in self.request.POST:
+            team = self.get_team()
+            team.delete()
+
+        return redirect(reverse('team'))
+
+    def get_team(self):
+        return Team.objects.get(id=self.kwargs.get('pk'))

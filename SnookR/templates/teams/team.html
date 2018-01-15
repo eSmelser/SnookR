@@ -71,6 +71,9 @@
                               {% endfor %}
                             </div>
                         </div>
+                        <form action="{% url 'delete-team-confirmation' pk=team.id %}">
+                            <input type="submit", class="btn btn-danger" value="Delete Team">
+                        </form>
                     {% endfor %}
                     </div>
                 <div id="team-creator-div" style="display:none">
