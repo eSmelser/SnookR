@@ -18,13 +18,15 @@ from rest_framework.renderers import JSONRenderer
 from teams.models import Team
 
 
-class SessionEventStartView(TemplateView):
-    template_name = 'invites/session_event_start.html'
-
+class TeamListMixin(ContextMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['teams'] = Team.objects.filter(team_captain=self.request.user)
         return context
+
+
+class SessionEventStartView(TeamListMixin, TemplateView):
+    template_name = 'invites/session_event_start.html'
 
 
 class SessionSelectView(TemplateView):
@@ -61,6 +63,7 @@ class SessionEventSelectView(TemplateView):
         context['session_events'] = JSONRenderer().render(copy)
         return context
 
+
 class SessionEventInviteConfirmView(TemplateView):
     template_name = 'invites/session_event_invite_confirm.html'
 
@@ -68,15 +71,19 @@ class SessionEventInviteConfirmView(TemplateView):
         context = super().get_context_data(**kwargs)
         ids = self.request.GET.getlist('sub')
         team_id = self.request.GET.get('teamId')
+        print(ids)
+        print('GET', self.request.GET)
         context['subs'] = Sub.objects.filter(id__in=ids)
 
-        # We all session events in this view will be on the same date and same session.
+
+        # All session events in this view will be on the same date and same session.
         # So we just grab the first one and use that as our reference data and session
         first = context['subs'].first()
         context['date'] = first.session_event.date
         context['session'] = first.session_event.session
         context['team'] = get_object_or_404(Team, id=team_id)
         return context
+
 
 class SessionEventInviteCreateView(TemplateResponseMixin, ContextMixin, ProcessFormView):
     template_name = 'invites/session_event_invite_create.html'
@@ -136,3 +143,8 @@ class InviteListView(FormView):
         if 'sub' in self.request.POST:
             print('return session event invite')
             return SessionEventInvite
+
+
+class DirectSubInviteView(TeamListMixin, TemplateView):
+    template_name = 'invites/direct_sub_invite.html'
+

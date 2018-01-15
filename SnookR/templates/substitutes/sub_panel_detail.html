@@ -11,11 +11,28 @@
             {% if sub.invited %}
                 <small id="small-invited">Invited!</small>
             {% endif %}
+        {% spaceless %}
+            <small>
+                Invited to
+                {% for team in user.managed_teams %}
+                    {% if team.team_captain in sub.invitation_requesters %}
+                        {% if forloop.first %}
+                            {{ team }}
+                        {% elif forloop.last %}
+                            and {{ team }}
+                        {% else %}
+                            ,  {{ team }}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </small>
+        {% endspaceless %}
         </h4>
         <form action="." method="post">
             <input type="hidden" name="session_event" value="{{ session_event.id }}">
             {% csrf_token %}
             {% if perms.teams.add_team and sub.user != user %}
+                <input type="hidden" name="user" value="{{ sub.user.id }}">
                 <input class="invite-button pull-right btn btn-default" data-sub-id="{{ sub.id }}" type="submit"
                        name="invite" value="Invite">
             {% elif sub.user == user %}

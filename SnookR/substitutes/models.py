@@ -7,6 +7,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils.functional import cached_property
 
+from invites.models import SessionEventInvite
+
 
 class Division(models.Model):
     '''
@@ -129,3 +131,7 @@ class Sub(models.Model):
 
     def is_registered(self, session_event: SessionEvent):
         return self.user.is_authenticated() and Sub.objects.filter(user=self.user, session_event=session_event).exists()
+
+    def invitation_requesters(self):
+        qs = SessionEventInvite.objects.select_related('team__team_captain').filter(sub=self)
+        return [obj.team.team_captain for obj in qs]

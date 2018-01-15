@@ -8,7 +8,7 @@ from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import FormView
 from django.views.generic.base import TemplateView, RedirectView
@@ -252,12 +252,15 @@ class SessionEventDetailView(FormView):
 
     def form_valid(self, form):
         if self.is_register_post():
-            print('valid', form.cleaned_data)
-
             Sub.objects.create(**form.cleaned_data)
         elif self.is_unregister_post():
             obj = Sub.objects.get(**form.cleaned_data)
             obj.delete()
+        elif self.is_invite_post():
+            obj = Sub.objects.get(**form.cleaned_data)
+            sub_id = obj.id
+            return redirect(reverse('invites:direct-sub-invite', kwargs={'sub_id': sub_id}))
+        
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -269,7 +272,7 @@ class SessionEventDetailView(FormView):
     def get_form_kwargs(self):
         ret = super().get_form_kwargs()
         ret['data'] = {
-            'user': self.request.user.id,
+            'user': self.request.POST.get('user', self.request.user.id),
             'session_event': self.get_session_event().id,
         }
         return ret

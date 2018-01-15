@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load render_bundle from webpack_loader %}
 
 {% block title %}{{ session_event.session.name }} Subs on {{ session_event.date }}{% endblock %}
 {% block content %}
@@ -44,6 +43,4 @@
       </div>
     </div>
   </div>
-{% endblock %}
-{% block footer_scripts %}
 {% endblock %}

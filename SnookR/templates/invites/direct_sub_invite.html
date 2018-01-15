@@ -7,7 +7,7 @@ session_event_start.html{% extends 'base.html' %}
   <div class="container">
     <div class="row">
       <div class="page-header">
-        <h1>Step 1 <small>Choose your team</small></h1>
+        <h1>Choose your team to invite them to</h1>
       </div>
       <div class="col-md-2">
         <p>
@@ -21,7 +21,7 @@ session_event_start.html{% extends 'base.html' %}
       <div class="col-md-5">
         <div class="list-group">
           {% for team in teams %}
-            <a href="{% url 'invites:session-event:session-select' team_id=team.id %}" class="list-group-item">{{ team.name }}</a>
+            <a href="{% url 'invites:session-event:confirm' %}?sub={{ view.kwargs.sub_id }}&teamId={{ team.id }}" class="list-group-item">{{ team.name }}</a>
           {% endfor %}
         </div>
       </div>

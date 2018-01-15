@@ -15,7 +15,6 @@ $(document).ready(function() {
     $parent.find('.invite-status[data-invited="true"]').each(addToInvitedList);
     let params = jQuery.param({ sub: invitedList, teamId: context.teamId }, true);
     let url = $(this).attr('href');
-    console.log(url + '?' + params);
     window.location.href = url + '?' + params;
   });
 });

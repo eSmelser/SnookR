@@ -12,6 +12,7 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 
 from substitutes.models import Session
 from invites.models import TeamInvite, SessionEventInvite
+from teams.models import Team
 
 
 def thumbnail_path(instance, filename):
@@ -104,6 +105,10 @@ class CustomUser(User):
             username = first_name + last_name + ''.join(random.randint(0, 9) for _ in range(4))
 
         return username
+
+    @property
+    def managed_teams(self):
+        return Team.objects.filter(team_captain=self)
 
 def generate_expiration():
     return timezone.now() + timedelta(minutes=20)
