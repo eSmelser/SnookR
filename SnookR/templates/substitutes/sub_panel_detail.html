@@ -1,4 +1,4 @@
-<div class="panel panel-default sub-panel" data-sub-id={{sub.id}}>
+<div class="panel panel-default sub-panel" data-sub-id={{ sub.id }}>
     <div class="panel-body">
         <div class="pull-left">
             <a href="{{ sub.user.profile.get_absolute_url }}">
@@ -6,13 +6,23 @@
                      src="{{ sub.user.profile.thumbnail_url }}">
             </a>
         </div>
-        <h4 class="pull-left"><a href="{{ sub.user.url }}" style="text-decoration:none;"><strong>{{ sub.user.username }}</strong></a>
-          {% if sub.invited %}
-            <small id="small-invited">Invited!</small>
-          {% endif %}
+        <h4 class="pull-left"><a href="{{ sub.user.url }}"
+                                 style="text-decoration:none;"><strong>{{ sub.user.username }}</strong></a>
+            {% if sub.invited %}
+                <small id="small-invited">Invited!</small>
+            {% endif %}
         </h4>
-        {% if perms.teams.add_team %}
-        <a href="#"><input class="invite-toggle pull-right btn btn-default" data-sub-id={{ sub.id }} type="submit" value="Invite"></a>
-        {% endif %}
+        <form action="." method="post">
+            <input type="hidden" name="session_event" value="{{ session_event.id }}">
+            {% csrf_token %}
+            {% if perms.teams.add_team and sub.user != user %}
+                <input class="invite-button pull-right btn btn-default" data-sub-id="{{ sub.id }}" type="submit"
+                       name="invite" value="Invite">
+            {% elif sub.user == user %}
+                <input class="unregister-button pull-right btn btn-default" data-sub-id="{{ sub.id }}" type="submit"
+                       name="unregister" value="Unregister">
+            {% endif %}
+        </form>
+
     </div>
 </div>

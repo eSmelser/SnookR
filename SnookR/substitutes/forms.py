@@ -19,9 +19,9 @@ def get_instance(id_, model_class):
 
     return model_class.objects.get(id=id_)
 
+
 class SubForm(forms.Form):
     user = forms.IntegerField(required=True)
-    date = forms.DateTimeField(required=True)
     session_event = forms.IntegerField(required=True)
 
     def clean_user(self):
@@ -30,4 +30,12 @@ class SubForm(forms.Form):
 
     def clean_session_event(self):
         id_ = self.cleaned_data['session_event']
+        return get_instance(id_, SessionEvent)
+
+
+class SessionEventIdForm(forms.Form):
+    session_event = forms.IntegerField(required=True)
+
+    def clean_session_event(self):
+        id_ = self.cleaned_data['session_event_id']
         return get_instance(id_, SessionEvent)

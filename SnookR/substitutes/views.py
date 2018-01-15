@@ -18,7 +18,7 @@ from rest_framework.renderers import JSONRenderer
 from accounts.models import CustomUser
 from api import serializers
 from invites.models import SessionEventInvite
-from substitutes.forms import SubForm
+from substitutes.forms import SubForm, SessionEventIdForm
 from substitutes.models import Division, Session, SessionEvent, Sub
 from teams.models import Team
 
@@ -213,6 +213,7 @@ class SessionEventView(TemplateView):
 
 class SessionEventDetailView(FormView):
     template_name = 'substitutes/session_event_detail.html'
+    form_class = SubForm
 
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
@@ -250,39 +251,40 @@ class SessionEventDetailView(FormView):
         return JSONRenderer().render(serializer.data)
 
     def form_valid(self, form):
-        print('form_valid')
+        if self.is_register_post():
+            print('valid', form.cleaned_data)
+
+            Sub.objects.create(**form.cleaned_data)
+        elif self.is_unregister_post():
+            obj = Sub.objects.get(**form.cleaned_data)
+            obj.delete()
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        print('inval', self.request.POST)
-        print(form)
+        # TODO: Determine a reasonable response to this form being invalid.  (Could it be invalid?  We generate it via templating)
+        print('invalid', form.cleaned_data)
+        print('data', self.request.POST)
         return super().form_invalid(form)
 
     def get_form_kwargs(self):
         ret = super().get_form_kwargs()
-        if self.is_register_post():
-            ret['data'] = self.get_register_form_data()
-
-        return ret
-
-    def get_register_form_data(self):
-        return {
+        ret['data'] = {
             'user': self.request.user.id,
-            'date': self.get_session_event().date,
             'session_event': self.get_session_event().id,
         }
-
-    def get_form_class(self):
-        if 'register' in self.request.POST:
-            return SubForm
-
-        return super().get_form_class()
+        return ret
 
     def get_form(self, form_class=None):
         if self.request.method == 'GET':
             return None
 
-        return super().get_form(form_class)
+        return self.get_form_class()(**self.get_form_kwargs())
 
     def is_register_post(self):
         return self.request.method == 'POST' and 'register' in self.request.POST
+
+    def is_unregister_post(self):
+        return self.request.method == 'POST' and 'unregister' in self.request.POST
+
+    def is_invite_post(self):
+        return self.request.method == 'POST' and 'invite' in self.request.POST

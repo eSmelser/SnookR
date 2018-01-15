@@ -108,8 +108,11 @@ class Sub(models.Model):
     date = models.DateTimeField('sub date', auto_now=True)
     session_event = models.ForeignKey(SessionEvent)
 
+    class Meta:
+        unique_together = ('user', 'session_event')
+
     def __str__(self):
-        return str(self.user)
+        return '<Sub: {} @ {} on {}>'.format(self.user, self.session_event.session.name, self.session_event.date)
 
     @cached_property
     def session(self):
