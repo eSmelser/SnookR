@@ -20,7 +20,7 @@
                 <div id="calendar"></div>
             </div>
             <div id="right-column" class="col-md-6">
-                <h3 id="date-header" style="display:none"><span
+                <h3 id="date-header"><span
                         class="session-name">{{ session_event.session.name }}</span>
                     <small class="session-date">{{ session_event.date }}</small>
                 </h3>
@@ -38,6 +38,7 @@
                 {# These are placeholders rendered in session-calendar.js #}
                 <div id="current-user-panel"></div>
                 <div id='sub-list' class="post-content">
+                    <h3>Subs Available</h3>
                     {% if subs %}
                         <h3 id="sub-list-header" style="display:none">Subs Available</h3>
                     {% endif %}

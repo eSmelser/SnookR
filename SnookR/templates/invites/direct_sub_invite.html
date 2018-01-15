@@ -22,6 +22,8 @@ session_event_start.html{% extends 'base.html' %}
         <div class="list-group">
           {% for team in teams %}
             <a href="{% url 'invites:session-event:confirm' %}?sub={{ view.kwargs.sub_id }}&teamId={{ team.id }}" class="list-group-item">{{ team.name }}</a>
+          {% empty %}
+              <strong>You are not captain for any teams yet!  Click <a href="{% url 'team' %}">here</a> to create a team.</strong>
           {% endfor %}
         </div>
       </div>
