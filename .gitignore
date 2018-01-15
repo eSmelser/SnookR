@@ -1,7 +1,7 @@
 # Webpack bundles
 SnookR/static/bundles/*.bundle.js
 SnookR/webpack-stats.json
-
+*.bundle.js
 webpack-stats.json
 
 # Byte-compiled / optimized / DLL files
