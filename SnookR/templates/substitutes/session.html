@@ -10,34 +10,12 @@
     <link rel="stylesheet" href="{% static 'substitutes/css/session.css' %}">
 {% endblock %}
 
-{% block title %}Subs{% endblock %}
+{% block title %}{{ session.name }}{% endblock %}
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-md-12">
-                <div id="register-form-div"></div>
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-8 col-md-offset-2">
                 <div id="calendar"></div>
-            </div>
-            <div id="right-column" class="col-md-6">
-              <h3 id="date-header" style="display:none"><span class="session-name">{{session_event.session.name}}</span> <small class="session-date">{{ session_event.date }}</small></h3>
-              {% if not user_registered %}
-                <button id="current-user-register-button" type="button" class="btn btn-default" name="button">Register</button>
-              {% endif %}
-                {# These are placeholders rendered in session-calendar.js #}
-                <h3 id="current-user-header" style="display:none">You are available</h3>
-                <div id="current-user-panel"></div>
-                <h3 id="sub-list-header" style="display:none">Subs Available</h3>
-                <div id='sub-list' class="post-content">
-                    {% for sub in subs %}
-                        {% include 'substitutes/sub_panel_detail.html' %}
-                    {% endfor %}
-                </div>
-                <div class="col-md-2"></div>
             </div>
         </div>
     </div>
@@ -48,12 +26,7 @@
     <script type="text/javascript">
         const context = {};
         context.SESSION_NAME = "{{  session.name|escapejs|safe }}";
-        context.initialSessionEvent = JSON.parse('{{ json.session_event | escapejs }}');
-        context.initialSessionEvents = JSON.parse('{{ json.session_events | escapejs }}');
-        context.initialSubArray = JSON.parse('{{ json.subs | escapejs }}');
-        context.SESSION_SLUG = "{{ session.slug|escapejs|safe }}";
-        context.currentUser = JSON.parse('{{ json.current_user | escapejs }}');
-        context.currentUserPreviousInvites = JSON.parse('{{ json.current_user_previous_invites | escapejs }}');
+        context.sessionEvents = JSON.parse('{{ json.session_events | escapejs }}');
     </script>
-    {# % render_bundle 'session-calendar' % #}
+    {% render_bundle 'session-event-detail' %}
 {% endblock %}
