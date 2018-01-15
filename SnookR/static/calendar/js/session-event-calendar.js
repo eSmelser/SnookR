@@ -21,6 +21,27 @@ $(document).ready(function () {
     let minTime = new Date(Math.min(...times)).getHours() - 2 + ':00:00';
     let maxTime = new Date(Math.min(...times)).getHours() + 2 + ':00:00';
 
+    event = context.sessionEvents[0];
+    console.log(event);
+    let $subsDiv = $('.substitutes-div');
+    let $sessionName = $('.session-name');
+    let $sessionDate = $('.session-date');
+
+
+    const render = function() {
+        $subsDiv.empty();
+        if(event.subs.length === 0) {
+            $subsDiv.append('<h3>No Substitutes available!</h3>')
+        } else {
+            $sessionName.empty().append(event.session.name);
+            $sessionDate.empty().append(event.date);
+            event.subs.map( sub => new Sub(sub) )
+                      .map( sub => $subsDiv.append(sub.$dom) );
+        }
+    };
+
+    render();
+
     $('#calendar').fullCalendar({
         header: {
             left: 'prev,next today',
@@ -34,10 +55,8 @@ $(document).ready(function () {
         editable: false,
         eventLimit: true, // allow "more" link when too many events
         eventClick: function (calEvent, jsEvent, view) {
-            let event = calEvent.sessionEvent;
-            let $div = $('.substitutes-div').empty();
-            event.subs.map( sub => new Sub(sub) )
-                      .map( sub => $div.append(sub.$dom) );
+            event = calEvent.sessionEvent;
+            render();
         },
         events: context.sessionEvents.map(sessionEvent => {
             return {

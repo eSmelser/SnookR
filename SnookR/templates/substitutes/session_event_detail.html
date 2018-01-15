@@ -38,9 +38,10 @@
                 {# These are placeholders rendered in session-calendar.js #}
                 <div id="current-user-panel"></div>
                 <div id='sub-list' class="post-content">
-                    <h3>Subs Available</h3>
                     {% if subs %}
-                        <h3 id="sub-list-header" style="display:none">Subs Available</h3>
+                        <h3 id="sub-list-header">Subs Available</h3>
+                    {% else %}
+                        <h3>No other subs available on this day for this session!</h3>
                     {% endif %}
                     {% for sub in subs %}
                         {% include 'substitutes/sub_panel_detail.html' %}

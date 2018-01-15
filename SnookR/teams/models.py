@@ -42,7 +42,7 @@ class Team(models.Model):
             return []
 
     def get_delete_url(self):
-        return reverse('delete_team', args=[self.slug, self.id])
+        return reverse('delete-team-confirmation', kwargs={'pk': self.id})
 
     def add_unregistered_players(self, players):
         for player in players:
