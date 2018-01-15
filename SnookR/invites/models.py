@@ -45,7 +45,7 @@ class InviteQuerySet(models.QuerySet):
 
 class TeamInvite(AbstractInvite, models.Model):
     invitee = models.ForeignKey('accounts.CustomUser')
-    team = models.ForeignKey('teams.Team')
+    team = models.ForeignKey('teams.Team', on_delete=models.CASCADE)
 
     objects = InviteQuerySet.as_manager()
 
@@ -60,8 +60,8 @@ class TeamInvite(AbstractInvite, models.Model):
 
 
 class SessionEventInvite(AbstractInvite, models.Model):
-    sub = models.ForeignKey('substitutes.Sub')
-    team = models.ForeignKey('teams.Team')
+    sub = models.ForeignKey('substitutes.Sub', on_delete=models.CASCADE)
+    team = models.ForeignKey('teams.Team', on_delete=models.CASCADE)
 
     objects = InviteQuerySet.as_manager()
 
