@@ -4,7 +4,8 @@ from rest_framework.renderers import JSONRenderer
 
 from accounts.models import CustomUser
 from api import serializers
-from substitutes.models import Sub, Session
+from substitutes.models import Sub
+from divisions.models import Session
 from teams.models import Team
 
 

@@ -2,9 +2,9 @@
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
 
 import itertools
-import functools
 from datetime import datetime
 
+import functools
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import Http404
@@ -17,12 +17,12 @@ from rest_framework.renderers import JSONRenderer
 
 from accounts.models import CustomUser
 from api import serializers
-from invites.models import SessionEventInvite
-from substitutes.forms import SubForm, SessionEventIdForm
-from substitutes.models import Division, Session, SessionEvent, Sub
-from teams.models import Team
-
 from api.serializers import SessionEventSerializer
+from divisions.forms import SubForm
+from divisions.models import Division, Session, SessionEvent
+from invites.models import SessionEventInvite
+from substitutes.models import Sub
+from teams.models import Team
 
 
 class DivisionListView(TemplateView):

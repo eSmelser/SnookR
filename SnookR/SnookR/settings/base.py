@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'webpack_loader',
     'social.apps.django_app.default',
     'social_django',
+    'divisions',
     'substitutes',
     'home',
     'api',
@@ -89,6 +90,7 @@ INSTALLED_APPS = [
     'invites',
     'messaging',
     'socialauth',
+
 ]
 
 MIDDLEWARE = [

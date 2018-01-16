@@ -9,7 +9,7 @@ from django.test import TestCase
 
 from accounts.models import CustomUser
 from core.tests import SeleniumTestCase
-from substitutes.models import Division
+from divisions.models import Division
 from teams.models import Team, TeamInvite
 
 

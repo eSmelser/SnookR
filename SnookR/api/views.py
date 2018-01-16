@@ -5,7 +5,8 @@ from django.views.generic import TemplateView
 from rest_framework.generics import ListCreateAPIView, UpdateAPIView, ListAPIView, RetrieveAPIView, CreateAPIView
 from django.core.cache import caches
 from rest_framework.response import Response
-from substitutes.models import Session, SessionEvent, Sub
+from substitutes.models import Sub
+from divisions.models import Session, SessionEvent
 from accounts.models import CustomUser
 from teams.models import Team, NonUserPlayer
 from invites.models import SessionEventInvite, TeamInvite

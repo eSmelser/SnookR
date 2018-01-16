@@ -1,5 +1,5 @@
 from django import forms
-from substitutes.models import Division
+from divisions.models import Division
 from teams.models import Team
 
 class TeamForm(forms.ModelForm):

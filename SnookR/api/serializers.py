@@ -3,7 +3,8 @@ from rest_framework import serializers
 import accounts.models
 from accounts.models import CustomUser
 from substitutes import models as main_models
-from substitutes.models import SessionEvent, Sub
+from substitutes.models import Sub
+from divisions.models import SessionEvent
 from teams.models import Team
 from invites.models import TeamInvite, SessionEventInvite
 from messaging.models import Message

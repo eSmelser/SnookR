@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.core.mail import send_mail
 from django.contrib.staticfiles.templatetags.staticfiles import static
 
-from substitutes.models import Session
+from divisions.models import Division, Session
 from invites.models import TeamInvite, SessionEventInvite
 from teams.models import Team
 
@@ -113,6 +113,14 @@ class CustomUser(User):
     def managed_teams(self):
         # TODO: rename this property or the related name of Team model because they conflict and mean the same thing
         return Team.objects.filter(team_captain=self)
+
+    @cached_property
+    def represented_divisions(self):
+        return Division.objects.filter(division_rep=self)
+
+    @property
+    def is_division_rep(self):
+        return self.represented_divisions.exists()
 
 def generate_expiration():
     return timezone.now() + timedelta(minutes=20)

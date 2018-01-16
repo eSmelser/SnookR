@@ -1,4 +1,5 @@
-from substitutes.models import Division, Session, SessionEvent, Sub
+from substitutes.models import Sub
+from divisions.models import Division, Session, SessionEvent
 from accounts.models import CustomUser
 from teams.models import Team
 from invites.models import TeamInvite, SessionEventInvite

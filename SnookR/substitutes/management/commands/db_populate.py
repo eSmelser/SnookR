@@ -9,7 +9,8 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
-from substitutes.models import Session, SessionEvent, Sub, Division
+from substitutes.models import Sub
+from divisions.models import Division, Session, SessionEvent
 from accounts.models import CustomUser, UserProfile
 from teams.models import Team
 import random

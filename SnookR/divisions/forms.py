@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from accounts.models import CustomUser
-from substitutes.models import Sub, SessionEvent
+from divisions.models import SessionEvent
 
 
 class SessionRegistrationForm(forms.Form):

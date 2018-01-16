@@ -12,7 +12,8 @@ from django.db import IntegrityError
 
 from invites.forms import TeamInviteForm, SessionEventInviteForm
 from invites.models import SessionEventInvite, TeamInvite
-from substitutes.models import SessionEvent, Sub, Session
+from substitutes.models import Sub
+from divisions.models import Session, SessionEvent
 from api.serializers import SessionEventSerializer, SubSerializer
 from rest_framework.renderers import JSONRenderer
 from teams.models import Team
