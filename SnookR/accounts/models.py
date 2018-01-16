@@ -43,6 +43,9 @@ class CustomUser(User):
 
     class Meta:
         proxy = True
+        permissions = (
+            ('can_permit_add_team', 'Can permit other users to have add_team permissions (i.e., is Division Rep)'),
+        )
 
     objects = CustomUserManager()
 
@@ -108,6 +111,7 @@ class CustomUser(User):
 
     @property
     def managed_teams(self):
+        # TODO: rename this property or the related name of Team model because they conflict and mean the same thing
         return Team.objects.filter(team_captain=self)
 
 def generate_expiration():
