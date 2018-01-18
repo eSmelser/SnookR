@@ -6,7 +6,16 @@
             <div class="col-md-8 col-md-offset-2">
                 <ul>
                     {% for division in divisions %}
-                    <li><a href="{%  url 'divisions:div-rep-create-session' pk=division.id %}">{{ division }}</a></li>
+                    <li>
+                        <a href="{%  url 'divisions:div-rep-create-session' pk=division.id %}">{{ division }}</a>
+                        <ul>
+                            {% for session in division.session_set.all %}
+                                <li>
+                                    {{ session }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
                     {% endfor %}
                 </ul>
 

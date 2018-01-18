@@ -50,4 +50,4 @@ class CreateDivisionForm(forms.ModelForm):
 class CreateSessionForm(forms.ModelForm):
     class Meta:
         model = Session
-        fields = ['name', 'game', 'division', 'start_date', 'end_date']
+        fields = ['name', 'game', 'start_date', 'end_date']

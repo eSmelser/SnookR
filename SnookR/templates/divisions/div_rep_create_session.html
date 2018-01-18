@@ -4,6 +4,7 @@
     <div class="content">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
+                <h2>Create Session for {{ division }}</h2>
                 <form action="." method="post">
                     {% csrf_token %}
                     {{ form }}

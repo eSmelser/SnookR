@@ -326,11 +326,22 @@ class DivRepDivisionsList(DivRepPermissionMixin, TemplateView):
 class DivRepCreateSessionView(DivRepPermissionMixin, FormView):
     template_name = 'divisions/div_rep_create_session.html'
     form_class = CreateSessionForm
+    success_url = reverse_lazy('divisions:div-rep-divisions-list')
 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.fields['division'].queryset = Division.objects.filter(pk=self.kwargs.get('pk'))
-        return form
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['division'] = self.get_division()
+        return context
+
+    def form_valid(self, form):
+        division = self.get_division()
+        Session.objects.create(division=division, **form.cleaned_data)
+        return super().form_valid(form)
+
+    def get_division(self):
+        return get_object_or_404(Division, pk=self.kwargs.get('pk'))
+
+
 
 
 

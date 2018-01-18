@@ -41,9 +41,9 @@ class Session(models.Model):
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
 
     game = models.CharField(max_length=100)
-    division = models.ForeignKey(Division)
-    start_date = models.DateTimeField('start date')
-    end_date = models.DateTimeField('end date')
+    division = models.ForeignKey(Division, related_name='session_set')
+    start_date = models.DateField('start date')
+    end_date = models.DateField('end date')
 
     def __str__(self):
         return self.name
