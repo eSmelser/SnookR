@@ -75,7 +75,7 @@ class Session(models.Model):
 class SessionEvent(models.Model):
     start_time = models.TimeField()
     date = models.DateField()
-    session = models.ForeignKey(Session)
+    session = models.ForeignKey(Session, related_name='sessionevent_set')
 
     def __str__(self):
         return 'SessionEvent on {} for {}'.format(self.date, self.session)

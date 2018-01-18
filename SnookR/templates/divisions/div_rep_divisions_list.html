@@ -4,22 +4,50 @@
     <div class="content">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
-                <ul>
-                    {% for division in divisions %}
-                    <li>
-                        <a href="{%  url 'divisions:div-rep-create-session' pk=division.id %}">{{ division }}</a>
-                        <ul>
-                            {% for session in division.session_set.all %}
-                                <li>
-                                    {{ session }}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                    {% endfor %}
-                </ul>
+                {% for division in divisions %}
+                    <h3>{{ division }}</h3>
+                    <div class="list-group list-group-root well">
+                        <div class="list-group">
+                            <a class="list-group-item"
+                               href="{% url 'divisions:div-rep-create-session' pk=division.id %}"><i class="glyphicon glyphicon-plus"></i> Add A Session</a>
+                        </div>
 
+                        {% for session in division.session_set.all %}
+                            <div class="list-group">
+                                <a href="#session-{{ session.id }}" class="list-group-item"
+                                   data-toggle="collapse">
+                                    <i class="glyphicon glyphicon-chevron-right"></i>
+                                    {{ session }}
+                                </a>
+
+                                <div class="list-group collapse" id="session-{{ session.id }}">
+                                    <a href="" class="list-group-item"><i class="glyphicon glyphicon-plus"></i> Add events</a>
+                                    {% for session_event in session.sessionevent_set.all %}
+                                        <a href="{{ session_event.get_absolute_url }}"
+                                           class="list-group-item">{{ session_event.date }}
+                                            at {{ session_event.start_time }}</a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
+{% endblock %}
+{% block footer_scripts %}
+    <script type="text/javascript">
+        $(function () {
+            $('.list-group-item').on('click', function () {
+                let $right = $(this).find('.glyphicon.glyphicon-chevron-right');
+                let $down = $(this).find('.glyphicon.glyphicon-chevron-down');
+                if ($right.length > 0) {
+                    $right.removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
+                } else {
+                    $down.removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
+                }
+            });
+        });
+    </script>
 {% endblock %}
