@@ -6,7 +6,7 @@
             <div class="col-md-8 col-md-offset-2">
                 <ul>
                     {% for division in divisions %}
-                    <li>{{ division }}</li>
+                    <li><a href="{%  url 'divisions:div-rep-create-session' pk=division.id %}">{{ division }}</a></li>
                     {% endfor %}
                 </ul>
 

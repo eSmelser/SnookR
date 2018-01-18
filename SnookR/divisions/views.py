@@ -18,7 +18,7 @@ from rest_framework.renderers import JSONRenderer
 from accounts.models import CustomUser
 from api import serializers
 from api.serializers import SessionEventSerializer
-from divisions.forms import SubForm, CreateDivisionForm
+from divisions.forms import SubForm, CreateDivisionForm, CreateSessionForm
 from divisions.models import Division, Session, SessionEvent
 from invites.models import SessionEventInvite
 from substitutes.models import Sub
@@ -293,10 +293,13 @@ class SessionEventDetailView(FormView):
         return self.request.method == 'POST' and 'invite' in self.request.POST
 
 
-class CreateDivisionView(PermissionRequiredMixin, FormView):
+class DivRepPermissionMixin(PermissionRequiredMixin):
+    permission_required = 'divisions.add_division'
+
+
+class CreateDivisionView(DivRepPermissionMixin, FormView):
     template_name = 'divisions/create_division.html'
     form_class = CreateDivisionForm
-    permission_required = 'divisions.add_division'
     success_url = reverse_lazy('divisions:div-rep-divisions-list')
 
     def form_valid(self, form):
@@ -305,9 +308,8 @@ class CreateDivisionView(PermissionRequiredMixin, FormView):
         return super().form_valid(form)
 
 
-class DivRepDivisionsList(PermissionRequiredMixin, TemplateView):
+class DivRepDivisionsList(DivRepPermissionMixin, TemplateView):
     template_name = 'divisions/div_rep_divisions_list.html'
-    permission_required = 'divisions.add_division'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -319,3 +321,17 @@ class DivRepDivisionsList(PermissionRequiredMixin, TemplateView):
             return redirect(reverse('divisions:create-division'))
 
         return super().get(request, *args, **kwargs)
+
+
+class DivRepCreateSessionView(DivRepPermissionMixin, FormView):
+    template_name = 'divisions/div_rep_create_session.html'
+    form_class = CreateSessionForm
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['division'].queryset = Division.objects.filter(pk=self.kwargs.get('pk'))
+        return form
+
+
+
+
