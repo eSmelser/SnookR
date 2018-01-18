@@ -26,7 +26,7 @@
                 </h3>
                 {% if current_user_sub %}
                     <h3 id="current-user-header">You are available</h3>
-                    {% include 'substitutes/sub_panel_detail.html' with sub=current_user_sub %}
+                    {% include 'divisions/sub_panel_detail.html' with sub=current_user_sub %}
                 {% else %}
                     <form action="." method="post">
                         {% csrf_token %}
@@ -44,7 +44,7 @@
                         <h3>No other subs available on this day for this session!</h3>
                     {% endif %}
                     {% for sub in subs %}
-                        {% include 'substitutes/sub_panel_detail.html' %}
+                        {% include 'divisions/sub_panel_detail.html' %}
                     {% endfor %}
                 </div>
                 <div class="col-md-2"></div>

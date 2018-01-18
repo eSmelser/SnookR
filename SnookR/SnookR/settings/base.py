@@ -55,7 +55,7 @@ if not DEBUG and os.environ.get('DJANGO_LOG', False):
                 'propagate': True,
                 'level': 'DEBUG',
             },
-            'substitutes': {
+            'divisions': {
                 'handlers': ['file'],
                 'level': 'DEBUG',
             },

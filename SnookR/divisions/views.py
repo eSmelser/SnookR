@@ -5,11 +5,11 @@ import itertools
 from datetime import datetime
 
 import functools
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView
 from django.views.generic.base import TemplateView, RedirectView
 from functools import reduce
@@ -18,7 +18,7 @@ from rest_framework.renderers import JSONRenderer
 from accounts.models import CustomUser
 from api import serializers
 from api.serializers import SessionEventSerializer
-from divisions.forms import SubForm
+from divisions.forms import SubForm, CreateDivisionForm
 from divisions.models import Division, Session, SessionEvent
 from invites.models import SessionEventInvite
 from substitutes.models import Sub
@@ -26,7 +26,7 @@ from teams.models import Team
 
 
 class DivisionListView(TemplateView):
-    template_name = 'substitutes/divisions.html'
+    template_name = 'divisions/divisions.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -35,7 +35,7 @@ class DivisionListView(TemplateView):
 
 
 class DivisionView(TemplateView):
-    template_name = 'substitutes/division.html'
+    template_name = 'divisions/division.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -117,7 +117,7 @@ class SessionViewMixin(TemplateView):
 
 
 class SessionView(LoginRequiredMixin, SessionViewMixin, TemplateView):
-    template_name = 'substitutes/session.html'
+    template_name = 'divisions/session.html'
 
 
 class SessionEventRegisterView(LoginRequiredMixin, RedirectView):
@@ -156,7 +156,7 @@ class SessionUnregisterView(RedirectView, SessionViewMixin):
 
 
 class SearchView(TemplateView):
-    template_name = 'substitutes/search.html'
+    template_name = 'divisions/search.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -170,7 +170,7 @@ class SearchView(TemplateView):
             # Filter sessions on the previously built Q object
             context['results'] = Session.objects.filter(q_object)
         elif search_type == 'substitute':
-            # Build a Q object that filters for available substitutes that have last or first names that
+            # Build a Q object that filters for available divisions that have last or first names that
             # starts with any of the search terms
 
             # 1.) Define all the Q objects
@@ -192,7 +192,7 @@ class SearchView(TemplateView):
 
 
 class SessionEventView(TemplateView):
-    template_name = 'substitutes/session_event.html'
+    template_name = 'divisions/session_event.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -212,7 +212,7 @@ class SessionEventView(TemplateView):
 
 
 class SessionEventDetailView(FormView):
-    template_name = 'substitutes/session_event_detail.html'
+    template_name = 'divisions/session_event_detail.html'
     form_class = SubForm
 
     def post(self, request, *args, **kwargs):
@@ -260,7 +260,7 @@ class SessionEventDetailView(FormView):
             obj = Sub.objects.get(**form.cleaned_data)
             sub_id = obj.id
             return redirect(reverse('invites:direct-sub-invite', kwargs={'sub_id': sub_id}))
-        
+
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -291,3 +291,31 @@ class SessionEventDetailView(FormView):
 
     def is_invite_post(self):
         return self.request.method == 'POST' and 'invite' in self.request.POST
+
+
+class CreateDivisionView(PermissionRequiredMixin, FormView):
+    template_name = 'divisions/create_division.html'
+    form_class = CreateDivisionForm
+    permission_required = 'divisions.add_division'
+    success_url = reverse_lazy('divisions:div-rep-divisions-list')
+
+    def form_valid(self, form):
+        name = form.cleaned_data['name']
+        Division.objects.create(name=name, division_rep=self.request.user)
+        return super().form_valid(form)
+
+
+class DivRepDivisionsList(PermissionRequiredMixin, TemplateView):
+    template_name = 'divisions/div_rep_divisions_list.html'
+    permission_required = 'divisions.add_division'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['divisions'] = self.request.user.represented_divisions_set.all()
+        return context
+
+    def get(self, request, *args, **kwargs):
+        if not self.request.user.represented_divisions_set.all().count() > 0:
+            return redirect(reverse('divisions:create-division'))
+
+        return super().get(request, *args, **kwargs)

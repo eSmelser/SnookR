@@ -11,22 +11,16 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('divisions', '0001_initial'),
         ('accounts', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Sub',
+            name='FacebookAuth',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateTimeField(auto_now=True, verbose_name='sub date')),
-                ('session_event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='divisions.SessionEvent')),
+                ('facebook_id', models.CharField(max_length=32)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='accounts.CustomUser')),
             ],
-        ),
-        migrations.AlterUniqueTogether(
-            name='sub',
-            unique_together=set([('user', 'session_event')]),
         ),
     ]

@@ -3,7 +3,7 @@ let jQuery = require('jquery');
 
 $(document).ready(function() {
   let invitedList = [];
-  let $parent = $('.substitutes-div');
+  let $parent = $('.divisions-div');
 
   const addToInvitedList = function(_, obj) {
     let id = $(obj).attr('data-sub-id');

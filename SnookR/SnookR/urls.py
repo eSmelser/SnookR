@@ -24,12 +24,12 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^', include('home.urls')),
     url(r'^admin/', admin.site.urls),
-
+    url(r'^divisions/', include('divisions.urls', namespace='divisions')),
     url(r'^api/', include('api.urls', namespace='api')),
     url(r'^teams/', include('teams.urls')),
     url(r'^invites/', include('invites.urls', namespace='invites')),
     url(r'^accounts/', include('accounts.urls')),
-    url(r'^substitutes/', include('substitutes.urls')),
+    url(r'^divisions/', include('substitutes.urls')),
     url(r'^messaging/', include('messaging.urls', namespace='messaging')),
     url(r'^auth/', include('social_django.urls', namespace='social')),
     url(r'^socialauth/', include('socialauth.urls', namespace='socialauth')),

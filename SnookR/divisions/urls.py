@@ -18,4 +18,6 @@ urlpatterns = [
     url(r'^session-events/(?P<pk>[0-9]+)/unregister/$', views.SessionEventUnregisterView.as_view(),
         name='session-event-unregister'),
     url(r'^session-events/(?P<pk>[0-9]+)/$', views.SessionEventView.as_view(), name='session-event'),
+    url(r'^create-division/', views.CreateDivisionView.as_view(), name='create-division'),
+    url(r'^/div-rep-divisions/$', views.DivRepDivisionsList.as_view(), name='div-rep-divisions-list'),
 ]

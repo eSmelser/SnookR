@@ -99,6 +99,11 @@ class Command(BaseCommand):
         )
         evan.user_permissions.add(create_team_permission)
 
+        perm = Permission.objects.get(
+            codename='add_division',
+        )
+        evan.user_permissions.add(perm)
+
         # Create admin
         admin = CustomUser.objects.create_user(username='admin', password='adminpassword')
         admin.is_superuser = True

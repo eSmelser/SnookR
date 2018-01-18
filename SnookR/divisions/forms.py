@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from accounts.models import CustomUser
-from divisions.models import SessionEvent
+from divisions.models import SessionEvent, Division
 
 
 class SessionRegistrationForm(forms.Form):
@@ -39,3 +39,9 @@ class SessionEventIdForm(forms.Form):
     def clean_session_event(self):
         id_ = self.cleaned_data['session_event_id']
         return get_instance(id_, SessionEvent)
+
+
+class CreateDivisionForm(forms.ModelForm):
+    class Meta:
+        model = Division
+        fields = ['name']

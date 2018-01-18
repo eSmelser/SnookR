@@ -23,7 +23,7 @@ $(document).ready(function () {
 
     event = context.sessionEvents[0];
     console.log(event);
-    let $subsDiv = $('.substitutes-div');
+    let $subsDiv = $('.divisions-div');
     let $sessionName = $('.session-name');
     let $sessionDate = $('.session-date');
 

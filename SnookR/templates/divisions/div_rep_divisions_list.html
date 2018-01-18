@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Create A Division{% endblock %}
+{% block content %}
+    <div class="content">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <ul>
+                    {% for division in divisions %}
+                    <li>{{ division }}</li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

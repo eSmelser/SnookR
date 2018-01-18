@@ -169,7 +169,7 @@ class UserProfile(models.Model):
         elif self.image_url:
             return self.image_url
         else:
-            return static('substitutes/images/default_profile.jpg')
+            return static('divisions/images/default_profile.jpg')
 
     def send_confirmation_email(self):
         activation_key = self.activation_key

@@ -18,14 +18,14 @@ class Division(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
 
-    division_rep = models.ForeignKey(User, related_name='division_representative')
+    division_rep = models.ForeignKey(User, related_name='represented_divisions_set')
     teams = models.ManyToManyField('teams.Team', blank=True)
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('division', args=[self.slug])
+        return reverse('divisions:division', args=[self.slug])
 
 
 class Session(models.Model):
@@ -49,7 +49,7 @@ class Session(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('session', args=self.get_url_args())
+        return reverse('divisions:session', args=self.get_url_args())
 
     def get_url_args(self):
         return [str(self.division.slug), str(self.slug)]
@@ -82,13 +82,13 @@ class SessionEvent(models.Model):
 
     @property
     def get_register_url(self):
-        return reverse('session-event-register', kwargs={'pk': self.id})
+        return reverse('divisions:session-event-register', kwargs={'pk': self.id})
 
     @property
     def get_unregister_url(self):
-        return reverse('session-event-unregister', kwargs={'pk': self.id})
+        return reverse('divisions:session-event-unregister', kwargs={'pk': self.id})
 
     @property
     def get_absolute_url(self):
         kwargs = {'division': self.session.division.slug, 'session': self.session.slug, 'session_event': self.id}
-        return reverse('session-event-detail', kwargs=kwargs)
+        return reverse('divisions:session-event-detail', kwargs=kwargs)
