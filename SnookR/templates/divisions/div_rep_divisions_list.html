@@ -21,7 +21,7 @@
                                 </a>
 
                                 <div class="list-group collapse" id="session-{{ session.id }}">
-                                    <a href="" class="list-group-item"><i class="glyphicon glyphicon-plus"></i> Add events</a>
+                                    <a href="{%  url 'divisions:div-rep-create-session-event' pk=session.id %}" class="list-group-item"><i class="glyphicon glyphicon-plus"></i> Add events</a>
                                     {% for session_event in session.sessionevent_set.all %}
                                         <a href="{{ session_event.get_absolute_url }}"
                                            class="list-group-item">{{ session_event.date }}

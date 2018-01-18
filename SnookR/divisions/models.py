@@ -1,3 +1,6 @@
+import calendar
+from datetime import timedelta
+
 from autoslug import AutoSlugField
 from django.contrib.auth.models import User
 from django.db import models
@@ -72,10 +75,29 @@ class Session(models.Model):
         return self
 
 
+class SessionEventQuerySet(models.QuerySet):
+    def create_repeated(self, session: Session, start_time, end_time, **kwargs):
+        start = session.start_date
+        end = session.end_date
+
+        day_delta = timedelta(days=1)
+        instances = []
+
+        import pdb;pdb.set_trace()
+        while start < end:
+            instance = self.model(session=session, start_time=start_time, end_time=end_time)
+            break
+
+
+
+
+
 class SessionEvent(models.Model):
     start_time = models.TimeField()
     date = models.DateField()
     session = models.ForeignKey(Session, related_name='sessionevent_set')
+
+    objects =SessionEventQuerySet.as_manager()
 
     def __str__(self):
         return 'SessionEvent on {} for {}'.format(self.date, self.session)

@@ -1,6 +1,4 @@
-# Copyright &copy; 2017 Evan Smelser
-# This software is Licensed under the MIT license. For more info please see SnookR/COPYING
-
+import calendar
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -51,3 +49,21 @@ class CreateSessionForm(forms.ModelForm):
     class Meta:
         model = Session
         fields = ['name', 'game', 'start_date', 'end_date']
+
+
+class CreateRepeatedEventForm(forms.Form):
+    repeated = forms.ChoiceField(choices=[('weekly', 'Weekly'), ('biweekly', 'Bi-Weekly')])
+    start_time = forms.TimeField(input_formats=['%I:%M%p', '%-I:%M%p'])
+    end_time = forms.TimeField(input_formats=['%I:%M%p', '%-I:%M%p'])
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for day in calendar.day_name:
+            self.fields[day.lower()] = forms.BooleanField(required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start, end = cleaned_data.get('start_time'), cleaned_data.get('end_time')
+        if start >= end:
+            raise forms.ValidationError('Start time is not before end time')
+

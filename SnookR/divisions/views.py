@@ -11,14 +11,16 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView
+from django.views import View
 from django.views.generic.base import TemplateView, RedirectView
+from django.views.generic.edit import ProcessFormView
 from functools import reduce
 from rest_framework.renderers import JSONRenderer
 
 from accounts.models import CustomUser
 from api import serializers
 from api.serializers import SessionEventSerializer
-from divisions.forms import SubForm, CreateDivisionForm, CreateSessionForm
+from divisions.forms import SubForm, CreateDivisionForm, CreateSessionForm, CreateRepeatedEventForm
 from divisions.models import Division, Session, SessionEvent
 from invites.models import SessionEventInvite
 from substitutes.models import Sub
@@ -342,7 +344,41 @@ class DivRepCreateSessionView(DivRepPermissionMixin, FormView):
         return get_object_or_404(Division, pk=self.kwargs.get('pk'))
 
 
+"""
+OrderedDict([
+('repeated', <django.forms.fields.ChoiceField object at 0x7f266b2e0c88>),
+ ('start_time', <django.forms.fields.TimeField object at 0x7f266a81a8d0>), 
+ ('end_time', <django.forms.fields.TimeField object at 0x7f266a749898>),
+  ('monday', <django.forms.fields.BooleanField object at 0x7f266a6f1da0>),
+   ('tuesday', <django.forms.fields.BooleanField object at 0x7f266a6f1400>), 
+   ('wednesday', <django.forms.fields.BooleanField object at 0x7f266a6f1a90>),
+    ('thursday', <django.forms.fields.BooleanField object at 0x7f266a6f1550>), 
+    ('friday', <django.forms.fields.BooleanField object at 0x7f266a6f1e80>), 
+    ('saturday', <django.forms.fields.BooleanField object at 0x7f266a6f1e48>), 
+    ('sunday', <django.forms.fields.BooleanField object at 0x7f266a6f1f98>)])
+valid {'saturday': False, 'end_time': datetime.time(21, 10), 'wednesday': True, 'monday': False, 'friday': False, 'sunday': False, 'start_time': datetime.time(21, 10), 'tuesday': False, 'thursday': True, 'repeated': 'weekly'}
 
 
+"""
 
+
+class DivRepCreateSessionEventView(DivRepPermissionMixin, FormView):
+    template_name = 'divisions/div_rep_create_session_event.html'
+    form_class = CreateRepeatedEventForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['session'] = self.get_session()
+        return context
+
+    def form_valid(self, form):
+        session = self.get_session()
+        SessionEvent.objects.create_repeated(session=session, **form.cleaned_data)
+        return super().form_valid(form)
+
+    def get_session(self):
+        return get_object_or_404(Session, pk=self.kwargs.get('pk'))
+
+    def get_success_url(self):
+        return reverse('divisions:div-rep-divisions-list')
 

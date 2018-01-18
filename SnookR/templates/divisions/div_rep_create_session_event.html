@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Create A Division{% endblock %}
+{% block content %}
+    <div class="content">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>Create Session Event for {{ session.division }} session {{ session }}</h3>
+                <form action="." method="post">
+                    {% csrf_token %}
+                    <!--label for="repeated">Repeated: </label>
+                    <select name="repeated" id="repeated">
+                        <option value="weekly">Weekly</option>
+                        <option value="biweekly">Bi-Weekly</option>
+                    </select>
+
+                    <label for="monday">Mon</label>
+                    <input type="checkbox" name="days" value="monday" id="monday">
+
+                    <label for="tuesday">Tues</label>
+                    <input type="checkbox" name="days" value="tuesday" id="tuesday">
+
+                    <label for="wednesday">Wed</label>
+                    <input type="checkbox" name="days" value="wednesday" id="wednesday">
+
+                    <label for="thursday">Thurs</label>
+                    <input type="checkbox" name="days" value="thursday" id="thursday">
+
+                    <label for="friday">Fri</label>
+                    <input type="checkbox" name="days" value="friday" id="friday">
+
+                    <label for="saturday">Sat</label>
+                    <input type="checkbox" name="days" value="saturday" id="saturday">
+
+                    <label for="sunday">Sunday</label>
+                    <input type="checkbox" name="days" value="sunday" id="sunday">
+
+                    <label for="start-time">Start Time (example format: "10:34pm)"</label>
+                    <input type="text" name="start_time" id="start-time" pattern="((10|11|12)|[1-9]):[0-5][0-9](am|pm)" required>
+
+                    <label for="end-time">End Time (example format: "10:34pm)</label>
+                    <input type="text" name="end_time" id="end-time" pattern="((10|11|12)|[1-9]):[0-5][0-9](am|pm)" required-->
+                    {{ form.as_p }}
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
