@@ -355,6 +355,7 @@ class DivRepCreateSessionEventView(DivRepPermissionMixin, FormView):
 
     def form_valid(self, form):
         session = self.get_session()
+        print(form.cleaned_data)
         SessionEvent.objects.create_repeated(session=session, **form.cleaned_data)
         return super().form_valid(form)
 

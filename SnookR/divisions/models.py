@@ -60,11 +60,13 @@ class Session(models.Model):
 
 
 class SessionEventQuerySet(models.QuerySet):
-    def create_repeated(self, session: Session, start_time, repeated='weekly', **kwargs):
+    def create_repeated(self, session: Session, start_time, repeated='weekly', days=None):
+        if days is None:
+            days = []
+
         start = session.start
         end = session.end
         day_delta = timedelta(days=1)
-        days = [day for day in utils.lower_day_name if kwargs[day]]
 
         if repeated == 'weekly':
             multiplier = 7

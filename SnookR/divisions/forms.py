@@ -59,21 +59,4 @@ class CreateSessionForm(forms.ModelForm):
 class CreateRepeatedEventForm(forms.Form):
     repeated = forms.ChoiceField(choices=[('weekly', 'Weekly'), ('biweekly', 'Bi-Weekly')])
     start_time = forms.TimeField(input_formats=['%I:%M%p', '%-I:%M%p'])
-    end_time = forms.TimeField(input_formats=['%I:%M%p', '%-I:%M%p'])
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for day in utils.lower_day_name:
-            self.fields[day] = forms.BooleanField(required=False)
-
-        fields = list(self.fields.keys())
-        fields.append(Submit('submit', 'Submit', css_class='button white'))
-        self.helper = FormHelper()
-        self.helper.layout = Layout(*fields)
-        self.helper.form_class = 'form-horizontal'
-
-    def clean(self):
-        cleaned_data = super().clean()
-        start, end = cleaned_data.get('start_time'), cleaned_data.get('end_time')
-        if start >= end:
-            raise forms.ValidationError('Start time is not before end time')
+    days = forms.MultipleChoiceField(choices=[(d, d.title()) for d in utils.lower_day_name])
