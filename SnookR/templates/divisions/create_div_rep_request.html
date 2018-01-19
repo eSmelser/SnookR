@@ -4,11 +4,17 @@
     <div class="content">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
-            <h3>Request Division Representative Status</h3>
-                <form action="." method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">Request Div Rep Status</button>
-                </form>
+                <h3>Request Division Representative Status</h3>
+                {% if perms.add_division %}
+                    <p>You already are a division representative</p>
+                {% elif user.divreprequest %}
+                    <p>Your request is still pending...</p>
+                {% else %}
+                    <form action="." method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Request Div Rep Status</button>
+                    </form>
+                {% endif %}
             </div>
         </div>
     </div>

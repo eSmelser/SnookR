@@ -122,7 +122,7 @@ class SessionEvent(models.Model):
 
 class DivRepRequest(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
-    user = models.OneToOneField('accounts.CustomUser')
+    user = models.OneToOneField('accounts.CustomUser', related_name='divreprequest')
 
     def __str__(self):
         return 'Div rep request for ' + str(self.user)
