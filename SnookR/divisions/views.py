@@ -11,9 +11,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView
-from django.views import View
 from django.views.generic.base import TemplateView, RedirectView
-from django.views.generic.edit import ProcessFormView, CreateView
 from functools import reduce
 from rest_framework.renderers import JSONRenderer
 

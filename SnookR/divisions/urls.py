@@ -1,5 +1,6 @@
 from django.conf.urls import url
 
+import teams.views
 from divisions import views
 
 urlpatterns = [
@@ -24,5 +25,5 @@ urlpatterns = [
     url(r'^div-rep-division/session/(?P<pk>[0-9]+)/create-session-event/$', views.DivRepCreateSessionEventView.as_view(),
         name='div-rep-create-session-event'),
     url(r'^div-rep-request/$', views.CreateDivRepRequestView.as_view(), name='create-div-rep-request'),
-    url(r'^div-rep-request/success/$', views.DivRepRequestSuccessView.as_view(), name='div-rep-request-success')
+    url(r'^div-rep-request/success/$', views.DivRepRequestSuccessView.as_view(), name='div-rep-request-success'),
 ]

@@ -68,6 +68,7 @@
                     <ul class="nav navbar-nav navbar-right">
                         {% if perms.divisions.add_division  %}
                                 <li><a href="{% url 'divisions:div-rep-divisions-list' %}">Your Divisions</a></li>
+                                <li><a href="{% url 'assign-team-captain' %}">Assign Team Captain</a></li>
                          {% endif %}
                         {% if user.is_authenticated %}
                             <li><a href="{%  url 'divisions:create-div-rep-request' %}">Request Div Rep</a></li>

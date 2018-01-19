@@ -1,4 +1,5 @@
 from collections import namedtuple
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.urls import reverse
@@ -90,3 +91,18 @@ class DeleteTeamView(TemplateView, ProcessFormView):
 
     def get_team(self):
         return Team.objects.get(id=self.kwargs.get('pk'))
+
+
+class AssignTeamCaptainView(LoginRequiredMixin, TemplateView):
+    template_name = 'teams/assign_team_captain.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search = self.request.GET.get('search', '')
+        if search:
+            query = Q()
+            for term in search.split(' '):
+                query |= Q(first_name__startswith=term)| Q(last_name__startswith=term)
+
+            context['results'] = CustomUser.objects.filter(query)
+        return context
