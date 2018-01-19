@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'webpack_loader',
     'social.apps.django_app.default',
     'social_django',
+    'bootstrap3',
     'divisions',
     'substitutes',
     'home',
@@ -192,6 +193,7 @@ LOGIN_REDIRECT_URL = 'home'
 
 # django-crispy-forms settings
 CRISPY_TEMPLATE_PACK = 'bootstrap'
+CRISPY_ALLOWED_TEMPLATE_PACKS = ('bootstrap',)
 
 CHROME_DRIVER = os.environ.get('CHROME_DRIVER', None)
 

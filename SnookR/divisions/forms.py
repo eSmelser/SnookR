@@ -1,7 +1,11 @@
 import calendar
+
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.utils.html import format_html
 
 from accounts.models import CustomUser
 from core import utils
@@ -62,9 +66,14 @@ class CreateRepeatedEventForm(forms.Form):
         for day in utils.lower_day_name:
             self.fields[day] = forms.BooleanField(required=False)
 
+        fields = list(self.fields.keys())
+        fields.append(Submit('submit', 'Submit', css_class='button white'))
+        self.helper = FormHelper()
+        self.helper.layout = Layout(*fields)
+        self.helper.form_class = 'form-horizontal'
+
     def clean(self):
         cleaned_data = super().clean()
         start, end = cleaned_data.get('start_time'), cleaned_data.get('end_time')
         if start >= end:
             raise forms.ValidationError('Start time is not before end time')
-
