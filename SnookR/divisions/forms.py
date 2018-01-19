@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from accounts.models import CustomUser
+from core import utils
 from divisions.models import SessionEvent, Division, Session
 
 
@@ -58,8 +59,8 @@ class CreateRepeatedEventForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for day in calendar.day_name:
-            self.fields[day.lower()] = forms.BooleanField(required=False)
+        for day in utils.lower_day_name:
+            self.fields[day] = forms.BooleanField(required=False)
 
     def clean(self):
         cleaned_data = super().clean()

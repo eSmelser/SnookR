@@ -5,16 +5,14 @@ from autoslug import AutoSlugField
 from django.contrib.auth.models import User
 from django.db import models
 
-# Create your models here.
 from django.urls import reverse
 
 from substitutes.models import Sub
-
+from core import utils
 
 class Division(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
-
     division_rep = models.ForeignKey(User, related_name='represented_divisions_set')
     teams = models.ManyToManyField('teams.Team', blank=True)
 
@@ -62,23 +60,40 @@ class Session(models.Model):
 
 
 class SessionEventQuerySet(models.QuerySet):
-    def create_repeated(self, session: Session, start_time, end_time, **kwargs):
+    def create_repeated(self, session: Session, start_time, repeated='weekly', **kwargs):
         start = session.start
         end = session.end
-
         day_delta = timedelta(days=1)
-        instances = []
+        days = [day for day in utils.lower_day_name if kwargs[day]]
 
-        import pdb;
-        pdb.set_trace()
-        while start < end:
-            instance = self.model(session=session, start_time=start_time, end_time=end_time)
-            break
+        if repeated == 'weekly':
+            multiplier = 7
+        elif repeated == 'biweekly':
+            multiplier = 14
+        else:
+            raise TypeError('argument "repeated" must be "weekly" or "biweekly", not {}'.format(repeated))
+
+        temp = start
+        events = []
+        for day in days:
+            # Move temp up to first day
+            while utils.lower_day_name[temp.weekday()] != day:
+                temp += day_delta
+
+            # Fill in days until the session's end
+            while temp <= end:
+                event = SessionEvent(date=temp, start_time=start_time, session=session)
+                events.append(event)
+                temp += (day_delta * multiplier)
+
+            temp = start
+
+        return SessionEvent.objects.bulk_create(events)
 
 
 class SessionEvent(models.Model):
     start_time = models.TimeField()
-    date = models.DateField()
+    date = models.DateField(null=False)
     session = models.ForeignKey(Session, related_name='sessionevent_set')
 
     objects = SessionEventQuerySet.as_manager()
