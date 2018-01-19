@@ -70,6 +70,7 @@
                                 <li><a href="{% url 'divisions:div-rep-divisions-list' %}">Your Divisions</a></li>
                          {% endif %}
                         {% if user.is_authenticated %}
+                            <li><a href="{%  url 'divisions:create-div-rep-request' %}">Request Div Rep</a></li>
                         <li><a data-turbolinks="false" href="{% url 'messaging:messaging' %}">Messages</a></li>
 
                             {% if perms.teams.add_team %}

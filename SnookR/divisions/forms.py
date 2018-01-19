@@ -9,7 +9,7 @@ from django.utils.html import format_html
 
 from accounts.models import CustomUser
 from core import utils
-from divisions.models import SessionEvent, Division, Session
+from divisions.models import SessionEvent, Division, Session, DivRepRequest
 
 
 class SessionRegistrationForm(forms.Form):

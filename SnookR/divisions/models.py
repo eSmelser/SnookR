@@ -118,3 +118,11 @@ class SessionEvent(models.Model):
     def get_absolute_url(self):
         kwargs = {'division': self.session.division.slug, 'session': self.session.id, 'session_event': self.id}
         return reverse('divisions:session-event-detail', kwargs=kwargs)
+
+
+class DivRepRequest(models.Model):
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.OneToOneField('accounts.CustomUser')
+
+    def __str__(self):
+        return 'Div rep request for ' + str(self.user)

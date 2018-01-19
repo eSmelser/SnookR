@@ -13,7 +13,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView
 from django.views import View
 from django.views.generic.base import TemplateView, RedirectView
-from django.views.generic.edit import ProcessFormView
+from django.views.generic.edit import ProcessFormView, CreateView
 from functools import reduce
 from rest_framework.renderers import JSONRenderer
 
@@ -21,7 +21,7 @@ from accounts.models import CustomUser
 from api import serializers
 from api.serializers import SessionEventSerializer
 from divisions.forms import SubForm, CreateDivisionForm, CreateSessionForm, CreateRepeatedEventForm
-from divisions.models import Division, Session, SessionEvent
+from divisions.models import Division, Session, SessionEvent, DivRepRequest
 from invites.models import SessionEventInvite
 from substitutes.models import Sub
 from teams.models import Team
@@ -300,7 +300,7 @@ class DivRepPermissionMixin(PermissionRequiredMixin):
 
 
 class CreateDivisionView(DivRepPermissionMixin, FormView):
-    template_name = 'divisions/create_division.html'
+    template_name = 'divisions/div_rep_create_division.html'
     form_class = CreateDivisionForm
     success_url = reverse_lazy('divisions:div-rep-divisions-list')
 
@@ -365,3 +365,14 @@ class DivRepCreateSessionEventView(DivRepPermissionMixin, FormView):
     def get_success_url(self):
         return reverse('divisions:div-rep-divisions-list')
 
+
+class CreateDivRepRequestView(LoginRequiredMixin, TemplateView):
+    template_name = 'divisions/create_div_rep_request.html'
+
+    def post(self, request, *args, **kwargs):
+        DivRepRequest.objects.get_or_create(user=self.request.user)
+        return redirect(reverse('divisions:div-rep-request-success'))
+
+
+class DivRepRequestSuccessView(LoginRequiredMixin, TemplateView):
+    template_name = 'divisions/div_rep_request_success.html'
