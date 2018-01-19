@@ -75,12 +75,17 @@ class SessionEventQuerySet(models.QuerySet):
         else:
             raise TypeError('argument "repeated" must be "weekly" or "biweekly", not {}'.format(repeated))
 
+        print('ss', session.start, 'se', session.end)
+        print('days', days)
         temp = start
+        print('start', start)
         events = []
         for day in days:
             # Move temp up to first day
             while utils.lower_day_name[temp.weekday()] != day:
                 temp += day_delta
+
+            print('tmep start', temp)
 
             # Fill in days until the session's end
             while temp <= end:
@@ -90,6 +95,7 @@ class SessionEventQuerySet(models.QuerySet):
 
             temp = start
 
+        print(events)
         return SessionEvent.objects.bulk_create(events)
 
 

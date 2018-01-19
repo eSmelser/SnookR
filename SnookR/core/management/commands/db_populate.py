@@ -198,7 +198,7 @@ class Command(BaseCommand):
             else:
                 session_divisions.append(divisions[1])
 
-        end_dates = [date + timedelta(hours=4) for date in start_dates]
+        end_dates = [date + timedelta(days=30 * 3) for date in start_dates]
         sessions = []
         for start, end, name, division in zip(start_dates, end_dates, names, session_divisions):
             session = Session.objects.create(name=name, game='8ball', division=division, start=start,
