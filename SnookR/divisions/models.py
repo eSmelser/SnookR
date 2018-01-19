@@ -12,12 +12,6 @@ from substitutes.models import Sub
 
 
 class Division(models.Model):
-    '''
-    A division must have a name and a division rep and can contain 0 or more teams and 0 or more subs
-    Division -> Player  : 1 .. *
-    Division -> Team    : 0 .. *
-    Division -> Session : 1 .. *
-    '''
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
 
@@ -32,21 +26,13 @@ class Division(models.Model):
 
 
 class Session(models.Model):
-    '''
-    Sessions are generally named after a season (summer, fall, etc), they have an associated game and
-    division, as well as a start date and an end date.
-    Session -> Division : 1 .. 1
-    '''
     date_format = '%Y-%m-%d_%H-%M'
     pretty_date_format = '%x %H:%M'
-
-    name = models.CharField(max_length=200)
-    slug = AutoSlugField(populate_from='name', always_update=True, default='')
-
-    game = models.CharField(max_length=100)
     division = models.ForeignKey(Division, related_name='session_set')
-    start_date = models.DateField('start date')
-    end_date = models.DateField('end date')
+    name = models.CharField(max_length=200)
+    game = models.CharField(max_length=100)
+    start = models.DateField(null=False)
+    end = models.DateField(null=False)
 
     def __str__(self):
         return self.name
@@ -77,19 +63,17 @@ class Session(models.Model):
 
 class SessionEventQuerySet(models.QuerySet):
     def create_repeated(self, session: Session, start_time, end_time, **kwargs):
-        start = session.start_date
-        end = session.end_date
+        start = session.start
+        end = session.end
 
         day_delta = timedelta(days=1)
         instances = []
 
-        import pdb;pdb.set_trace()
+        import pdb;
+        pdb.set_trace()
         while start < end:
             instance = self.model(session=session, start_time=start_time, end_time=end_time)
             break
-
-
-
 
 
 class SessionEvent(models.Model):
@@ -97,7 +81,7 @@ class SessionEvent(models.Model):
     date = models.DateField()
     session = models.ForeignKey(Session, related_name='sessionevent_set')
 
-    objects =SessionEventQuerySet.as_manager()
+    objects = SessionEventQuerySet.as_manager()
 
     def __str__(self):
         return 'SessionEvent on {} for {}'.format(self.date, self.session)
@@ -112,5 +96,5 @@ class SessionEvent(models.Model):
 
     @property
     def get_absolute_url(self):
-        kwargs = {'division': self.session.division.slug, 'session': self.session.slug, 'session_event': self.id}
+        kwargs = {'division': self.session.division.slug, 'session': self.session.id, 'session_event': self.id}
         return reverse('divisions:session-event-detail', kwargs=kwargs)

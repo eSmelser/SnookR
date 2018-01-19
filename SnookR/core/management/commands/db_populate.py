@@ -3,6 +3,7 @@
 import os
 from datetime import datetime, timedelta
 
+from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
@@ -18,82 +19,85 @@ import random
 TZINFO = timezone.get_current_timezone()
 DATA_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
 
+USERS = [
+    {
+        "username": 'evan',
+        "password": 'evanpassword',
+        "first_name": 'evan',
+        "last_name": 'smelser',
+        "email": 'e@sme.com',
+    },
+    {
+        "username": 'darrin',
+        "password": 'darrinpassword',
+        "first_name": 'darrin',
+        "last_name": 'howard',
+        "email": 'darrin@test.com',
+    },
+    {
+        "username": 'jason',
+        "password": 'jasonpassword',
+        "first_name": 'jason',
+        "last_name": 'bennett',
+        "email": 'jason@test.com',
+    },
+    {
+        "username": 'andy',
+        "password": 'andypassword',
+        "first_name": 'andy',
+        "last_name": 'dalbey',
+        "email": 'andy@test.com',
+    },
+    {
+        "username": 'isaac',
+        "password": 'isaacpassword',
+        "first_name": 'isaac',
+        "last_name": 'norman',
+        "email": 'isaac@test.com',
+    },
+    {
+        "username": 'chris',
+        "password": 'chrispassword',
+        "first_name": 'chris',
+        "last_name": 'nieland',
+        "email": 'chris@test.com',
+    },
+    {
+        "username": 'sarah',
+        "password": 'sarahpassword',
+        "first_name": 'sarah',
+        "last_name": 'nieland',
+        "email": 'sarah@test.com',
+    },
+    {
+        "username": 'nick',
+        "password": 'nickpassword',
+        "first_name": 'nick',
+        "last_name": 'jordan',
+        "email": 'nick@test.com',
+    },
+    {
+        "username": 'pete',
+        "password": 'petepassword',
+        "first_name": 'pete',
+        "last_name": 'gates',
+        "email": 'pete@test.com',
+    },
+]
+
 
 class Command(BaseCommand):
     help = 'Populates database with default (test) data'
 
     def handle(self, *args, **options):
-        users = [
-            {
-                "username": 'evan',
-                "password": 'evanpassword',
-                "first_name": 'evan',
-                "last_name": 'smelser',
-                "email": 'e@sme.com',
-            },
-            {
-                "username": 'darrin',
-                "password": 'darrinpassword',
-                "first_name": 'darrin',
-                "last_name": 'howard',
-                "email": 'darrin@test.com',
-            },
-            {
-                "username": 'jason',
-                "password": 'jasonpassword',
-                "first_name": 'jason',
-                "last_name": 'bennett',
-                "email": 'jason@test.com',
-            },
-            {
-                "username": 'andy',
-                "password": 'andypassword',
-                "first_name": 'andy',
-                "last_name": 'dalbey',
-                "email": 'andy@test.com',
-            },
-            {
-                "username": 'isaac',
-                "password": 'isaacpassword',
-                "first_name": 'isaac',
-                "last_name": 'norman',
-                "email": 'isaac@test.com',
-            },
-            {
-                "username": 'chris',
-                "password": 'chrispassword',
-                "first_name": 'chris',
-                "last_name": 'nieland',
-                "email": 'chris@test.com',
-            },
-            {
-                "username": 'sarah',
-                "password": 'sarahpassword',
-                "first_name": 'sarah',
-                "last_name": 'nieland',
-                "email": 'sarah@test.com',
-            },
-            {
-                "username": 'nick',
-                "password": 'nickpassword',
-                "first_name": 'nick',
-                "last_name": 'jordan',
-                "email": 'nick@test.com',
-            },
-            {
-                "username": 'pete',
-                "password": 'petepassword',
-                "first_name": 'pete',
-                "last_name": 'gates',
-                "email": 'pete@test.com',
-            },
-        ]
-
         self.stdout.write('Creating users...')
-        users = [CustomUser.objects.create_user(**user) for user in users]
+
+        users = []
+        for i, user in enumerate(USERS):
+            obj = CustomUser.objects.create_user(**user)
+            users.append(obj)
 
         evan = users[0]
-        content_type = ContentType.objects.get_for_model(Team)
         create_team_permission = Permission.objects.get(
             codename='add_team',
         )
@@ -130,6 +134,7 @@ class Command(BaseCommand):
 
         self.stdout.write('Creating sessions...')
         sessions = self.create_sessions(divisions)
+
         self.stdout.write('Creating session events...')
         for session in sessions:
             session_events = SessionEvent.objects.filter(session=session)
@@ -137,7 +142,6 @@ class Command(BaseCommand):
                 for user in users:
                     if random.random() < 0.1:
                         Sub.objects.create(user=user, date=timezone.now(), session_event=session_event)
-
 
         temp_users = users.copy()
         captain1 = temp_users.pop(0)
@@ -172,28 +176,38 @@ class Command(BaseCommand):
         divisions[1].teams.add(teams[1])
 
     def create_sessions(self, divisions):
-        session_names = ['wichita', '501 Bar', 'Location B', 'Rialto', 'SomeOtherSession', 'TheWhiteHouse', 'PSU',
-                         'My House', 'Location Z']
+        names = [
+            'wichita',
+            '501 Bar',
+            'Location B',
+            'Rialto',
+            'SomeOtherSession',
+            'TheWhiteHouse',
+            'PSU',
+            'My House',
+            'Location Z'
+        ]
         day = datetime(datetime.now().year, datetime.now().month, 1, tzinfo=TZINFO)
         session_divisions = []
         start_dates = []
-        for i, _ in enumerate(session_names):
+        for i, _ in enumerate(names):
             day = day + timedelta(days=1)
             start_dates.append(day)
-            if i < len(session_names) // 2:
+            if i < len(names) // 2:
                 session_divisions.append(divisions[0])
             else:
                 session_divisions.append(divisions[1])
 
         end_dates = [date + timedelta(hours=4) for date in start_dates]
         sessions = []
-        for start, end, name, division in zip(start_dates, end_dates, session_names, session_divisions):
-            session = Session.objects.create(name=name, game='8ball', division=division, start_date=start, end_date=end)
+        for start, end, name, division in zip(start_dates, end_dates, names, session_divisions):
+            session = Session.objects.create(name=name, game='8ball', division=division, start=start,
+                                             end=end)
             sessions.append(session)
 
         for session in sessions:
-            start = session.start_date
-            start_hour = random.choice([16, 17, 18]) # Starts at 4, 5, or 6
+            start = session.start
+            start_hour = random.choice([16, 17, 18])  # Starts at 4, 5, or 6
             start_time = datetime(start.year, start.month, start.day, start_hour)
 
             # Make 8 weeks worth of events per session

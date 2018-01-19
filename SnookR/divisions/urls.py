@@ -4,7 +4,7 @@ from divisions import views
 
 urlpatterns = [
     url(r'^divisions/$', views.DivisionListView.as_view(), name='divisions'),
-    url(r'^divisions/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/session-events/(?P<session_event>[0-9]+)/$',
+    url(r'^divisions/(?P<division>[\w-]+)/session/(?P<session>\d+)/session-events/(?P<session_event>\d+)/$',
         views.SessionEventDetailView.as_view(), name='session-event-detail'),
     url(r'^divisions/(?P<division>[\w-]+)/$', views.DivisionView.as_view(), name='division'),
     url(r'^divisions/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/$', views.SessionView.as_view(), name='session'),

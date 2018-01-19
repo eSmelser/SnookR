@@ -101,8 +101,8 @@ class DivisionSerializer(serializers.Serializer):
 class SessionSerializer(serializers.Serializer):
     name = serializers.CharField()
     id = serializers.ReadOnlyField()
-    start_date = serializers.DateTimeField()
-    end_date = serializers.DateTimeField()
+    start = serializers.DateTimeField()
+    end = serializers.DateTimeField()
     division = DivisionSerializer()
 
 

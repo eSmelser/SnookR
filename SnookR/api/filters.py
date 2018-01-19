@@ -53,16 +53,13 @@ class DivisionFilter(filters.FilterSet):
 class SessionFilter(filters.FilterSet):
     division = filters.RelatedFilter(DivisionFilter, name='division', queryset=Division.objects.all())
 
-    # subs = filters.RelatedFilter(SubFilter, name='subs', queryset=Sub.objects.all())
-
     class Meta:
         model = Session
         fields = {
             'name': character_filters,
             'game': character_filters,
-            'start_date': time_filters,
-            'end_date': time_filters,
-            'slug': ['exact'],
+            'start': time_filters,
+            'end': time_filters,
         }
 
 
