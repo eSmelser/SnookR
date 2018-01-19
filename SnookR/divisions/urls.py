@@ -7,7 +7,7 @@ urlpatterns = [
     url(r'^divisions/(?P<division>[\w-]+)/session/(?P<session>\d+)/session-events/(?P<session_event>\d+)/$',
         views.SessionEventDetailView.as_view(), name='session-event-detail'),
     url(r'^divisions/(?P<division>[\w-]+)/$', views.DivisionView.as_view(), name='division'),
-    url(r'^divisions/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/$', views.SessionView.as_view(), name='session'),
+    url(r'^divisions/(?P<division>\d+)/session/(?P<session>\d+)/$', views.SessionView.as_view(), name='session'),
     url(
         r'^divisions/(?P<division>[\w-]+)/session/(?P<session>[\w-]+)/date/(?P<date>\d{4}-\d{2}-\d{2}_\d{2}-\d{2})/unregister/$',
         views.SessionUnregisterView.as_view(),

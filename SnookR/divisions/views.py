@@ -107,9 +107,9 @@ class SessionViewMixin(TemplateView):
         return SessionEvent.objects.filter(session=session).order_by('date')
 
     def get_session_instance(self):
-        session_slug = self.kwargs.get('session')
-        division_slug = self.kwargs.get('division')
-        return Session.objects.get(slug=session_slug, division__slug=division_slug)
+        session = self.kwargs.get('session')
+        division = self.kwargs.get('division')
+        return Session.objects.get(id=session, division__id=division)
 
     def user_is_registered(self, subs):
         return subs.filter(user=self.request.user).exists()

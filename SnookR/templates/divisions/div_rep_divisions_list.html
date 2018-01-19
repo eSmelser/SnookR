@@ -4,12 +4,18 @@
     <div class="content">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
+                <a class="btn btn-default" href="{% url 'divisions:create-division' %}">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    Create a division
+                </a>
                 {% for division in divisions %}
                     <h3>{{ division }}</h3>
                     <div class="list-group list-group-root well">
+
                         <div class="list-group">
                             <a class="list-group-item"
-                               href="{% url 'divisions:div-rep-create-session' pk=division.id %}"><i class="glyphicon glyphicon-plus"></i> Add A Session</a>
+                               href="{% url 'divisions:div-rep-create-session' pk=division.id %}"><i
+                                    class="glyphicon glyphicon-plus"></i> Add A Session</a>
                         </div>
 
                         {% for session in division.session_set.all %}
@@ -21,7 +27,8 @@
                                 </a>
 
                                 <div class="list-group collapse" id="session-{{ session.id }}">
-                                    <a href="{%  url 'divisions:div-rep-create-session-event' pk=session.id %}" class="list-group-item"><i class="glyphicon glyphicon-plus"></i> Add events</a>
+                                    <a href="{% url 'divisions:div-rep-create-session-event' pk=session.id %}"
+                                       class="list-group-item"><i class="glyphicon glyphicon-plus"></i> Add events</a>
                                     {% for session_event in session.sessionevent_set.all %}
                                         <a href="{{ session_event.get_absolute_url }}"
                                            class="list-group-item">{{ session_event.date }}

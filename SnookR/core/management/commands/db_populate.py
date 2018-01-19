@@ -207,7 +207,7 @@ class Command(BaseCommand):
 
         for session in sessions:
             start = session.start
-            start_hour = random.choice([16, 17, 18])  # Starts at 4, 5, or 6
+            start_hour = random.choice([16, 17, 18])  # 4pm, 5pm, or 6pm
             start_time = datetime(start.year, start.month, start.day, start_hour)
 
             # Make 8 weeks worth of events per session

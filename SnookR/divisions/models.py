@@ -36,10 +36,7 @@ class Session(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('divisions:session', args=self.get_url_args())
-
-    def get_url_args(self):
-        return [str(self.division.slug), str(self.slug)]
+        return reverse('divisions:session', kwargs={'division': self.division.id, 'session': self.id})
 
     def get_subs_with_unregister_urls(self):
         subs = self.subs.all()
