@@ -84,7 +84,7 @@ var InvitationView = function(controller, parentView) {
     }
 
     this.getCaptainDOM = function() {
-        return $( '<span>' ).attr( 'id' , this.getIDPrefix() + '_team_captain').append( this.model.team.team_captain.username );
+        return $( '<span>' ).attr( 'id' , this.getIDPrefix() + '_captain').append( this.model.team.captain.username );
     }
 
 

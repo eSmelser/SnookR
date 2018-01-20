@@ -16,6 +16,7 @@ module.exports = {
         'facebook': './static/socialauth/js/facebook.js',
         'base': './static/js/base.js',
         'session-event-detail': './static/substitutes/js/session-event-detail.js',
+        'assign-captain': './static/teams/js/assign-captain.js',
     },
 
     output: {

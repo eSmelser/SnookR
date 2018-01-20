@@ -228,7 +228,7 @@ class TeamInviteTestCase(SeleniumTestCase):
         self.browser.find_element_by_id('id_accept_button_' + str(id)).click()
         text = self.browser.find_element_by_id('id_accepted_invites_list').text
         self.assertIn('joe', text)
-        obj = TeamInvite.objects.get(invitee__username='will', team__team_captain__username='joe')
+        obj = TeamInvite.objects.get(invitee__username='will', team__captain__username='joe')
         self.assertEqual(obj.status, TeamInvite.APPROVED)
 
 
@@ -271,7 +271,7 @@ class TeamInviteModelTestCase(TestCase):
     def setUp(self):
         self.captain = CustomUser.objects.create_user(username='captain', password='captainpassword')
         self.invitee = CustomUser.objects.create_user(username='invitee', password='inviteepassword')
-        self.team = Team.objects.create(team_captain=self.captain, name='My Team')
+        self.team = Team.objects.create(captain=self.captain, name='My Team')
         self.team_invite = TeamInvite.objects.create(team=self.team, invitee=self.invitee)
 
     def test_invite_status_change_adds_player_to_team(self):

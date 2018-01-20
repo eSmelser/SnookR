@@ -27,7 +27,7 @@ def players(request):
 
 
 class TeamFilter(filters.FilterSet):
-    team_captain = filters.RelatedFilter(UserFilter, name='team_captain', queryset=CustomUser.objects.all())
+    captain = filters.RelatedFilter(UserFilter, name='captain', queryset=CustomUser.objects.all())
     players = filters.RelatedFilter(UserFilter, name='players', queryset=players)
 
     class Meta:

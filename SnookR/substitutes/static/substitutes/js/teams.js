@@ -211,7 +211,7 @@ var teams = (function () {
             event.preventDefault();
             console.log('submit');
             var team = {
-                team_captain: loggedInUser.asJSON(),
+                captain: loggedInUser.asJSON(),
                 name: $('#id_team_name').val(),
                 players: addedUsers.map(p => p.asJSON()),
 //                unregisteredPlayers: unregisteredPlayers

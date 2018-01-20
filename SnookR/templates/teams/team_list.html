@@ -4,7 +4,7 @@
 
 
 {% for team in teams %}
-{% if team.team_captain == user %}
+{% if team.captain == user %}
 <h4> {{ team.name }} <a href="{{ team.get_delete_url }}"> delete this team</a></h4>
 {% else %}
 <h4> {{ team.name }}</h4>
@@ -16,7 +16,7 @@
     <li><a href="{{ division.get_absolute_url }}">{{ division }}</a></li>
     {% endfor %}
 </ul>
-<h5>Captain: <a href="{{ team.team_captain.get_absolute_url }}">{{ team.team_captain }}</a></h5>
+<h5>Captain: <a href="{{ team.captain.get_absolute_url }}">{{ team.captain }}</a></h5>
 <h5>Players</h5>
 <ul>
     {% for player in team.players.all %}

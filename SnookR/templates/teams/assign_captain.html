@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load webpack_loader %}
+{% load static %}
+{% block title %}Assign team captain{% endblock %}
+{% block content %}
+    <div class="content">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>Make {{ player }} a team captain</h3>
+                <div class="form-group">
+                    <form action="." method="post" class="form" id="assign-captain-form">
+                        {% csrf_token %}
+                        {% bootstrap_form form %}
+                        {% buttons %}
+                            <input type="text" id="text-input" >
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        {% endbuttons %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block footer_scripts %}
+    <link rel="stylesheet" type="text/css" href="{% static 'vendor/tokeninput/css/token-input.css' %}"/>
+    {% render_bundle 'assign-captain' %}
+
+    <script type="text/javascript">
+
+    </script>
+{% endblock %}

@@ -8,8 +8,8 @@ from substitutes.models import Sub
 
 
 class TeamManager(models.Manager):
-    def create_team(self, name, team_captain, players):
-        team = self.create(team_captain=team_captain, name=name)
+    def create_team(self, name, captain, players):
+        team = self.create(captain=captain, name=name)
         for player in players:
             TeamInvite.objects.create(invitee=player, team=team)
 
@@ -34,7 +34,7 @@ class Team(models.Model):
     @staticmethod
     def get_all_related(user):
         if user.is_authenticated():
-            combined = list(Team.objects.filter(team_captain=user))
+            combined = list(Team.objects.filter(captain=user))
             combined += list(Team.objects.filter(players=user))
             return sorted(list(set(combined)), key=lambda obj: obj.id)
         else:

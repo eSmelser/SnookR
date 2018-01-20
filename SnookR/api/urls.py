@@ -18,4 +18,5 @@ urlpatterns = [
     url(r'^session-event-invites/(?P<pk>[0-9]+)/$', views.SessionEventInviteView.as_view(), name='session-event-invite'),
     url(r'^messaging/message/new/$', messaging_views.MessageNewView.as_view(), name='new-message'),
     url(r'^messaging/message/$', messaging_views.MessageCreateView.as_view(), name='message-detail-create'),
+    url(r'^tokeninput/$', views.TokenInputListView.as_view(), name='tokeninput'),
 ]

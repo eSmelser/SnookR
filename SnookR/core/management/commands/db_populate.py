@@ -151,13 +151,13 @@ class Command(BaseCommand):
         teams = [
             {
                 'name': 'team 1',
-                'team_captain': captain1,
+                'captain': captain1,
                 'players': temp_users[halfway:]
             },
 
             {
                 'name': 'team 1',
-                'team_captain': captain2,
+                'captain': captain2,
                 'players': temp_users[:halfway]
             },
         ]

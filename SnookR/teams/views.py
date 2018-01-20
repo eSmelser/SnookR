@@ -1,12 +1,16 @@
+import json
+
 from collections import namedtuple
+from django.core import serializers
 from django.db.models import Q
+from django.http import QueryDict
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView, CreateView, RedirectView, FormView
 from django.views.generic.edit import ProcessFormView
 
-from teams.forms import TeamForm
+from teams.forms import TeamForm, CaptainForm
 from accounts.models import CustomUser
 from invites.models import TeamInvite
 from teams.models import Team, NonUserPlayer
@@ -38,7 +42,7 @@ class TeamView(TemplateView, LoginRequiredMixin):
                 unregistered_players.append({'name': name, 'team': team})
 
             # Add the team captain too
-            players.append(Player(team, team.team_captain, 'Approved'))
+            players.append(Player(team, team.captain, 'Approved'))
 
         # Get every invited player for every team
         invites = TeamInvite.objects.filter(team__in=teams)
@@ -66,7 +70,8 @@ class CreateTeamView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     login_url = '/login/'
 
     def post(self, request, *args, **kwargs):
-        team = Team.objects.create_team(team_captain=request.user, name=request.POST['team-name'], players=self.get_players())
+        team = Team.objects.create_team(captain=request.user, name=request.POST['team-name'],
+                                        players=self.get_players())
         NonUserPlayer.objects.create_from_strings(self.request.POST.getlist('unregistered-player'), team=team)
         return redirect('team')
 
@@ -93,16 +98,40 @@ class DeleteTeamView(TemplateView, ProcessFormView):
         return Team.objects.get(id=self.kwargs.get('pk'))
 
 
-class AssignTeamCaptainView(LoginRequiredMixin, TemplateView):
-    template_name = 'teams/assign_team_captain.html'
+class AssignTeamCaptainView(LoginRequiredMixin, FormView):
+    template_name = 'teams/assign_captain.html'
+    form_class = CaptainForm
+    success_url = reverse_lazy('assign-team-captain-success')
+
+    def get_initial(self):
+        return {'user': self.request.user}
+
+    def form_valid(self, form):
+        division = form.cleaned_data['division']
+        users = form.cleaned_data['users']
+        for user in users:
+            user.groups.add(division.team_captain_group)
+
+        division = serializers.serialize('json', [division])
+        users = serializers.serialize('json', users)
+
+        self.request.session['division'] = division
+        self.request.session['users'] = users
+        return super().form_valid(form)
+
+
+class AssignTeamCaptainSuccessView(LoginRequiredMixin, TemplateView):
+    template_name = 'teams/assign_captain_success.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        search = self.request.GET.get('search', '')
-        if search:
-            query = Q()
-            for term in search.split(' '):
-                query |= Q(first_name__startswith=term)| Q(last_name__startswith=term)
+        division = json.loads(self.request.session['division'])[0]
+        user = json.loads(self.request.session['users'])
 
-            context['results'] = CustomUser.objects.filter(query)
+        context['division'] = division
+        context['users'] = user
+
         return context
+
+
+

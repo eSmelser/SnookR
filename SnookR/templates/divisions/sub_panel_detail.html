@@ -14,7 +14,7 @@
         {% spaceless %}
             <small>
                 {% for team in user.managed_teams %}
-                    {% if team.team_captain in sub.invitation_requesters %}
+                    {% if team.captain in sub.invitation_requesters %}
                         {% if forloop.first %}
                             Invited to {{ team }}
                         {% elif forloop.last %}

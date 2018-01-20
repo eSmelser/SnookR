@@ -112,7 +112,7 @@ class CustomUser(User):
     @property
     def managed_teams(self):
         # TODO: rename this property or the related name of Team model because they conflict and mean the same thing
-        return Team.objects.filter(team_captain=self)
+        return Team.objects.filter(captain=self)
 
     @cached_property
     def represented_divisions(self):

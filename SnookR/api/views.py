@@ -23,7 +23,7 @@ from api.serializers import (
     SubSerializer,
     SessionEventInviteSerializer,
     MessageSerializer,
-)
+    TokenInputSerializer)
 from api.permissions import TeamPermission, TeamInvitePermission, MessagePermission
 from api.filters import TeamFilter, TeamInviteFilter, UserFilter, SessionFilter, SessionEventFilter, SubFilter, \
     SessionEventInviteFilter, MessageFilter
@@ -128,9 +128,24 @@ class MessageListView(ListCreateAPIView):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     filter_class = MessageFilter
-    #filter_fields = ('sender', 'receiver', 'id', 'timestamp')
-
-
 
     def get_queryset(self):
         return super().get_queryset().filter(Q(sender=self.request.user) | Q(receiver=self.request.user))
+
+
+class TokenInputListView(ListAPIView):
+    serializer_class = TokenInputSerializer
+
+    def list(self, request, *args, **kwargs):
+        print('list')
+        queryset = self.get_queryset()
+        serializer = TokenInputSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def get_queryset(self):
+        q = self.request.GET.get('q', '')
+        query = Q()
+        for term in q.split(' '):
+            query |= Q(first_name__startswith=term) | Q(last_name__startswith=term)
+
+        return CustomUser.objects.filter(query)

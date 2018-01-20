@@ -16,6 +16,17 @@ def must_have_id(data):
         })
 
 
+
+class TokenInputSerializer(serializers.Serializer):
+    """Serializer for jquery.tokeninput.js"""
+    id = serializers.IntegerField(required=True)
+    name = serializers.CharField(required=True)
+
+    def to_representation(self, instance):
+        print('here')
+        return {'id': instance.id, 'name': instance.full_name}
+
+
 class CustomUserSerializer(serializers.Serializer):
     username = serializers.CharField()
     first_name = serializers.CharField(required=False, allow_blank=True)
@@ -41,12 +52,12 @@ class TeamSerializer(serializers.Serializer):
     players = CustomUserSerializer(many=True)
     id = serializers.IntegerField(required=False)
     name = serializers.CharField(required=True)
-    team_captain = CustomUserSerializer(required=False)
+    captain = CustomUserSerializer(required=False)
 
     def create(self, validated_data):
         captain = accounts.models.CustomUser.objects.get(id=self.context['request'].user.id)
         name = validated_data.get('name')
-        instance = Team.objects.create(team_captain=captain, name=name)
+        instance = Team.objects.create(captain=captain, name=name)
 
         players = []
         for player in validated_data.get('players', []):

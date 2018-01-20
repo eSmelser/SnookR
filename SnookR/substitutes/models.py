@@ -42,5 +42,5 @@ class Sub(models.Model):
         return '/dummy-url/'
 
     def invitation_requesters(self):
-        qs = SessionEventInvite.objects.select_related('team__team_captain').filter(sub=self)
-        return [obj.team.team_captain for obj in qs]
+        qs = SessionEventInvite.objects.select_related('team__captain').filter(sub=self)
+        return [obj.team.captain for obj in qs]

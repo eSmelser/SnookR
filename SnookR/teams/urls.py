@@ -6,4 +6,6 @@ urlpatterns = [
     url(r'^teams/create/$', views.CreateTeamView.as_view(), name='create_team'),
     url(r'^delete/team/(?P<pk>\d+)/$', views.DeleteTeamView.as_view(), name='delete-team-confirmation'),
     url(r'^assign-team-captain/$', views.AssignTeamCaptainView.as_view(), name='assign-team-captain'),
+    url(r'^assign-team-captain/success/$', views.AssignTeamCaptainSuccessView.as_view(), name='assign-team-captain-success'),
+
 ]

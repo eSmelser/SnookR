@@ -78,7 +78,7 @@ const api = (function () {
      *
      * Arguments:
      *     data: An object describing the team to be created.
-     *           Required fields: name, team_captain.
+     *           Required fields: name, captain.
      *           Optional fields: players
      *
      * Permisions: User must have the 'substitutes.add_team' permission to POST a team.
@@ -86,7 +86,7 @@ const api = (function () {
      * Example data arg:
      *       {
      *           'name': MyTeam,
-     *           'team_captain': {
+     *           'captain': {
      *              'username': 'evan'
      *            },
      *           'players': [
@@ -283,6 +283,8 @@ const api = (function () {
       });
     };
 
+    const tokenInputUrl = '/api/tokeninput/';
+
     // Return public methods for API
     return {
         baseURL,
@@ -303,6 +305,7 @@ const api = (function () {
         getNewMessage,
         postMessage,
         getMessages,
+        tokenInputUrl,
     }
 })();
 
