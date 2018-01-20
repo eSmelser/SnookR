@@ -18,7 +18,7 @@ from api.serializers import TeamInviteSerializer, TeamSerializer, CustomUserSeri
 from rest_framework.renderers import JSONRenderer
 
 
-class TeamView(TemplateView, LoginRequiredMixin):
+class TeamView(PermissionRequiredMixin, LoginRequiredMixin, TemplateView):
     template_name = 'teams/team.html'
 
     def get_context_data(self, **kwargs):
@@ -62,6 +62,10 @@ class TeamView(TemplateView, LoginRequiredMixin):
         context['unregistered_players'] = unregistered_players
         print(context['unregistered_players'])
         return context
+
+    def has_permission(self):
+        print('has_permission')
+        return self.request.user.is_captain()
 
 
 class CreateTeamView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):

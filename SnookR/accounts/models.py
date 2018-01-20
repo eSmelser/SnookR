@@ -122,6 +122,11 @@ class CustomUser(User):
     def is_division_rep(self):
         return self.represented_divisions.exists()
 
+    def is_captain(self):
+        query = Q(name__startswith='division') & Q(name__endswith='team_captain')
+        return self.groups.filter(query).exists()
+
+
 def generate_expiration():
     return timezone.now() + timedelta(minutes=20)
 

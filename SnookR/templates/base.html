@@ -74,7 +74,7 @@
                             <li><a href="{%  url 'divisions:create-div-rep-request' %}">Request Div Rep</a></li>
                         <li><a data-turbolinks="false" href="{% url 'messaging:messaging' %}">Messages</a></li>
 
-                            {% if perms.teams.add_team %}
+                            {% if user.is_captain %}
                                 <li><a data-turbolinks="false" href="{% url 'invites:session-event:start' %}">Invite a Sub</a></li>
                             {% endif %}
 
