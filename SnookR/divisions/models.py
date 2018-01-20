@@ -51,6 +51,9 @@ class Division(models.Model):
     def get_absolute_url(self):
         return reverse('divisions:division', args=[self.slug])
 
+    def make_captain(self, user):
+        user.groups.add(self.team_captain_group)
+
 
 class Session(models.Model):
     date_format = '%Y-%m-%d_%H-%M'

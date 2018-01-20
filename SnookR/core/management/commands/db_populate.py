@@ -173,10 +173,9 @@ class Command(BaseCommand):
 
         teams = temp
         divisions[0].teams.add(teams[0])
+        divisions[0].make_captain(captain1)
         divisions[1].teams.add(teams[1])
-        teams[0].captain.groups.add(divisions[0].team_captain_group)
-        teams[1].captain.groups.add(divisions[1].team_captain_group)
-
+        divisions[1].make_captain(captain2)
 
     def create_sessions(self, divisions):
         names = [
