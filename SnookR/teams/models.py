@@ -15,7 +15,6 @@ class TeamManager(models.Manager):
 
         return team
 
-
 class Team(models.Model):
     '''
     A team can contain many players but should only ever exist in one division
@@ -24,7 +23,7 @@ class Team(models.Model):
     '''
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
-    team_captain = models.ForeignKey('accounts.CustomUser', related_name='managed_teams')
+    captain = models.ForeignKey('accounts.CustomUser', related_name='managed_teams')
     players = models.ManyToManyField('accounts.CustomUser', blank=True, related_name='team_set')
 
     objects = TeamManager()

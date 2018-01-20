@@ -2,7 +2,8 @@ import calendar
 from datetime import timedelta
 
 from autoslug import AutoSlugField
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 from django.urls import reverse
@@ -10,11 +11,35 @@ from django.urls import reverse
 from substitutes.models import Sub
 from core import utils
 
+
 class Division(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
     division_rep = models.ForeignKey(User, related_name='represented_divisions_set')
     teams = models.ManyToManyField('teams.Team', blank=True)
+
+    def save(self, *args, **kwargs):
+        content_type = ContentType.objects.get(app_label='teams', model='Team')
+        permission = Permission.objects.create(
+            codename='division.%s.add_team' % self.id,
+            name='Can add teams in division %s' % self.name,
+            content_type=content_type
+        )
+        group = Group.objects.create(name='division.%s.team_captain')
+        group.permissions.add(permission)
+        super().save(*args, **kwargs)
+
+    def get_add_team_permission(self):
+        obj, _ = Permission.objects.get_or_create(codename='division.%s.add_team' % self.id)
+        return obj
+
+    def get_team_captain_group(self):
+        permission = self.get_add_team_permission()
+        group, created = Group.objects.get_or_create(name='division.%s.team_captain')
+        if created:
+            group.permissions.add(permission)
+
+        return group
 
     def __str__(self):
         return self.name

@@ -1,24 +1,17 @@
 {% extends 'base.html' %}
-{% block title %}Search for a player{% endblock %}
+{% block title %}Assign team captain{% endblock %}
 {% block content %}
     <div class="content">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
-                <h3>Search for users to assign as team captain</h3>
+                <h3>Make {{ player }} a team captain</h3>
                 <div class="form-group">
-                    <form action="." method="get">
+                    <form action="." method="post">
                         {% csrf_token %}
-                        <label for="search"></label>
-                        <input class="form-control" type="text" id="search" name="search">
-                        <button type="submit" class="btn btn-primary">Search</button>
+                        {{ form }}
+                        <button type="submit" class="btn btn-default">Submit</button>
                     </form>
                 </div>
-
-                <ul>
-                    {% for result in results %}
-                        <li>{{ result.full_name }}</li>
-                    {% endfor %}
-                </ul>
             </div>
         </div>
     </div>
