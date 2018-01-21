@@ -24,7 +24,7 @@ class TokenInputSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         print('here')
-        return {'id': instance.id, 'name': instance.full_name}
+        return {'id': instance.id, 'name': instance.get_full_name()}
 
 
 class CustomUserSerializer(serializers.Serializer):

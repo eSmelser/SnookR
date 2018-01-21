@@ -33,24 +33,14 @@ class AccountView(FormView):
         profile.save()
         return super().form_valid(form)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context['user'] = CustomUser.from_user(self.request.user)
-        return context
-
 
 class AccountChangeView(FormView):
     template_name = 'accounts/account_change.html'
     form_class = CustomUserChangeForm
     success_url = reverse_lazy('account')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context['user'] = CustomUser.from_user(self.request.user)
-        return context
-
     def form_valid(self, form):
-        user = CustomUser.from_user(self.request.user)
+        user = self.request.user
 
         # Update user only with fields with non-empty values
         for field in self.form_class.Meta.fields:

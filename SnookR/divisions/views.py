@@ -313,11 +313,11 @@ class DivRepDivisionsList(DivRepPermissionMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['divisions'] = self.request.user.represented_divisions_set.all()
+        context['divisions'] = self.request.user.divisions_set.all()
         return context
 
     def get(self, request, *args, **kwargs):
-        if not self.request.user.represented_divisions_set.all().count() > 0:
+        if not self.request.user.divisions_set.all().count() > 0:
             return redirect(reverse('divisions:create-division'))
 
         return super().get(request, *args, **kwargs)

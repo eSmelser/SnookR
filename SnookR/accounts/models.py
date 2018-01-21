@@ -65,41 +65,13 @@ class CustomUser(User):
         except UserProfile.DoesNotExist:
             return None
 
-    @cached_property
-    def sessions(self):
-        return Session.objects.filter(subs__user=self)
-
-    @cached_property
-    def pending_invites(self):
-        return self.teaminvite_set.filter(invitee=self, status='P')
-
-    @cached_property
-    def all_invites(self):
-        return self.teaminvite_set.filter(invitee=self)
-
-    @staticmethod
-    def from_user(user):
-        return CustomUser.objects.get(id=user.id)
-
     @property
     def get_absolute_url(self):
         return reverse('profile', kwargs={'username': self.username})
 
-    @cached_property
-    def full_name(self):
-        return str(self.first_name) + ' ' + str(self.last_name)
-
-    @cached_property
-    def team_invites(self):
-        return TeamInvite.objects.filter(invitee=self)
-
-    @cached_property
-    def session_event_invites(self):
-        return SessionEventInvite.objects.filter(sub__user__username=self.username)
-
     @property
     def invites_count(self):
-        return self.session_event_invites.pending().count() + self.team_invites.pending().count()
+        return SessionEventInvite.objects.filter(sub__user=self).pending().count() + self.teaminvite_set.pending().count()
 
     @staticmethod
     def unique_username(first_name, last_name):
@@ -109,18 +81,8 @@ class CustomUser(User):
 
         return username
 
-    @property
-    def managed_teams(self):
-        # TODO: rename this property or the related name of Team model because they conflict and mean the same thing
-        return Team.objects.filter(captain=self)
-
-    @cached_property
-    def represented_divisions(self):
-        return Division.objects.filter(division_rep=self)
-
-    @property
     def is_division_rep(self):
-        return self.represented_divisions.exists()
+        return self.divisions_set.all().exists()
 
     def is_captain(self):
         return self.is_authenticated() and self.captain_divisions.exists()

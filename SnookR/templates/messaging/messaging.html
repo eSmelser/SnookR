@@ -2,96 +2,101 @@
 {% load render_bundle from webpack_loader %}
 {% load static %}
 {% block styles %}
-  {% render_bundle 'messaging' %}
-  <link href="{% static 'messaging/css/messaging.css' %}" rel='stylesheet'/>
+    {% render_bundle 'messaging' %}
+    <link href="{% static 'messaging/css/messaging.css' %}" rel='stylesheet'/>
 {% endblock %}
 {% block content %}
-  <div class="container" id="main-content">
-    <div class="row full-height main-row">
-    {% if friend %}
-      <div class="col-md-4 full-height bordered">
-        <div class="list-group" id="recent-messages-group">
-          <h4 id="recent-header">Previous messages</h4>
-          {% for message in recent_messages %}
-            {% include 'messaging/recent_message.html' with message=message orientation='left' %}
-          {% endfor %}
+    <div class="container" id="main-content">
+        <div class="row full-height main-row">
+            {% if friend %}
+                <div class="col-md-4 full-height bordered">
+                    <div class="list-group" id="recent-messages-group">
+                        <h4 id="recent-header">Previous messages</h4>
+                        {% for message in recent_messages %}
+                            {% include 'messaging/recent_message.html' with message=message orientation='left' %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 full-height bordered">
+                    <h1>{{ friend.get_full_name }}</h1>
+                    <ul class="list-group .turbolinks-disable-scroll" id="messages-list">
+                        {% if not friend %}
+                            <li><strong>No messages!</strong></li>
+                        {% else %}
+                            <div id="loader" class="text-center" style="display:none"><span
+                                    class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
+                            </div>
+
+                            {% include 'messaging/message_list_elements.html' %}
+                        {% endif %}
+                    </ul>
+                    <form action='.' method='post' data-turbolinks-permanent id="message-text-form">
+                        {% csrf_token %}
+                        {{ form.text }}
+                        {{ form.sender }}
+                        {{ form.receiver }}
+                    </form>
+                </div>
+                <div class="col-md-2 right-column full-height bordered">
+                    <div class="text-center">
+                        <img id="right-column-thumbnail" class="img-circle text-center"
+                             src="{{ friend.profile.thumbnail_url }}" href="{{ friend.profile.get_absolute_url }}">
+                        <h1><a href="{{ friend.profile.get_absolute_url }}">{{ friend.get_full_name }}</a></h1>
+                        {% if friend.managedteam_set.all.exists %}
+                            <h4>Team Captain</h4>
+                        {% endif %}
+                        <p>
+                        <ol style="list-style-type:none" class="text-center">
+                            {% for team in friend.managedteam_set.all %}
+                                <li class="right-column-team-item">{{ team }}</li>
+                            {% endfor %}
+                        </ol>
+                        </p>
+
+                        <h4>Team Member</h4>
+                        <p>
+                        <ol style="list-style-type:none" class="text-center">
+                            {% for team in friend.team_set.all %}
+                                <li class="right-column-team-item">{{ team }}</li>
+                            {% endfor %}
+                        </ol>
+                        </p>
+                    </div>
+                </div>
+
+                <script id="message-template" type="text/template">
+                    <div>
+                        <li class="list-group-item message-item" id="">
+                            <a href="" class="">
+                                <img class="img-circle" src="">
+                            </a>
+
+                            <div class="">
+                                <small class="list-group-item-heading message-fullname text-muted"></small>
+                                <small class="message-timestamp text-muted"></small>
+                            </div>
+                            <p class="message-text"></p>
+                        </li>
+                    </div>
+                </script>
+
+            {% else %}
+                <h3>No messages sent or received yet (TODO: place help info here)</h3>
+            {% endif %}
         </div>
-      </div>
-      <div class="col-md-6 full-height bordered">
-        <h1>{{ friend.get_full_name }}</h1>
-        <ul class="list-group .turbolinks-disable-scroll" id="messages-list">
-          {% if not friend %}
-            <li><strong>No messages!</strong></li>
-          {% else %}
-            <div id="loader" class="text-center" style="display:none"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 
-            {% include 'messaging/message_list_elements.html' %}
-          {% endif %}
-        </ul>
-        <form action='.' method='post' data-turbolinks-permanent id="message-text-form">
-          {% csrf_token %}
-          {{ form.text }}
-          {{ form.sender }}
-          {{ form.receiver }}
-        </form>
-      </div>
-        <div class="col-md-2 right-column full-height bordered">
-          <div class="text-center">
-            <img id="right-column-thumbnail"class="img-circle text-center" src="{{ friend.profile.thumbnail_url }}" href="{{ friend.profile.get_absolute_url }}">
-            <h1><a href="{{ friend.profile.get_absolute_url }}">{{ friend.get_full_name }}</a></h1>
-            {% if friend.managed_teams.all %}<small><h4>Team Captain</h4></small>{% endif %}
-            <p>
-              <ol style="list-style-type:none" class="text-center">
-                {% for team in friend.managed_teams.all %}
-                  <li class="right-column-team-item">{{ team }}</li>
-                {% endfor %}
-              </ol>
-            </p>
-
-            <h4>Team Member</h4>
-            <p>
-              <ol style="list-style-type:none" class="text-center">
-                {% for team in friend.team_set.all %}
-                  <li class="right-column-team-item">{{ team }}</li>
-                {% endfor %}
-              </ol>
-            </p>
-          </div>
-        </div>
-
-      <script id="message-template" type="text/template">
-        <div>
-            <li class="list-group-item message-item" id="">
-              <a href="" class="">
-                  <img class="img-circle" src="">
-              </a>
-
-              <div class="">
-                  <small class="list-group-item-heading message-fullname text-muted"></small>
-                  <small class="message-timestamp text-muted"></small>
-              </div>
-            <p class="message-text"></p>
-      </li>
-      </div>
-      </script>
-
-      {% else %}
-        <h3>No messages sent or received yet (TODO: place help info here)</h3>
-      {% endif %}
     </div>
-
-  </div>
 {% endblock %}
 {% block footer_scripts %}
-  <input type="hidden" id="user-id" name="name" value="{{ user.id }}">
-  <input type="hidden" id="user-name" name="name" value="{{ user.get_full_name }}">
-  <input type="hidden" id="friend-name" name="name" value="{{ friend.get_full_name }}">
-  <input type="hidden" id="friend-username" value="{{ friend.username }}">
-  <input type="hidden" id="user-username" value="{{ user.username }}">
+    <input type="hidden" id="user-id" name="name" value="{{ user.id }}">
+    <input type="hidden" id="user-name" name="name" value="{{ user.get_full_name }}">
+    <input type="hidden" id="friend-name" name="name" value="{{ friend.get_full_name }}">
+    <input type="hidden" id="friend-username" value="{{ friend.username }}">
+    <input type="hidden" id="user-username" value="{{ user.username }}">
 
-  <input type="hidden" id="friend-id" name="name" value="{{ friend.id }}">
-  <input type="hidden" id="user-profile-url" name="name" value="{{ user.profile.get_absolute_url }}">
-  <input type="hidden" id="friend-profile-url" name="name" value="{{ friend.profile.get_absolute_url }}">
-  <input type="hidden" id="user-thumbnail-url" name="name" value="{{ user.profile.thumbnail_url }}">
-  <input type="hidden" id="friend-thumbnail-url" name="name" value="{{ friend.profile.thumbnail_url }}">
+    <input type="hidden" id="friend-id" name="name" value="{{ friend.id }}">
+    <input type="hidden" id="user-profile-url" name="name" value="{{ user.profile.get_absolute_url }}">
+    <input type="hidden" id="friend-profile-url" name="name" value="{{ friend.profile.get_absolute_url }}">
+    <input type="hidden" id="user-thumbnail-url" name="name" value="{{ user.profile.thumbnail_url }}">
+    <input type="hidden" id="friend-thumbnail-url" name="name" value="{{ friend.profile.thumbnail_url }}">
 {% endblock %}

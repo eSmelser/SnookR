@@ -16,8 +16,6 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated():
             try:
-                context['user'] = CustomUser.from_user(self.request.user)
-
                 # Gets all foreign keys in a single query
                 # Note: ordering is required for itertools.groupby to work
                 subs = Sub.objects.select_related('session_event__session__division') \
