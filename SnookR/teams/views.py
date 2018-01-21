@@ -15,7 +15,7 @@ from divisions.models import Division
 from teams.forms import TeamForm, CaptainForm
 from accounts.models import User
 from invites.models import TeamInvite
-from teams.models import Team, NonUserPlayer
+from teams.models import Team, NonUserPlayer, Captain
 from api.serializers import TeamInviteSerializer, TeamSerializer, CustomUserSerializer
 from rest_framework.renderers import JSONRenderer
 
@@ -81,19 +81,19 @@ class CreateTeamView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def has_permission(self):
         division = self.get_division()
-        return self.request.user.captain_divisions.filter(pk=division.id).exists()
+        return self.request.user.captain_set.filter(division=division).exists()
 
     def get_division(self):
         pk = self.request.POST.get('division')
         return get_object_or_404(Division, pk=pk)
 
     def create_team(self):
-        request = self.request
+        division = self.get_division()
+        captain = get_object_or_404(Captain, user=self.request.user, division=division)
         return Team.objects.create_team(
-            captain=request.user,
-            name=request.POST['team-name'],
+            captain=captain,
+            name=self.request.POST['team-name'],
             players=self.get_players(),
-            division=self.get_division(),
         )
 
 

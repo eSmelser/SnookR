@@ -46,6 +46,7 @@ class CustomUserSerializer(serializers.Serializer):
 
         json['invite_url'] = self.context.get('invite_url', None)
         json['unregister_url'] = self.context.get('unregister_url', None)
+        json['full_name'] = instance.get_full_name().title()
         return json
 
 

@@ -105,6 +105,7 @@ let Handlebars = require('handlebars');
         searchForTerm: function (term) {
             if (term in this.clientCache) {
                 this.searchResults = this.clientCache[term];
+                console.log('sr', this.searchResults);
             } else {
                 self = this;
                 this.$loader.show();

@@ -73,8 +73,8 @@
                         <div class="form-group" id="division-choice">
                             <label for="division">Division:</label>
                             <select class="form-control" id="division" required>
-                                {% for division in user.captain_divisions %}
-                                    <option class="division-option" value="{{ division.id }}">{{ division }}</option>
+                                {% for captain in user.captain_set.all %}
+                                    <option class="division-option" value="{{ captain.division.id }}">{{ captain.division }}</option>
                                 {% endfor %}
                             </select>
                             <input type="hidden" name="division" id="division-hidden" value="">
@@ -107,7 +107,7 @@
                                         </div>
                                         <h4 class="pull-left">
                                             <a href="{{ url }}"
-                                               style="text-decoration:none;"><strong>{{ username }}</strong></a>
+                                               style="text-decoration:none;"><strong>{{ full_name }}</strong></a>
                                         </h4>
                                     </div>
                                 </div>
