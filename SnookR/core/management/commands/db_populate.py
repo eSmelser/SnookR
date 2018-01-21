@@ -152,30 +152,23 @@ class Command(BaseCommand):
             {
                 'name': 'team 1',
                 'captain': captain1,
-                'players': temp_users[halfway:]
+                'players': temp_users[halfway:],
+                'division': divisions[0],
             },
 
             {
                 'name': 'team 1',
                 'captain': captain2,
-                'players': temp_users[:halfway]
+                'players': temp_users[:halfway],
+                'division': divisions[1],
             },
         ]
 
         self.stdout.write('Creating teams...')
-
-        temp = []
         for team in teams:
             players = team.pop('players')
             team = Team.objects.create(**team)
             team.players.add(*players)
-            temp.append(team)
-
-        teams = temp
-        divisions[0].teams.add(teams[0])
-        divisions[0].make_captain(captain1)
-        divisions[1].teams.add(teams[1])
-        divisions[1].make_captain(captain2)
 
     def create_sessions(self, divisions):
         names = [

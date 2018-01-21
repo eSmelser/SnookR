@@ -123,8 +123,20 @@ class CustomUser(User):
         return self.represented_divisions.exists()
 
     def is_captain(self):
+        return self.is_authenticated() and self.captain_divisions.exists()
+
+    @cached_property
+    def captain_divisions(self):
         query = Q(name__startswith='division') & Q(name__endswith='team_captain')
-        return self.groups.filter(query).exists()
+        groups = self.groups.filter(query)
+        ids = []
+        for group in groups:
+            name = group.name
+            id_ = name.lstrip('division.').rstrip('.team_captain') # 'division.2.team_captain' -> '2'
+            id_ = int(id_)
+            ids.append(id_)
+
+        return Division.objects.filter(pk__in=ids)
 
 
 def generate_expiration():

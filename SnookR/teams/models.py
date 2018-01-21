@@ -8,28 +8,28 @@ from substitutes.models import Sub
 
 
 class TeamManager(models.Manager):
-    def create_team(self, name, captain, players):
-        team = self.create(captain=captain, name=name)
+    def create_team(self, name, captain, players, division):
+        team = self.create(captain=captain, name=name, division=division)
         for player in players:
             TeamInvite.objects.create(invitee=player, team=team)
 
         return team
 
 class Team(models.Model):
-    '''
-    A team can contain many players but should only ever exist in one division
-    Team -> Player   : 1 .. *
-    Team -> Division : 1
-    '''
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
-    captain = models.ForeignKey('accounts.CustomUser', related_name='managed_teams')
+    captain = models.ForeignKey('accounts.CustomUser', null=False, related_name='managed_teams')
     players = models.ManyToManyField('accounts.CustomUser', blank=True, related_name='team_set')
+    division = models.ForeignKey('divisions.Division', null=False, related_name='divisions_set')
 
     objects = TeamManager()
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.division.make_captain(self.captain)
 
     @staticmethod
     def get_all_related(user):

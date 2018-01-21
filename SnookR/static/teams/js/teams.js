@@ -19,6 +19,9 @@ let Handlebars = require('handlebars');
             this.selectedTeamId = this.initSelectedTeam();
             this.bindEvents();
             this.render();
+
+            let division = this.$form.find('.division-option').first().attr('value');
+            this.$divisionHiddenInput.attr('value', division);
         },
 
         cacheDom: function () {
@@ -31,6 +34,8 @@ let Handlebars = require('handlebars');
             this.$searchResultsDiv = $('#search-results');
             this.$addedPlayersDiv = $('#added-players');
             this.$form = $('#team-form');
+            this.$divisionSelect = this.$form.find('#division-select');
+            this.$divisionHiddenInput = this.$form.find('#division-hidden');
         },
 
         bindEvents: function () {
@@ -55,13 +60,14 @@ let Handlebars = require('handlebars');
                 .click(this.validateForm.bind(this))
                 .click(this.addAddedPlayersToForm.bind(this));
             this.$form.find('#unregistered-player-add-button')
-                .click(this.addUnregisteredPlayer.bind(this))
+                .click(this.addUnregisteredPlayer.bind(this));
+            this.$divisionSelect.change(this.divisionSelectUpdate);
         },
 
-        addUnregisteredPlayer: function() {
-          let val = this.$form.find('#unregistered-player-text-input').val();
-          this.unregisteredPlayers.push(val);
-          this.render();
+        addUnregisteredPlayer: function () {
+            let val = this.$form.find('#unregistered-player-text-input').val();
+            this.unregisteredPlayers.push(val);
+            this.render();
         },
 
         validateForm: function () {
@@ -160,18 +166,18 @@ let Handlebars = require('handlebars');
             }
         },
 
-        renderUnregisteredPlayersList: function() {
-          let $dom = this.$form.find('#unregistered-players-list').empty();
-          this.unregisteredPlayers.map( p => {
-            let $li = $('<li>').append(p);
-            let $input = $(`<input type="hidden" name="unregistered-player" value=${p}>`)
-            $dom.append($li);
-            $dom.append($input);
-          });
+        renderUnregisteredPlayersList: function () {
+            let $dom = this.$form.find('#unregistered-players-list').empty();
+            this.unregisteredPlayers.map(p => {
+                let $li = $('<li>').append(p);
+                let $input = $(`<input type="hidden" name="unregistered-player" value=${p}>`);
+                $dom.append($li);
+                $dom.append($input);
+            });
         },
 
         addAddedPlayersToForm: function () {
-            this.$form.append(this.addedPlayers.map( p => `<input type="hidden" value="${p.id}" name="player">`))
+            this.$form.append(this.addedPlayers.map(p => `<input type="hidden" value="${p.id}" name="player">`))
         },
 
         activatePanelMouseOver: function () {
@@ -273,6 +279,11 @@ let Handlebars = require('handlebars');
             return `.player-group-${this.selectedTeamId}`;
         },
 
+        divisionSelectUpdate: function () {
+            const division = $('option:selected', this).attr('value');
+            this.$divisionHiddenInput.attr('value', division);
+        },
+
         addPlayer: function (event) {
             let self = event.data.self;
             let id = parseInt($(this).attr('data-user-id'));
@@ -291,10 +302,10 @@ let Handlebars = require('handlebars');
             self.addedPlayers.splice(index, 1);
             self.searchResults.push(user);
             self.render();
-        }
+        },
     };
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         team.init();
     });
 })();

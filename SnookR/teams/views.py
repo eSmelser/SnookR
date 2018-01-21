@@ -4,12 +4,14 @@ from collections import namedtuple
 from django.core import serializers
 from django.db.models import Q
 from django.http import QueryDict
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.urls import reverse, reverse_lazy
+from django.views import View
 from django.views.generic import TemplateView, CreateView, RedirectView, FormView
 from django.views.generic.edit import ProcessFormView
 
+from divisions.models import Division
 from teams.forms import TeamForm, CaptainForm
 from accounts.models import CustomUser
 from invites.models import TeamInvite
@@ -24,8 +26,7 @@ class TeamView(PermissionRequiredMixin, LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         teams = Team.get_all_related(self.request.user)
-        context['teams'] = teams
-        context['first_team_id'] = teams[0].id if teams else None
+
         Player = namedtuple('Player', ['team', 'instance', 'status'])
 
         # Get every player for every team related to the current user
@@ -55,32 +56,45 @@ class TeamView(PermissionRequiredMixin, LoginRequiredMixin, TemplateView):
 
         serializer = TeamInviteSerializer(invites, many=True)
         context['invites_json'] = JSONRenderer().render(serializer.data)
-
+        context['teams'] = teams
+        context['first_team_id'] = teams[0].id if teams else None
         # Wrap players in set() to remove duplicates
         context['players'] = set(players)
-
         context['unregistered_players'] = unregistered_players
-        print(context['unregistered_players'])
         return context
 
     def has_permission(self):
-        print('has_permission')
         return self.request.user.is_captain()
 
 
-class CreateTeamView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class CreateTeamView(LoginRequiredMixin, PermissionRequiredMixin, View):
     form_class = TeamForm
-    permission_required = 'teams.add_team'
-    login_url = '/login/'
+    login_url = reverse_lazy('login')
 
     def post(self, request, *args, **kwargs):
-        team = Team.objects.create_team(captain=request.user, name=request.POST['team-name'],
-                                        players=self.get_players())
+        team = self.create_team()
         NonUserPlayer.objects.create_from_strings(self.request.POST.getlist('unregistered-player'), team=team)
         return redirect('team')
 
     def get_players(self):
         return CustomUser.objects.filter(id__in=self.request.POST.getlist('player'))
+
+    def has_permission(self):
+        division = self.get_division()
+        return self.request.user.captain_divisions.filter(pk=division.id).exists()
+
+    def get_division(self):
+        pk = self.request.POST.get('division')
+        return get_object_or_404(Division, pk=pk)
+
+    def create_team(self):
+        request = self.request
+        return Team.objects.create_team(
+            captain=request.user,
+            name=request.POST['team-name'],
+            players=self.get_players(),
+            division=self.get_division(),
+        )
 
 
 class DeleteTeamView(TemplateView, ProcessFormView):
@@ -136,6 +150,3 @@ class AssignTeamCaptainSuccessView(LoginRequiredMixin, TemplateView):
         context['users'] = user
 
         return context
-
-
-

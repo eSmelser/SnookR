@@ -18,7 +18,6 @@ class Division(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
     division_rep = models.ForeignKey(User, related_name='represented_divisions_set')
-    teams = models.ManyToManyField('teams.Team', blank=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
