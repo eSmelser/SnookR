@@ -7,6 +7,7 @@ from datetime import datetime
 import functools
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Q
+from django.utils.functional import cached_property
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -313,14 +314,19 @@ class DivRepDivisionsList(DivRepPermissionMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['divisions'] = self.request.user.divisions_set.all()
+        context['divisions'] = self.divisions
         return context
 
     def get(self, request, *args, **kwargs):
-        if not self.request.user.divisions_set.all().count() > 0:
+        if not self.divisions.count() > 0:
             return redirect(reverse('divisions:create-division'))
 
         return super().get(request, *args, **kwargs)
+
+    @cached_property
+    def divisions(self):
+        user = self.request.user
+        return user.represented_divisions_set.all()
 
 
 class DivRepCreateSessionView(DivRepPermissionMixin, FormView):
