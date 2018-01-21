@@ -2,7 +2,7 @@ import itertools
 from django.views.generic import TemplateView
 from rest_framework.renderers import JSONRenderer
 
-from accounts.models import CustomUser
+from accounts.models import User
 from api import serializers
 from substitutes.models import Sub
 from divisions.models import Session
@@ -45,7 +45,7 @@ class HomeView(TemplateView):
                 serializer = serializers.SessionEventSerializer((sub.session_event for sub in subs), many=True)
                 context['session_events_json'] = JSONRenderer().render(serializer.data)
 
-            except CustomUser.DoesNotExist:
+            except User.DoesNotExist:
                 pass
         else:
             context['sub_count'] = len(set(sub.user for sub in Sub.objects.all()))

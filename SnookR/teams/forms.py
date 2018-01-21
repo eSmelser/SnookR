@@ -1,6 +1,6 @@
 from django import forms
 
-from accounts.models import CustomUser
+from accounts.models import User
 from divisions.models import Division
 from teams.models import Team
 
@@ -22,8 +22,8 @@ class CaptainForm(forms.Form):
 
     def clean(self):
         super().clean()
-        users = CustomUser.objects.filter(pk__in=self.data.getlist('user'))
+        users = User.objects.filter(pk__in=self.data.getlist('user'))
         if not users.exists():
             raise forms.ValidationError('Must select at least one user to be a captain')
 
-        self.cleaned_data['users'] = CustomUser.objects.filter(pk__in=self.data.getlist('user'))
+        self.cleaned_data['users'] = User.objects.filter(pk__in=self.data.getlist('user'))

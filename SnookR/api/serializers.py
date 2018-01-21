@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 import accounts.models
-from accounts.models import CustomUser
+from accounts.models import User
 from substitutes import models as main_models
 from substitutes.models import Sub
 from divisions.models import SessionEvent
@@ -55,13 +55,13 @@ class TeamSerializer(serializers.Serializer):
     captain = CustomUserSerializer(required=False)
 
     def create(self, validated_data):
-        captain = accounts.models.CustomUser.objects.get(id=self.context['request'].user.id)
+        captain = accounts.models.User.objects.get(id=self.context['request'].user.id)
         name = validated_data.get('name')
         instance = Team.objects.create(captain=captain, name=name)
 
         players = []
         for player in validated_data.get('players', []):
-            players.append(accounts.models.CustomUser.objects.get(**player))
+            players.append(accounts.models.User.objects.get(**player))
 
         instance.players.add(*players)
         return instance
@@ -77,7 +77,7 @@ class TeamInviteSerializer(serializers.Serializer):
         team_id = validated_data.get('team').get('id')
         username = validated_data.get('invitee').get('username')
         team = Team.objects.get(id=team_id)
-        invitee = accounts.models.CustomUser.objects.get(username=username)
+        invitee = accounts.models.User.objects.get(username=username)
         return TeamInvite.objects.create(team=team, invitee=invitee)
 
 
@@ -145,7 +145,7 @@ class SubSerializer(serializers.ModelSerializer):
         event = validated_data.get('session_event')
         event = SessionEvent.objects.get(id=event.get('id'))
         user = validated_data.get('user')
-        user = CustomUser.objects.get(username=user.get('username'))
+        user = User.objects.get(username=user.get('username'))
         return Sub.objects.create(session_event=event, user=user)
 
 
@@ -177,7 +177,7 @@ class SessionEventInviteSerializer(serializers.HyperlinkedModelSerializer):
         sub = validated_data.get('sub', {})
         sub = main_models.Sub.objects.get(id=sub.get('id'))
         captain = validated_data.get('captain')
-        captain = CustomUser.objects.get(username=captain.get('username'))
+        captain = User.objects.get(username=captain.get('username'))
         return SessionEventInvite.objects.create(sub=sub, captain=captain)
 
 

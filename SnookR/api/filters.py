@@ -1,6 +1,6 @@
 from substitutes.models import Sub
 from divisions.models import Division, Session, SessionEvent
-from accounts.models import CustomUser
+from accounts.models import User
 from teams.models import Team
 from invites.models import TeamInvite, SessionEventInvite
 from messaging.models import Message
@@ -12,7 +12,7 @@ time_filters = ['exact', 'gt', 'gte', 'lt', 'lte']
 
 class UserFilter(filters.FilterSet):
     class Meta:
-        model = CustomUser
+        model = User
         fields = {
             'id': ['exact'],
             'first_name': character_filters,
@@ -27,7 +27,7 @@ def players(request):
 
 
 class TeamFilter(filters.FilterSet):
-    captain = filters.RelatedFilter(UserFilter, name='captain', queryset=CustomUser.objects.all())
+    captain = filters.RelatedFilter(UserFilter, name='captain', queryset=User.objects.all())
     players = filters.RelatedFilter(UserFilter, name='players', queryset=players)
 
     class Meta:
@@ -36,7 +36,7 @@ class TeamFilter(filters.FilterSet):
 
 
 class TeamInviteFilter(filters.FilterSet):
-    invitee = filters.RelatedFilter(UserFilter, name='invitee', queryset=CustomUser.objects.all())
+    invitee = filters.RelatedFilter(UserFilter, name='invitee', queryset=User.objects.all())
     team = filters.RelatedFilter(TeamFilter, name='team', queryset=Team.objects.all())
     status = filters.CharFilter(name='status')
 
@@ -76,7 +76,7 @@ class SessionEventFilter(filters.FilterSet):
 
 
 class SubFilter(filters.FilterSet):
-    user = filters.RelatedFilter(UserFilter, name='user', queryset=CustomUser.objects.all())
+    user = filters.RelatedFilter(UserFilter, name='user', queryset=User.objects.all())
     session_event = filters.RelatedFilter(SessionEventFilter, name='session_event', queryset=SessionEvent.objects.all())
 
     class Meta:
@@ -94,8 +94,8 @@ class SessionEventInviteFilter(filters.FilterSet):
 
 
 class MessageFilter(filters.FilterSet):
-    sender = filters.RelatedFilter(UserFilter, name='sender', queryset=CustomUser.objects.all())
-    receiver = filters.RelatedFilter(UserFilter, name='receiver', queryset=CustomUser.objects.all())
+    sender = filters.RelatedFilter(UserFilter, name='sender', queryset=User.objects.all())
+    receiver = filters.RelatedFilter(UserFilter, name='receiver', queryset=User.objects.all())
     id__gt = filters.NumberFilter(name='id', lookup_expr='gt')
     id__lt = filters.NumberFilter(name='id', lookup_expr='lt')
 

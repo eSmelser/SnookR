@@ -1,4 +1,4 @@
-from accounts.models import CustomUser
+from accounts.models import User
 
 
 class CustomUserMiddleware:
@@ -11,4 +11,4 @@ class CustomUserMiddleware:
 
     def process_request(self, request):
         if hasattr(request, 'user') and request.user.is_authenticated():
-            request.user.__class__ = CustomUser
+            request.user.__class__ = User

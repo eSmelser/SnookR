@@ -7,7 +7,7 @@ from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
-from accounts.models import CustomUser
+from accounts.models import User
 from core.tests import SeleniumTestCase
 from divisions.models import Division
 from teams.models import Team, TeamInvite
@@ -170,16 +170,16 @@ class TeamInviteTestCase(SeleniumTestCase):
                 'password': 'willpassword',
             }
         }
-        joe = CustomUser.objects.create_user(**self.data['joe'])
+        joe = User.objects.create_user(**self.data['joe'])
         content_type = ContentType.objects.get_for_model(Team)
         permission = Permission.objects.get(
             codename='add_team',
             content_type=content_type,
         )
         joe.user_permissions.add(permission)
-        CustomUser.objects.create_user(**self.data['will'])
+        User.objects.create_user(**self.data['will'])
 
-        rep = CustomUser.objects.create_user(username='rep', password='reppassword')
+        rep = User.objects.create_user(username='rep', password='reppassword')
         Division.objects.create(name='division 1', division_rep=rep)
 
     def joe_invite_will(self):
@@ -239,7 +239,7 @@ class AccountTestCase(SeleniumTestCase):
         self.password = 'userpassword'
         self.email = 'user@gmail.com'
 
-        user = CustomUser.objects.create_user(username=self.username, password=self.password)
+        user = User.objects.create_user(username=self.username, password=self.password)
         self.old_hashed_pass = user.password
         self.login(username=self.username, password=self.password)
 
@@ -248,7 +248,7 @@ class AccountTestCase(SeleniumTestCase):
         self.browser.find_element_by_id("id_delete_account_link").click()
         self.browser.find_element_by_id("id_delete_account_confirm_link").click()
         self.assertIn('Deleted', self.browser.find_element_by_id('id_confirmation_message').text)
-        self.assertTrue(not CustomUser.objects.all().exists())
+        self.assertTrue(not User.objects.all().exists())
 
     def test_change_password(self):
         self.browser.find_element_by_id("id_account_link").click()
@@ -260,7 +260,7 @@ class AccountTestCase(SeleniumTestCase):
         self.browser.find_element_by_id('id_submit_button').click()
         self.browser.find_element_by_id('id_logout_link').click()
 
-        new_hashed_pass = CustomUser.objects.get(username=self.username).password
+        new_hashed_pass = User.objects.get(username=self.username).password
         self.assertNotEqual(self.old_hashed_pass, new_hashed_pass)
         self.login(username=self.username, password=new_password)
         nav_text = self.browser.find_element_by_css_selector('nav').text
@@ -269,8 +269,8 @@ class AccountTestCase(SeleniumTestCase):
 
 class TeamInviteModelTestCase(TestCase):
     def setUp(self):
-        self.captain = CustomUser.objects.create_user(username='captain', password='captainpassword')
-        self.invitee = CustomUser.objects.create_user(username='invitee', password='inviteepassword')
+        self.captain = User.objects.create_user(username='captain', password='captainpassword')
+        self.invitee = User.objects.create_user(username='invitee', password='inviteepassword')
         self.team = Team.objects.create(captain=self.captain, name='My Team')
         self.team_invite = TeamInvite.objects.create(team=self.team, invitee=self.invitee)
 

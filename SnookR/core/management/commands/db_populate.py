@@ -12,7 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from substitutes.models import Sub
 from divisions.models import Division, Session, SessionEvent
-from accounts.models import CustomUser, UserProfile
+from accounts.models import User, UserProfile
 from teams.models import Team
 import random
 
@@ -94,7 +94,7 @@ class Command(BaseCommand):
 
         users = []
         for i, user in enumerate(USERS):
-            obj = CustomUser.objects.create_user(**user)
+            obj = User.objects.create_user(**user)
             users.append(obj)
 
         evan = users[0]
@@ -109,7 +109,7 @@ class Command(BaseCommand):
         evan.user_permissions.add(perm)
 
         # Create admin
-        admin = CustomUser.objects.create_user(username='admin', password='adminpassword')
+        admin = User.objects.create_user(username='admin', password='adminpassword')
         admin.is_superuser = True
         admin.is_staff = True
         admin.save()

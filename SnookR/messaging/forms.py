@@ -1,6 +1,6 @@
 from django import forms
 from messaging.models import Message
-from accounts.models import CustomUser
+from accounts.models import User
 
 
 class MessageForm(forms.Form):
@@ -13,7 +13,7 @@ class MessageForm(forms.Form):
         sender = self.cleaned_data['sender']
         receiver = self.cleaned_data['receiver']
         text = self.cleaned_data['text']
-        sender = CustomUser.objects.get(id=sender)
-        receiver = CustomUser.objects.get(id=receiver)
+        sender = User.objects.get(id=sender)
+        receiver = User.objects.get(id=receiver)
         print('save called!')
         return Message.objects.create(sender=sender, receiver=receiver, text=text)

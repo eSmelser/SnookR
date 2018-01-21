@@ -1,8 +1,8 @@
-import calendar
 from datetime import timedelta
 
 from autoslug import AutoSlugField
-from django.contrib.auth.models import User, Group, Permission
+from django.conf import settings
+from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
@@ -17,17 +17,13 @@ from teams.models import Team
 class Division(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
-    division_rep = models.ForeignKey(User, related_name='divisions_set')
+    division_rep = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='divisions_set')
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-
         content_type = ContentType.objects.get_for_model(Team)
-
-        print('division id', self.id)
         codename = 'division.%s.add_team' % self.id
         name = 'Can add teams in division %s' % self.id
-        print('codename', codename, 'name', name)
         permission = Permission.objects.create(
             codename=codename,
             name=name,
@@ -153,7 +149,7 @@ class SessionEvent(models.Model):
 
 class DivRepRequest(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
-    user = models.OneToOneField('accounts.CustomUser', related_name='divreprequest')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='divreprequest')
 
     def __str__(self):
         return 'Div rep request for ' + str(self.user)

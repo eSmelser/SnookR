@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
@@ -18,8 +19,8 @@ class TeamManager(models.Manager):
 class Team(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
-    captain = models.ForeignKey('accounts.CustomUser', null=False, related_name='managedteams_set')
-    players = models.ManyToManyField('accounts.CustomUser', blank=True, related_name='team_set')
+    captain = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, related_name='managedteams_set')
+    players = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='team_set')
     division = models.ForeignKey('divisions.Division', null=False, related_name='divisions_set')
 
     objects = TeamManager()

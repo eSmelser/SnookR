@@ -6,7 +6,7 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import FormView, TemplateView, RedirectView
 
 from accounts.forms import CustomUserLoginForm, CustomUserChangeForm, CustomUserForm, UploadThumbnailForm
-from accounts.models import CustomUser, UserProfile
+from accounts.models import User, UserProfile
 from accounts.emails import send_confirmation_email
 
 
@@ -57,7 +57,7 @@ class ProfileView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['player'] = get_object_or_404(CustomUser, username=kwargs.get('username'))
+        context['player'] = get_object_or_404(User, username=kwargs.get('username'))
         return context
 
 

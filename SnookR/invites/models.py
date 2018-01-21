@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -44,7 +45,7 @@ class InviteQuerySet(models.QuerySet):
 
 
 class TeamInvite(AbstractInvite, models.Model):
-    invitee = models.ForeignKey('accounts.CustomUser', related_name='teaminvite_set')
+    invitee = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='teaminvite_set')
     team = models.ForeignKey('teams.Team', on_delete=models.CASCADE)
 
     objects = InviteQuerySet.as_manager()

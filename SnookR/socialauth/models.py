@@ -1,5 +1,6 @@
+from django.conf import settings
 from django.db import models
-from accounts.models import CustomUser, UserProfile
+from accounts.models import User, UserProfile
 
 
 class FacebookAuthQuerySet(models.QuerySet):
@@ -8,8 +9,8 @@ class FacebookAuthQuerySet(models.QuerySet):
             obj = self.get(facebook_id=facebook_id)
             created = False
         except FacebookAuth.DoesNotExist:
-            username = CustomUser.unique_username(first_name, last_name)
-            user = CustomUser.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=facebook_id)
+            username = User.unique_username(first_name, last_name)
+            user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=facebook_id)
             profile = UserProfile.objects.create(user=user, image_url=image_url, phone_number=phone_number, thumbnail=thumbnail)
             profile.send_confirmation_email()
             obj = self.create(user=user, facebook_id=facebook_id)
@@ -19,7 +20,7 @@ class FacebookAuthQuerySet(models.QuerySet):
 
 
 class FacebookAuth(models.Model):
-    user = models.ForeignKey('accounts.CustomUser', null=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=False)
     facebook_id = models.CharField(blank=False, max_length=32)
 
     objects = FacebookAuthQuerySet.as_manager()

@@ -7,7 +7,7 @@ from django.db.models import Q
 
 from messaging.forms import MessageForm
 from messaging.models import Message
-from accounts.models import CustomUser
+from accounts.models import User
 
 
 class MessagingView(LoginRequiredMixin, FormView):
@@ -62,8 +62,8 @@ class MessagingView(LoginRequiredMixin, FormView):
             return dict()
 
     def get_users(self, username):
-        sender = CustomUser.objects.get(id=self.request.user.id)
-        receiver = get_object_or_404(CustomUser, username=username)
+        sender = User.objects.get(id=self.request.user.id)
+        receiver = get_object_or_404(User, username=username)
         return sender, receiver
 
     def get_recent_messages(self):
@@ -79,7 +79,7 @@ class MessageNewView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = CustomUser.objects.get(id=self.request.user.id)
+        user = User.objects.get(id=self.request.user.id)
         friend = self.request.GET.get('username')
         messages = Message.objects\
             .select_related('sender', 'receiver')\
@@ -122,12 +122,12 @@ class MessageCreateView(FormView):
 
     def get_receiver(self, data):
         receiver = int(data['receiver'])
-        receiver = CustomUser.objects.get(id=receiver)
+        receiver = User.objects.get(id=receiver)
         return receiver
 
     def get_sender(self, data):
         sender = int(data['sender'])
-        sender = CustomUser.objects.get(id=sender)
+        sender = User.objects.get(id=sender)
         return sender
 
     def get_data(self):

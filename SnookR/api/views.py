@@ -7,7 +7,7 @@ from django.core.cache import caches
 from rest_framework.response import Response
 from substitutes.models import Sub
 from divisions.models import Session, SessionEvent
-from accounts.models import CustomUser
+from accounts.models import User
 from teams.models import Team, NonUserPlayer
 from invites.models import SessionEventInvite, TeamInvite
 from messaging.models import Message
@@ -31,15 +31,15 @@ from api.filters import TeamFilter, TeamInviteFilter, UserFilter, SessionFilter,
 
 class UserView(RetrieveAPIView):
     serializer_class = CustomUserSerializer
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
 
     def get_object(self):
-        return CustomUser.objects.get(username=self.request.user.username)
+        return User.objects.get(username=self.request.user.username)
 
 
 class UserSearchView(ListAPIView):
     serializer_class = CustomUserSerializer
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
 
     def list(self, request, *args, **kwargs):
         import pdb;
@@ -48,7 +48,7 @@ class UserSearchView(ListAPIView):
 
 class UserListView(ListAPIView):
     serializer_class = CustomUserSerializer
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
     filter_class = UserFilter
     filter_fields = ('username', 'id', 'first_name', 'last_name')
 
@@ -105,7 +105,7 @@ class SearchUserView(ListAPIView):
         key = 'search_user_view:%s' % hashlib.md5(query.encode('ascii', 'ignore')).hexdigest()
         objs = cache.get(key)
         if objs is None:
-            objs = CustomUser.objects.search(query)
+            objs = User.objects.search(query)
             cache.set(key, objs, 60 * 3)
 
         serializer = CustomUserSerializer(objs, many=True)
@@ -148,4 +148,4 @@ class TokenInputListView(ListAPIView):
         for term in q.split(' '):
             query |= Q(first_name__startswith=term) | Q(last_name__startswith=term)
 
-        return CustomUser.objects.filter(query)
+        return User.objects.filter(query)

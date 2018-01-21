@@ -1,6 +1,6 @@
 # Copyright &copy; 2017 Evan Smelser
 # This software is Licensed under the MIT license. For more info please see SnookR/COPYING
-
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.functional import cached_property
@@ -18,7 +18,7 @@ class Sub(models.Model):
     session containing the dates of a particular session within a division. There are typically 3 sessions
     in a division per year, but the sessions don't necessarily correspond across divisions.
     '''
-    user = models.ForeignKey('accounts.CustomUser')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     date = models.DateTimeField('sub date', auto_now=True)
     session_event = models.ForeignKey('divisions.SessionEvent')
 

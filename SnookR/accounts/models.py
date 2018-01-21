@@ -1,7 +1,7 @@
 import random
 from datetime import timedelta
 
-from django.contrib.auth.models import UserManager, User
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
@@ -19,35 +19,25 @@ def thumbnail_path(instance, filename):
     return 'uploads/user/{0}/{1}'.format(instance.user.username, filename)
 
 
-class CustomUserQuerySet(models.QuerySet):
+class UserQuerySet(models.QuerySet):
     def search(self, string):
         query = Q()
         for term in string.split():
             query |= Q(username__startswith=term) | Q(first_name__startswith=term) | Q(last_name__startswith=term)
 
-        print('string', string)
         return self.filter(query)
 
 
-class CustomUserManager(UserManager):
-    def get_queryset(self):
-        return CustomUserQuerySet(self.model, using=self._db)
-
-    def search(self, string):
-        return self.get_queryset().search(string)
-
-
-class CustomUser(User):
+class User(AbstractUser):
     """This is a proxy model for the User model.  Proxy models just give methods
     to the base model, without creating any new tables"""
 
     class Meta:
-        proxy = True
         permissions = (
             ('can_permit_add_team', 'Can permit other users to have add_team permissions (i.e., is Division Rep)'),
         )
 
-    objects = CustomUserManager()
+    objects = UserQuerySet.as_manager()
 
     def as_json(self):
         return {
@@ -76,7 +66,7 @@ class CustomUser(User):
     @staticmethod
     def unique_username(first_name, last_name):
         username = first_name + last_name
-        while CustomUser.objects.filter(username=username).exists():
+        while User.objects.filter(username=username).exists():
             username = first_name + last_name + ''.join(random.randint(0, 9) for _ in range(4))
 
         return username

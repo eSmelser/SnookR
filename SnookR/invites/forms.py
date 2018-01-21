@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from accounts.models import CustomUser
+from accounts.models import User
 from substitutes.models import Sub
 from teams.models import Team
 
@@ -23,7 +23,7 @@ class TeamInviteForm(TeamForm):
 
     def clean_invitee(self):
         id_ = self.cleaned_data['invitee']
-        if not CustomUser.objects.filter(pk=id_).exists():
+        if not User.objects.filter(pk=id_).exists():
             raise ValidationError('User with id {} does not exist'.format(id_))
 
         return id_

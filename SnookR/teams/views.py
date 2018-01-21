@@ -13,7 +13,7 @@ from django.views.generic.edit import ProcessFormView
 
 from divisions.models import Division
 from teams.forms import TeamForm, CaptainForm
-from accounts.models import CustomUser
+from accounts.models import User
 from invites.models import TeamInvite
 from teams.models import Team, NonUserPlayer
 from api.serializers import TeamInviteSerializer, TeamSerializer, CustomUserSerializer
@@ -77,7 +77,7 @@ class CreateTeamView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return redirect('team')
 
     def get_players(self):
-        return CustomUser.objects.filter(id__in=self.request.POST.getlist('player'))
+        return User.objects.filter(id__in=self.request.POST.getlist('player'))
 
     def has_permission(self):
         division = self.get_division()

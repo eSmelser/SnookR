@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory, APITestCase
 from substitutes.models import Sub
 from divisions.models import Division, Session, SessionEvent
-from accounts.models import CustomUser
+from accounts.models import User
 from teams.models import Team
 from invites.models import TeamInvite, SessionEventInvite
 from api.serializers import SessionEventInvite
@@ -17,7 +17,7 @@ class UserListTestCase(APITestCase):
     def setUp(self):
         self.username = 'joe'
         self.password = 'joepassword'
-        CustomUser.objects.create_user(username=self.username, password=self.password)
+        User.objects.create_user(username=self.username, password=self.password)
 
     def test_user_list(self):
         url = reverse('api:user_list')
@@ -25,21 +25,21 @@ class UserListTestCase(APITestCase):
         self.assertEqual(response.data[0]['username'], 'joe')
 
     def test_multiple_users_list(self):
-        user = CustomUser.objects.create_user(username='myuser', password='password')
+        user = User.objects.create_user(username='myuser', password='password')
         url = reverse('api:user_list')
         response = self.client.get(url)
         self.assertEqual(len(response.data), 2)
         user.delete()
 
     def test_user_filter(self):
-        user = CustomUser.objects.create_user(username='myuser', password='password')
+        user = User.objects.create_user(username='myuser', password='password')
         url = reverse('api:user_list')
         response = self.client.get(url, data={'username': 'myuser'}, format='json')
         self.assertEqual(len(response.data), 1)
         user.delete()
 
     def test_user_special_filter(self):
-        user = CustomUser.objects.create_user(username='myuser', password='password')
+        user = User.objects.create_user(username='myuser', password='password')
         url = reverse('api:user_list')
         response = self.client.get(url, data={'username__icontains': 'my'}, format='json')
         self.assertEqual(len(response.data), 1)
@@ -48,12 +48,12 @@ class UserListTestCase(APITestCase):
 
 class TeamInviteTestCase(APITestCase):
     def setUp(self):
-        self.captain = CustomUser.objects.create_user(username='captain', password='captainpassword')
+        self.captain = User.objects.create_user(username='captain', password='captainpassword')
         permission = Permission.objects.get(codename='add_team')
         self.captain.user_permissions.add(permission)
 
-        self.invitee1 = CustomUser.objects.create_user(username='invitee1', password='invitee1password')
-        self.invitee2 = CustomUser.objects.create_user(username='invitee2', password='invitee2password')
+        self.invitee1 = User.objects.create_user(username='invitee1', password='invitee1password')
+        self.invitee2 = User.objects.create_user(username='invitee2', password='invitee2password')
 
         self.team = Team.objects.create(captain=self.captain, name='My Team')
         self.invite1 = TeamInvite.objects.create(team=self.team, invitee=self.invitee1)
@@ -76,11 +76,11 @@ class TeamInviteTestCase(APITestCase):
 
 class TeamInviteCreateTestCase(APITestCase):
     def setUp(self):
-        self.captain = CustomUser.objects.create_user(username='captain', password='captainpassword')
+        self.captain = User.objects.create_user(username='captain', password='captainpassword')
         permission = Permission.objects.get(codename='add_team')
         self.captain.user_permissions.add(permission)
 
-        self.invitee = CustomUser.objects.create_user(username='invitee', password='inviteepassword')
+        self.invitee = User.objects.create_user(username='invitee', password='inviteepassword')
         self.client.login(username='captain', password='captainpassword')
         self.team = Team.objects.create(captain=self.captain, name='My Team')
 
@@ -105,11 +105,11 @@ class TeamInviteCreateTestCase(APITestCase):
 
 class TeamFilterTestCase(APITestCase):
     def setUp(self):
-        self.captain = CustomUser.objects.create_user(username='captain', password='captainpassword')
+        self.captain = User.objects.create_user(username='captain', password='captainpassword')
         permission = Permission.objects.get(codename='add_team')
         self.captain.user_permissions.add(permission)
 
-        self.invitee = CustomUser.objects.create_user(username='invitee', password='inviteepassword')
+        self.invitee = User.objects.create_user(username='invitee', password='inviteepassword')
         self.client.login(username='captain', password='captainpassword')
         self.team_name = 'My Team'
         self.team = Team.objects.create(captain=self.captain, name=self.team_name)
@@ -141,7 +141,7 @@ class TeamFilterTestCase(APITestCase):
 
 class TeamPostTestCase(APITestCase):
     def setUp(self):
-        self.captain = CustomUser.objects.create_user(username='captain', password='captainpassword')
+        self.captain = User.objects.create_user(username='captain', password='captainpassword')
         permission = Permission.objects.get(codename='add_team')
         self.captain.user_permissions.add(permission)
 
@@ -174,7 +174,7 @@ class TeamPostTestCase(APITestCase):
 
 class GetCurrentUserTestCase(APITestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(username='user', password='userpassword')
+        self.user = User.objects.create_user(username='user', password='userpassword')
         self.client.login(username='user', password='userpassword')
 
     def test_get_current_user(self):
@@ -185,11 +185,11 @@ class GetCurrentUserTestCase(APITestCase):
 
 class TeamInviteUpdateTestCase(APITestCase):
     def setUp(self):
-        self.captain = CustomUser.objects.create_user(username='captain', password='captainpassword')
+        self.captain = User.objects.create_user(username='captain', password='captainpassword')
         permission = Permission.objects.get(codename='add_team')
         self.captain.user_permissions.add(permission)
 
-        self.invitee1 = CustomUser.objects.create_user(username='invitee1', password='invitee1password')
+        self.invitee1 = User.objects.create_user(username='invitee1', password='invitee1password')
 
         self.team = Team.objects.create(captain=self.captain, name='My Team')
         self.invite1 = TeamInvite.objects.create(team=self.team, invitee=self.invitee1)
@@ -205,7 +205,7 @@ class TeamInviteUpdateTestCase(APITestCase):
 
 class UnregisteredPlayersTestCase(APITestCase):
     def setUp(self):
-        self.captain = CustomUser.objects.create_user(username='captain', password='captainpassword')
+        self.captain = User.objects.create_user(username='captain', password='captainpassword')
         permission = Permission.objects.get(codename='add_team')
         self.captain.user_permissions.add(permission)
         self.client.login(username='captain', password='captainpassword')
@@ -223,7 +223,7 @@ class SubListTestCase(APITestCase):
         # Create divisions, sessions, users, and subs
         self.username = 'joe'
         self.password = 'joepassword'
-        user = CustomUser.objects.create_user(username=self.username, password=self.password)
+        user = User.objects.create_user(username=self.username, password=self.password)
         division = Division.objects.create(name='Division A', division_rep=user)
         self.session = Session.objects.create(name='Session A', division=division, game='8ball',
                                               start_date=timezone.now(),
@@ -245,7 +245,7 @@ class SubListTestCase(APITestCase):
         self.assertEqual(json[0]['user']['username'], 'joe')
 
     def test_filter(self):
-        user = CustomUser.objects.create_user(username='totally not joe', password=self.password)
+        user = User.objects.create_user(username='totally not joe', password=self.password)
         self.add_user_to_session_as_sub(user)
 
         self.client.login(username=self.username, password=self.password)
@@ -269,7 +269,7 @@ class SessionEventTestCase(APITestCase):
     def setUp(self):
         self.username = 'joe'
         self.password = 'joepassword'
-        user = CustomUser.objects.create_user(username=self.username, password=self.password)
+        user = User.objects.create_user(username=self.username, password=self.password)
         division = Division.objects.create(name='Division A', division_rep=user)
 
         self.now = datetime.now()
@@ -296,7 +296,7 @@ class SessionEventInviteTestCase(APITestCase):
     def setUp(self):
         self.username = 'joe'
         self.password = 'joepassword'
-        self.user = CustomUser.objects.create_user(username=self.username, password=self.password)
+        self.user = User.objects.create_user(username=self.username, password=self.password)
         division = Division.objects.create(name='Division A', division_rep=self.user)
 
         self.now = datetime.now()
@@ -306,7 +306,7 @@ class SessionEventInviteTestCase(APITestCase):
 
         self.session_event = SessionEvent.objects.create(session=self.session, start_time=start_time, date=self.now.date())
         self.sub = Sub.objects.create(user=self.user, date=timezone.now(), session_event=self.session_event)
-        self.captain = CustomUser.objects.create_user(username='evan', password=self.password)
+        self.captain = User.objects.create_user(username='evan', password=self.password)
 
     def test_post(self):
         url = reverse('api:session_event_invite_list')
@@ -317,8 +317,8 @@ class SessionEventInviteTestCase(APITestCase):
 
 class MessageGetFilter(APITestCase):
     def setUp(self):
-        self.user1 = CustomUser.objects.create_user(username='joe', password='password')
-        self.user2 = CustomUser.objects.create_user(username='sue', password='password')
+        self.user1 = User.objects.create_user(username='joe', password='password')
+        self.user2 = User.objects.create_user(username='sue', password='password')
         self.messages = [Message.objects.create(text='text %s' % str(i), sender=self.user1, receiver=self.user2) for i in range(10)]
 
     def test_filter0(self):
@@ -334,7 +334,7 @@ class MessageGetFilter(APITestCase):
         self.assertEqual(len(response.json()), 0)
 
     def test_permission_denied(self):
-        user3 = CustomUser.objects.create_user(username='jimmy', password='password')
+        user3 = User.objects.create_user(username='jimmy', password='password')
         self.client.login(username=user3.username, password='password')
         url = reverse('api:message-list')
         response = self.client.get(url, data={'sender__username': self.user1.username})

@@ -15,7 +15,7 @@ from django.views.generic.base import TemplateView, RedirectView
 from functools import reduce
 from rest_framework.renderers import JSONRenderer
 
-from accounts.models import CustomUser
+from accounts.models import User
 from api import serializers
 from api.serializers import SessionEventSerializer
 from divisions.forms import SubForm, CreateDivisionForm, CreateSessionForm, CreateRepeatedEventForm
@@ -81,7 +81,7 @@ class SessionViewMixin(TemplateView):
 
         context['json'] = dict()
         if self.request.user.is_authenticated():
-            user = CustomUser.objects.get(id=self.request.user.id)
+            user = User.objects.get(id=self.request.user.id)
             custom_user_serializer = serializers.CustomUserSerializer(user, context={'request': self.request})
             context['json']['current_user'] = JSONRenderer().render(custom_user_serializer.data)
 
@@ -184,7 +184,7 @@ class SearchView(TemplateView):
             distinct_ids = Sub.objects.filter(q_object).values('user').distinct()
 
             # 4.) Filter on the distinct ids and set results
-            context['results'] = CustomUser.objects.filter(id__in=distinct_ids)
+            context['results'] = User.objects.filter(id__in=distinct_ids)
         else:
             raise Http404('Invalid URL kwargs: ' + str(kwargs))
 

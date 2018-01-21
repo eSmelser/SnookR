@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.html import format_html
 
-from accounts.models import CustomUser
+from accounts.models import User
 from core import utils
 from divisions.models import SessionEvent, Division, Session, DivRepRequest
 
@@ -29,7 +29,7 @@ class SubForm(forms.Form):
 
     def clean_user(self):
         id_= self.cleaned_data['user']
-        return get_instance(id_, CustomUser)
+        return get_instance(id_, User)
 
     def clean_session_event(self):
         id_ = self.cleaned_data['session_event']

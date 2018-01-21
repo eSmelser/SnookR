@@ -27,6 +27,8 @@ SECRET_KEY = 'c@m7v*xvl6gq+c9qga_n4(_1h!6n(nlkz4a$d2f8rp++!6w%-j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+AUTH_USER_MODEL = 'accounts.User'
+
 # If DEBUG is False then enable logging.
 if not DEBUG and os.environ.get('DJANGO_LOG', False):
     LOGGING = {
@@ -91,7 +93,6 @@ INSTALLED_APPS = [
     'invites',
     'messaging',
     'socialauth',
-
 ]
 
 MIDDLEWARE = [
