@@ -1,7 +1,7 @@
 import random
 from datetime import timedelta
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
@@ -16,37 +16,39 @@ from teams.models import Team
 
 
 def thumbnail_path(instance, filename):
+    """Returns the path in which to save an uploaded thumbnail image"""
     return 'uploads/user/{0}/{1}'.format(instance.user.username, filename)
 
 
-class UserQuerySet(models.QuerySet):
+def generate_expiration():
+    """Returns an datetime in which a new user confirmation key will expire."""
+    return timezone.now() + timedelta(minutes=20)
+
+
+def generate_key():
+    """Returns a new user confirmation key."""
+    return ''.join(str(random.randint(0, 9)) for _ in range(6))
+
+
+class CustomUserManager(UserManager):
     def search(self, string):
+        """Returns a queryset of users with usernames, first names, or last names that start with any word 
+        in string.
+        
+        Parameters:
+            string: str
+                A string of one or more words separated by whitespace.
+        
+        """
         query = Q()
         for term in string.split():
             query |= Q(username__startswith=term) | Q(first_name__startswith=term) | Q(last_name__startswith=term)
 
-        return self.filter(query)
+        return self.get_queryset().filter(query)
 
 
 class User(AbstractUser):
-    """This is a proxy model for the User model.  Proxy models just give methods
-    to the base model, without creating any new tables"""
-
-    class Meta:
-        permissions = (
-            ('can_permit_add_team', 'Can permit other users to have add_team permissions (i.e., is Division Rep)'),
-        )
-
-    objects = UserQuerySet.as_manager()
-
-    def as_json(self):
-        return {
-            'userName': self.username,
-            'firstName': self.first_name,
-            'lastName': self.last_name,
-            'id': self.id,
-            'url': self.get_absolute_url,
-        }
+    objects = CustomUserManager()
 
     @cached_property
     def profile(self):
@@ -61,15 +63,8 @@ class User(AbstractUser):
 
     @property
     def invites_count(self):
-        return SessionEventInvite.objects.filter(sub__user=self).pending().count() + self.teaminvite_set.pending().count()
-
-    @staticmethod
-    def unique_username(first_name, last_name):
-        username = first_name + last_name
-        while User.objects.filter(username=username).exists():
-            username = first_name + last_name + ''.join(random.randint(0, 9) for _ in range(4))
-
-        return username
+        return SessionEventInvite.objects.filter(
+            sub__user=self).pending().count() + self.teaminvite_set.pending().count()
 
     def is_division_rep(self):
         return self.divisions_set.all().exists()
@@ -84,19 +79,11 @@ class User(AbstractUser):
         ids = []
         for group in groups:
             name = group.name
-            id_ = name.lstrip('division.').rstrip('.team_captain') # 'division.2.team_captain' -> '2'
+            id_ = name.lstrip('division.').rstrip('.team_captain')  # 'division.2.team_captain' -> '2'
             id_ = int(id_)
             ids.append(id_)
 
         return Division.objects.filter(pk__in=ids)
-
-
-def generate_expiration():
-    return timezone.now() + timedelta(minutes=20)
-
-
-def generate_key():
-    return ''.join(str(random.randint(0, 9)) for _ in range(6))
 
 
 class UserProfile(models.Model):
