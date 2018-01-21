@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 import accounts.models
@@ -5,16 +6,16 @@ from accounts.models import User
 from substitutes import models as main_models
 from substitutes.models import Sub
 from divisions.models import SessionEvent
-from teams.models import Team
+from teams.models import Team, Captain
 from invites.models import TeamInvite, SessionEventInvite
 from messaging.models import Message
+
 
 def must_have_id(data):
     if 'id' not in data:
         raise serializers.ValidationError({
             'id': 'This field is required',
         })
-
 
 
 class TokenInputSerializer(serializers.Serializer):
@@ -46,39 +47,6 @@ class CustomUserSerializer(serializers.Serializer):
         json['invite_url'] = self.context.get('invite_url', None)
         json['unregister_url'] = self.context.get('unregister_url', None)
         return json
-
-
-class TeamSerializer(serializers.Serializer):
-    players = CustomUserSerializer(many=True)
-    id = serializers.IntegerField(required=False)
-    name = serializers.CharField(required=True)
-    captain = CustomUserSerializer(required=False)
-
-    def create(self, validated_data):
-        captain = accounts.models.User.objects.get(id=self.context['request'].user.id)
-        name = validated_data.get('name')
-        instance = Team.objects.create(captain=captain, name=name)
-
-        players = []
-        for player in validated_data.get('players', []):
-            players.append(accounts.models.User.objects.get(**player))
-
-        instance.players.add(*players)
-        return instance
-
-
-class TeamInviteSerializer(serializers.Serializer):
-    team = TeamSerializer(required=True, validators=[must_have_id])
-    invitee = CustomUserSerializer(required=True)
-    id = serializers.IntegerField(read_only=True)
-    status = serializers.CharField(required=False)
-
-    def create(self, validated_data):
-        team_id = validated_data.get('team').get('id')
-        username = validated_data.get('invitee').get('username')
-        team = Team.objects.get(id=team_id)
-        invitee = accounts.models.User.objects.get(username=username)
-        return TeamInvite.objects.create(team=team, invitee=invitee)
 
 
 class TeamInviteUpdateSerializer(serializers.Serializer):
@@ -124,12 +92,19 @@ class SessionEventSerializer(serializers.Serializer):
     id = serializers.IntegerField()
 
     def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['registerUrl'] = instance.get_register_url
-        rep['unregisterUrl'] = instance.get_unregister_url
-        rep['url'] = instance.get_absolute_url
+        data = super().to_representation(instance)
+        data['registerUrl'] = instance.get_register_url
+        data['unregisterUrl'] = instance.get_unregister_url
+        data['url'] = instance.get_absolute_url
 
-        return rep
+        subs = []
+        for sub in instance.sub_set.all():
+            user = CustomUserSerializer(sub.user).data
+            id_ = sub.id
+            subs.append({'user': user, 'id': id_})
+
+        data['subs'] = subs
+        return data
 
 
 class SubSerializer(serializers.ModelSerializer):
@@ -149,7 +124,6 @@ class SubSerializer(serializers.ModelSerializer):
         return Sub.objects.create(session_event=event, user=user)
 
 
-
 class SessionEventWritableSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=True)
 
@@ -162,6 +136,45 @@ class SubWritableSerializer(serializers.ModelSerializer):
     class Meta:
         model = main_models.Sub
         fields = ['user', 'session_event', 'id']
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    'Jan. 8, 2018, 6:52 a.m.'
+    timestamp = serializers.DateTimeField(format='%b. %d, %Y, %I:%M %p')
+
+    class Meta:
+        model = Message
+        fields = ['receiver', 'sender', 'text', 'timestamp', 'id']
+
+
+class CaptainSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer()
+    division = DivisionSerializer()
+
+    class Meta:
+        model = Captain
+        fields = ['user', 'division']
+
+
+class TeamSerializer(serializers.Serializer):
+    players = CustomUserSerializer(many=True)
+    id = serializers.IntegerField(required=False)
+    name = serializers.CharField(required=True)
+    captain = CaptainSerializer(required=False)
+
+
+class TeamInviteSerializer(serializers.Serializer):
+    team = TeamSerializer(required=True, validators=[must_have_id])
+    invitee = CustomUserSerializer(required=True)
+    id = serializers.IntegerField(read_only=True)
+    status = serializers.CharField(required=False)
+
+    def create(self, validated_data):
+        team_id = validated_data.get('team').get('id')
+        username = validated_data.get('invitee').get('username')
+        team = Team.objects.get(id=team_id)
+        invitee = accounts.models.User.objects.get(username=username)
+        return TeamInvite.objects.create(team=team, invitee=invitee)
 
 
 class SessionEventInviteSerializer(serializers.HyperlinkedModelSerializer):
@@ -179,11 +192,3 @@ class SessionEventInviteSerializer(serializers.HyperlinkedModelSerializer):
         captain = validated_data.get('captain')
         captain = User.objects.get(username=captain.get('username'))
         return SessionEventInvite.objects.create(sub=sub, captain=captain)
-
-
-class MessageSerializer(serializers.ModelSerializer):
-    'Jan. 8, 2018, 6:52 a.m.'
-    timestamp = serializers.DateTimeField(format='%b. %d, %Y, %I:%M %p')
-    class Meta:
-        model = Message
-        fields = ['receiver', 'sender', 'text', 'timestamp', 'id']

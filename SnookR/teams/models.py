@@ -16,10 +16,12 @@ class Captain(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='captain_set')
     division = models.ForeignKey('divisions.Division', related_name='captain_set')
 
+    def __str__(self):
+        return 'Captain: %s' % self.user
 
 class TeamManager(models.Manager):
-    def create_team(self, name, captain, players, division):
-        team = self.create(captain=captain, name=name, division=division)
+    def create_team(self, name, captain, players):
+        team = self.create(captain=captain, name=name)
         for player in players:
             TeamInvite.objects.create(invitee=player, team=team)
 
@@ -40,7 +42,7 @@ class Team(models.Model):
     @staticmethod
     def get_all_related(user):
         if user.is_authenticated():
-            combined = list(Team.objects.filter(captain=user))
+            combined = list(Team.objects.filter(captain__user=user))
             combined += list(Team.objects.filter(players=user))
             return sorted(list(set(combined)), key=lambda obj: obj.id)
         else:
@@ -65,7 +67,7 @@ class NonUserPlayerManager(models.Manager):
 class NonUserPlayer(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
-    team = models.ForeignKey(Team)
+    team = models.ForeignKey(Team, related_name='nonuserplayer_set')
 
     objects = NonUserPlayerManager()
 

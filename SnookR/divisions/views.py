@@ -85,7 +85,7 @@ class SessionViewMixin(TemplateView):
             custom_user_serializer = serializers.CustomUserSerializer(user, context={'request': self.request})
             context['json']['current_user'] = JSONRenderer().render(custom_user_serializer.data)
 
-            invites = SessionEventInvite.objects.filter(team__captain=self.request.user)
+            invites = SessionEventInvite.objects.filter(team__captain__user=self.request.user)
             invites_serializer = serializers.SessionEventInviteSerializer(invites, many=True)
             context['json']['current_user_previous_invites'] = JSONRenderer().render(invites_serializer.data)
 
@@ -202,7 +202,7 @@ class SessionEventView(TemplateView):
             context['subs'] = subs
         else:
             context['subs'] = subs.exclude(user=self.request.user)
-            context['teams'] = Team.objects.filter(captain=self.request.user)
+            context['teams'] = Team.objects.filter(captain__user=self.request.user)
             try:
                 context['current_user_sub'] = subs.get(user=self.request.user)
             except Sub.DoesNotExist:
@@ -229,7 +229,7 @@ class SessionEventDetailView(FormView):
             context['subs'] = subs
         else:
             context['subs'] = subs.exclude(user=self.request.user)
-            context['teams'] = Team.objects.filter(captain=self.request.user)
+            context['teams'] = Team.objects.filter(captain__user=self.request.user)
             try:
                 context['current_user_sub'] = subs.get(user=self.request.user)
             except Sub.DoesNotExist:

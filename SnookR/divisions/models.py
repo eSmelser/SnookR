@@ -15,8 +15,8 @@ from teams.models import Team
 
 class Division(models.Model):
     name = models.CharField(max_length=200)
-    slug = AutoSlugField(populate_from='name', always_update=True, default='')
     representative = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='represented_divisions_set')
+    slug = AutoSlugField(populate_from='name', always_update=True, default='')
 
     def __str__(self):
         return self.name

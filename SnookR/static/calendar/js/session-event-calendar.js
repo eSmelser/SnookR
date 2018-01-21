@@ -22,8 +22,7 @@ $(document).ready(function () {
     let maxTime = new Date(Math.min(...times)).getHours() + 2 + ':00:00';
 
     event = context.sessionEvents[0];
-    console.log(event);
-    let $subsDiv = $('.divisions-div');
+    let $subsDiv = $('.substitutes-div');
     let $sessionName = $('.session-name');
     let $sessionDate = $('.session-date');
 
@@ -35,6 +34,7 @@ $(document).ready(function () {
         } else {
             $sessionName.empty().append(event.session.name);
             $sessionDate.empty().append(event.date);
+            console.log('sub', event.subs);
             event.subs.map( sub => new Sub(sub) )
                       .map( sub => $subsDiv.append(sub.$dom) );
         }

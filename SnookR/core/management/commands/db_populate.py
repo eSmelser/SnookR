@@ -3,6 +3,7 @@
 import os
 from datetime import datetime, timedelta
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from django.core.files import File
@@ -12,9 +13,11 @@ from django.contrib.contenttypes.models import ContentType
 
 from substitutes.models import Sub
 from divisions.models import Division, Session, SessionEvent
-from accounts.models import User, UserProfile
-from teams.models import Team
+from accounts.models import UserProfile
+from teams.models import Team, Captain
 import random
+
+User = get_user_model()
 
 TZINFO = timezone.get_current_timezone()
 DATA_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
@@ -108,11 +111,7 @@ class Command(BaseCommand):
         )
         evan.user_permissions.add(perm)
 
-        # Create admin
-        admin = User.objects.create_user(username='admin', password='adminpassword')
-        admin.is_superuser = True
-        admin.is_staff = True
-        admin.save()
+        User.objects.create_superuser(username='admin', password='adminpassword', email='admin@test.com')
 
         self.stdout.write('Creating profiles...')
         profiles = []
@@ -128,8 +127,8 @@ class Command(BaseCommand):
         self.stdout.write('Creating divisions...')
         darrin = users[1]
         divisions = [
-            Division.objects.create(name='Division A', division_rep=evan),
-            Division.objects.create(name='Division B', division_rep=darrin)
+            Division.objects.create(name='Division A', representative=evan),
+            Division.objects.create(name='Division B', representative=darrin)
         ]
 
         self.stdout.write('Creating sessions...')
@@ -143,32 +142,23 @@ class Command(BaseCommand):
                     if random.random() < 0.1:
                         Sub.objects.create(user=user, date=timezone.now(), session_event=session_event)
 
+        self.stdout.write('Creating teams...')
         temp_users = users.copy()
-        captain1 = temp_users.pop(0)
-        captain2 = temp_users.pop(0)
+        evan = temp_users.pop(0)
+        darrin = temp_users.pop(0)
+        division1 = divisions[0]
+        division2 = divisions[1]
+
+        captain1 = Captain.objects.create(user=evan, division=division1)
+        captain2 = Captain.objects.create(user=darrin, division=division2)
 
         halfway = len(temp_users) // 2
-        teams = [
-            {
-                'name': 'team 1',
-                'captain': captain1,
-                'players': temp_users[halfway:],
-                'division': divisions[0],
-            },
-
-            {
-                'name': 'team 1',
-                'captain': captain2,
-                'players': temp_users[:halfway],
-                'division': divisions[1],
-            },
-        ]
-
-        self.stdout.write('Creating teams...')
-        for team in teams:
-            players = team.pop('players')
-            team = Team.objects.create(**team)
-            team.players.add(*players)
+        first_half = temp_users[halfway:]
+        second_half = temp_users[:halfway]
+        t1 = Team.objects.create(name='team 1', captain=captain1)
+        t2 = Team.objects.create(name='team 2', captain=captain2)
+        t1.players.add(*first_half)
+        t2.players.add(*second_half)
 
     def create_sessions(self, divisions):
         names = [

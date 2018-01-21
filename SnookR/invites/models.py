@@ -22,10 +22,9 @@ class AbstractInvite(models.Model):
     def is_closed(self):
         return self.status != AbstractInvite.PENDING
 
-    @staticmethod
-    def human_readable_status(status):
+    def human_readable_status(self):
         for k, v in AbstractInvite.STATUS_CHOICES:
-            if status == k:
+            if self.status == k:
                 return v
 
     def approve(self):
@@ -46,7 +45,7 @@ class InviteQuerySet(models.QuerySet):
 
 class TeamInvite(AbstractInvite, models.Model):
     invitee = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='teaminvite_set')
-    team = models.ForeignKey('teams.Team', on_delete=models.CASCADE)
+    team = models.ForeignKey('teams.Team', on_delete=models.CASCADE, related_name='teaminvite_set')
 
     objects = InviteQuerySet.as_manager()
 

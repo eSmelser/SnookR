@@ -3,11 +3,12 @@ let jQuery = require('jquery');
 
 $(document).ready(function() {
   let invitedList = [];
-  let $parent = $('.divisions-div');
+  let $parent = $('.substitutes-div');
 
   const addToInvitedList = function(_, obj) {
     let id = $(obj).attr('data-sub-id');
     invitedList.push(id);
+    console.log('id', id);
   };
 
   $('#submit').click(function() {

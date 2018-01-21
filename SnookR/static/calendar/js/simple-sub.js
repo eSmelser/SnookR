@@ -29,7 +29,7 @@ Sub.prototype.render = function() {
 }
 
 Sub.prototype.bindEvents = function() {
-    this.$dom.on('click', '.invite-button', this.toggleInvited.bind(this))
+    this.$dom.on('click', '.invite-button', this.toggleInvited.bind(this));
     this.$dom.on('click', '.checkmark-button', this.toggleInvited.bind(this))
 };
 

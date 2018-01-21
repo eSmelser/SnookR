@@ -36,43 +36,27 @@
             </div>
             <div id="right-column" class="col-md-8">
                 <div id="players-div">
-                    <h3>Players</h3>
                     {% for team in teams %}
                         <div class="list-group player-group player-group-{{ team.id }}">
-                        <h3>Division: {{ team.division }}</h3>
-                            {% for player in players %}
-                                {% if team == player.team %}
-                                    <div class="panel panel-default">
-                                        <div class="panel-body player-group-item" data-user-id="{{ id }}">
-                                            <div class="pull-left">
-                                                <a href="{{ player.instance.get_absolute_url }}">
-                                                    <img class="img-circle" width="50px" height="50px"
-                                                         style="margin-right:8px; margin-top:-5px;"
-                                                         src="{{ player.instance.profile.thumbnail_url }}">
-                                                </a>
-                                            </div>
-                                            <h4 class="pull-left">
-                                                <a href="{{ player.instance.get_absolute_url }}"
-                                                   style="text-decoration:none;"><strong>{{ player.instance.username }}</strong></a>
-                                                <small>{{ player.status|title }}</small>
-                                            </h4>
-                                        </div>
-                                    </div>
+                            <h3>Division: {{ team.captain.division }}</h3>
+                            <h3>Players</h3>
+                            {% for player in team.players.all %}
+                                {% include 'accounts/player_panel.html' with player=player %}
+                            {% endfor %}
 
-
-                                {% endif %}
+                            <h4>Pending Invites</h4>
+                            {% for invite in team.teaminvite_set.all %}
+                                {% include 'accounts/player_panel.html' with player=invite.invitee invite=invite %}
                             {% endfor %}
 
                             <h3>Unregistered Players</h3>
                             <div class="list-group player-group player-group-{{ team.id }}" style="display:none">
-                                {% for player in unregistered_players %}
-                                    {% if team == player.team %}
-                                        <li class="list-item">{{ player.name }}</li>
-                                    {% endif %}
+                                {% for player in team.nonuserplayer_set.all %}
+                                    <li class="list-item">{{ player.name }}</li>
                                 {% endfor %}
                             </div>
                             <form action="{% url 'delete-team-confirmation' pk=team.id %}">
-                                <input type="submit" , class="btn btn-danger" value="Delete Team">
+                                <input type="submit" class="btn btn-danger" value="Delete Team">
                             </form>
                         </div>
                     {% endfor %}
@@ -111,7 +95,7 @@
                         <div id="added-players">
                             {# Use verbatim so Django doesn't render the text/template for Handlebars.js #}
                             {% verbatim %}
-                            <script id="user-panel-template" type="text/template">
+                            <script id="user-panel-template" type="text/x-handlebars-template">
                                 <div class="panel panel-default">
                                     <div class="panel-body" data-user-id="{{ id }}">
                                         <div class="pull-left">

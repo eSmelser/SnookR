@@ -70,7 +70,7 @@ class User(AbstractUser):
         return self.represented_divisions_set.all().exists()
 
     def is_captain(self):
-        return self.is_authenticated() and self.captain_divisions.exists()
+        return self.is_authenticated() and self.captain_set.exists()
 
     @cached_property
     def captain_divisions(self):

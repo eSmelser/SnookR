@@ -20,7 +20,7 @@ class Sub(models.Model):
     '''
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     date = models.DateTimeField('sub date', auto_now=True)
-    session_event = models.ForeignKey('divisions.SessionEvent')
+    session_event = models.ForeignKey('divisions.SessionEvent', related_name='sub_set')
 
     class Meta:
         unique_together = ('user', 'session_event')

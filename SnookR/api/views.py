@@ -41,24 +41,12 @@ class UserSearchView(ListAPIView):
     serializer_class = CustomUserSerializer
     queryset = User.objects.all()
 
-    def list(self, request, *args, **kwargs):
-        import pdb;
-        pdb.set_trace()
-
 
 class UserListView(ListAPIView):
     serializer_class = CustomUserSerializer
     queryset = User.objects.all()
     filter_class = UserFilter
     filter_fields = ('username', 'id', 'first_name', 'last_name')
-
-
-class TeamView(ListCreateAPIView):
-    queryset = Team.objects.all()
-    serializer_class = TeamSerializer
-    permission_classes = (TeamPermission,)
-    filter_class = TeamFilter
-    filter_fields = ('id', 'name')
 
 
 class TeamInviteListView(ListAPIView):

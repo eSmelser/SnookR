@@ -74,34 +74,7 @@ const api = (function () {
             data: JSON.stringify(data)
         });
     };
-    /* postTeam() : Returns a POST request for creating a Team.
-     *
-     * Arguments:
-     *     data: An object describing the team to be created.
-     *           Required fields: name, captain.
-     *           Optional fields: players
-     *
-     * Permisions: User must have the 'substitutes.add_team' permission to POST a team.
-     *
-     * Example data arg:
-     *       {
-     *           'name': MyTeam,
-     *           'captain': {
-     *              'username': 'evan'
-     *            },
-     *           'players': [
-     *               {'username': 'joe'},
-     *               {'username': 'john'}
-     *           ]
-     *       }
-     */
-    const postTeam = function (data) {
-        return $.post({
-            dataType: 'json',
-            url: '/api/team/',
-            data: JSON.stringify(data),
-        });
-    };
+
     /* getInvitationList(): Returns a response object containing a list of invitations.
      *
      * Arguments:
@@ -195,7 +168,7 @@ const api = (function () {
     };
 
     // Search for a user using a term search string
-    const searchForUser = function(data) {
+    const searchForUser = function (data) {
         return $.get({
             dataType: 'json',
             url: '/api/search-user/',
@@ -203,7 +176,7 @@ const api = (function () {
         });
     };
 
-    const getSessionEventInviteList = function(data) {
+    const getSessionEventInviteList = function (data) {
         return $.get({
             dataType: 'json',
             url: '/api/session-event-invites/',
@@ -211,7 +184,7 @@ const api = (function () {
         })
     };
 
-    const getSessionEventInvite = function(id) {
+    const getSessionEventInvite = function (id) {
         return $.get({
             dataType: 'json',
             url: '/api/session-event-invites/' + id,
@@ -219,22 +192,22 @@ const api = (function () {
     };
 
     /*
-    postSessionEventInvite() POST a session invite, return an AJAX promise
+     postSessionEventInvite() POST a session invite, return an AJAX promise
 
-    POST data should be in the format:
-        {
-            sub: {
-                id: id,
-                session_event: {
-                    id: number
-                }
-            },
-            captain: {
-                username: string
-            }
-        }
+     POST data should be in the format:
+     {
+     sub: {
+     id: id,
+     session_event: {
+     id: number
+     }
+     },
+     captain: {
+     username: string
+     }
+     }
      */
-    const postSessionEventInvite = function(data) {
+    const postSessionEventInvite = function (data) {
         return $.post({
             dataType: 'json',
             url: '/api/session-event-invites/',
@@ -246,41 +219,41 @@ const api = (function () {
      * Data format:
      *    {
      *        session_event: { id: number },
-    *         user: { username: string }
+     *         user: { username: string }
      *    }
      */
-    const postSub = function(data) {
-      return $.post({
-          dataType: 'json',
-          url: '/api/subs/',
-          data: JSON.stringify(data),
-      })
-    }
+    const postSub = function (data) {
+        return $.post({
+            dataType: 'json',
+            url: '/api/subs/',
+            data: JSON.stringify(data),
+        })
+    };
 
-    const getNewMessage = function(data) {
-      return $.get({
-          dataType: 'html',
-          url: '/api/messaging/message/new',
-          data: data,
-      });
-    }
+    const getNewMessage = function (data) {
+        return $.get({
+            dataType: 'html',
+            url: '/api/messaging/message/new',
+            data: data,
+        });
+    };
 
 
-    const postMessage = function(data) {
-      return $.post({
-          dataType: 'html',
-          url: '/api/messaging/message/',
-          data: JSON.stringify(data),
-          contentType: 'application/json; charset=utf-8',
-      });
-    }
+    const postMessage = function (data) {
+        return $.post({
+            dataType: 'html',
+            url: '/api/messaging/message/',
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=utf-8',
+        });
+    };
 
-    const getMessages = function(data) {
-          return $.get({
-          dataType: 'json',
-          url: '/api/messages/',
-          data: data,
-      });
+    const getMessages = function (data) {
+        return $.get({
+            dataType: 'json',
+            url: '/api/messages/',
+            data: data,
+        });
     };
 
     const tokenInputUrl = '/api/tokeninput/';
@@ -289,7 +262,6 @@ const api = (function () {
     return {
         baseURL,
         getUserList,
-        postTeam,
         getInvitationList,
         getLoggedInUser,
         postInvitation,

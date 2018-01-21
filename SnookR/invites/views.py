@@ -22,7 +22,7 @@ from teams.models import Team
 class TeamListMixin(ContextMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['teams'] = Team.objects.filter(captain=self.request.user)
+        context['teams'] = Team.objects.filter(captain__user=self.request.user)
         return context
 
 
@@ -46,22 +46,15 @@ class SessionSelectView(TemplateView):
 
         return context
 
+
 class SessionEventSelectView(TemplateView):
     template_name = 'invites/session_event_select.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs = SessionEvent.objects.filter(session__id=kwargs.get('session_id'))
-        serializer = SessionEventSerializer(qs, many=True)
-
-        # Add subs to the data copy
-        copy = list(serializer.data)
-        for i, data in enumerate(serializer.data):
-            qs = Sub.objects.filter(session_event__id=data['id'])
-            serializer = SubSerializer(qs, many=True)
-            copy[i]['subs'] = serializer.data
-
-        context['session_events'] = JSONRenderer().render(copy)
+        events = SessionEvent.objects.filter(session__id=kwargs.get('session_id'))
+        serializer = SessionEventSerializer(events, many=True)
+        context['session_events'] = JSONRenderer().render(serializer.data)
         return context
 
 
@@ -72,11 +65,8 @@ class SessionEventInviteConfirmView(TemplateView):
         context = super().get_context_data(**kwargs)
         ids = self.request.GET.getlist('sub')
         team_id = self.request.GET.get('teamId')
-        print(ids)
-        print('GET', self.request.GET)
+
         context['subs'] = Sub.objects.filter(id__in=ids)
-
-
         # All session events in this view will be on the same date and same session.
         # So we just grab the first one and use that as our reference data and session
         first = context['subs'].first()
