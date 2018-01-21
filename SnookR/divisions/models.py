@@ -7,7 +7,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 from django.urls import reverse
-from django.utils.functional import cached_property
 
 from substitutes.models import Sub
 from core import utils
@@ -17,37 +16,13 @@ from teams.models import Team
 class Division(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
-    division_rep = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='divisions_set')
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        content_type = ContentType.objects.get_for_model(Team)
-        codename = 'division.%s.add_team' % self.id
-        name = 'Can add teams in division %s' % self.id
-        permission = Permission.objects.create(
-            codename=codename,
-            name=name,
-            content_type=content_type
-        )
-        group = Group.objects.create(name='division.%s.team_captain' % self.id)
-        group.permissions.add(permission)
-
-    @cached_property
-    def add_team_permission(self):
-        return Permission.objects.get(codename='division.%s.add_team' % self.id)
-
-    @cached_property
-    def team_captain_group(self):
-        return Group.objects.get(name='division.%s.team_captain' % self.id)
+    representative = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='represented_divisions_set')
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
         return reverse('divisions:division', args=[self.slug])
-
-    def make_captain(self, user):
-        user.groups.add(self.team_captain_group)
 
 
 class Session(models.Model):
@@ -64,18 +39,6 @@ class Session(models.Model):
 
     def get_absolute_url(self):
         return reverse('divisions:session', kwargs={'division': self.division.id, 'session': self.id})
-
-    def get_subs_with_unregister_urls(self):
-        subs = self.subs.all()
-        for sub in subs:
-            sub.unregister_url = self.get_unregister_url(sub=sub)
-
-        return subs
-
-    def add_user_as_sub(self, user, date):
-        sub = Sub.create_from_user(user, date)
-        self.subs.add(sub)
-        return self
 
     def remove_user_as_sub(self, user, date):
         sub = Sub.objects.get(user=user, date__date=date.date(), date__hour=date.hour, date__minute=date.minute)
@@ -99,17 +62,12 @@ class SessionEventQuerySet(models.QuerySet):
         else:
             raise TypeError('argument "repeated" must be "weekly" or "biweekly", not {}'.format(repeated))
 
-        print('ss', session.start, 'se', session.end)
-        print('days', days)
         temp = start
-        print('start', start)
         events = []
         for day in days:
             # Move temp up to first day
             while utils.lower_day_name[temp.weekday()] != day:
                 temp += day_delta
-
-            print('tmep start', temp)
 
             # Fill in days until the session's end
             while temp <= end:
@@ -119,7 +77,6 @@ class SessionEventQuerySet(models.QuerySet):
 
             temp = start
 
-        print(events)
         return SessionEvent.objects.bulk_create(events)
 
 
@@ -149,7 +106,7 @@ class SessionEvent(models.Model):
 
 class DivRepRequest(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='divreprequest')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
         return 'Div rep request for ' + str(self.user)

@@ -8,6 +8,15 @@ from invites.models import SessionEventInvite, TeamInvite
 from substitutes.models import Sub
 
 
+class Captain(models.Model):
+    """We use this model instead of a Team -> User foreign key because Captains need also have a reference
+    to which Division they are in.  Division representatives make captains for their division, and then captains can
+    make teams.  A simple foreign key from Team -> User wouldn't account for captains that haven't created any teams yet.
+    """
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='captain_set')
+    division = models.ForeignKey('divisions.Division', related_name='captain_set')
+
+
 class TeamManager(models.Manager):
     def create_team(self, name, captain, players, division):
         team = self.create(captain=captain, name=name, division=division)
@@ -16,21 +25,17 @@ class TeamManager(models.Manager):
 
         return team
 
+
 class Team(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from='name', always_update=True, default='')
-    captain = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, related_name='managedteams_set')
+    captain = models.ForeignKey(Captain, null=False, related_name='team_set')
     players = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='team_set')
-    division = models.ForeignKey('divisions.Division', null=False, related_name='divisions_set')
 
     objects = TeamManager()
 
     def __str__(self):
         return self.name
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        self.division.make_captain(self.captain)
 
     @staticmethod
     def get_all_related(user):

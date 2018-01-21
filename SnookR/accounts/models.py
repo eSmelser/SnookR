@@ -67,7 +67,7 @@ class User(AbstractUser):
             sub__user=self).pending().count() + self.teaminvite_set.pending().count()
 
     def is_division_rep(self):
-        return self.divisions_set.all().exists()
+        return self.represented_divisions_set.all().exists()
 
     def is_captain(self):
         return self.is_authenticated() and self.captain_divisions.exists()
