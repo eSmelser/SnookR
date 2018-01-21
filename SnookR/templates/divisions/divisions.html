@@ -6,20 +6,24 @@
 {% extends 'base.html' %}
 {% block title %}Divisions{% endblock %}
 {% block content %}
-<div class="row">
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
-        <h3>Divisions</h3>
-        <hr>
-        {% for division in divisions %}
-        <h4><a href="{{ division.get_absolute_url}}">{{ division.name }}</a></h4>
-        <ul>
-            {% for session in division.session_set.all %}
-            <li><a href="{{ session.get_absolute_url }}">{{ session.name }}</a></li>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <h3>Divisions</h3>
+            <hr>
+            {% for division in divisions %}
+                <h4><a href="{{ division.get_absolute_url }}">{{ division.name }}</a> <small>Representative: {{ division.division_rep.get_full_name }}</small></h4>
+                <ul>
+                    {% for session in division.session_set.all %}
+                        <li><a href="{{ session.get_absolute_url }}">{{ session.name }}</a></li>
+                    {% endfor %}
+                </ul>
             {% endfor %}
-        </ul>
-        {% endfor %}
+            <br>
+            <p><strong>Division representative?</strong> Request division representative status <a
+                    href="{% url 'divisions:create-div-rep-request' %}">here</a>
+            </p>
+        </div>
+        <div class="col-md-2"></div>
     </div>
-    <div class="col-md-2"></div>
-</div>
 {% endblock %}

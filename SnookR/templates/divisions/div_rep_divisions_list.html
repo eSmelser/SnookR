@@ -8,6 +8,7 @@
                     <i class="glyphicon glyphicon-plus"></i>
                     Create a division
                 </a>
+                <a class="btn btn-default" href="{% url 'assign-team-captain' %}"> <i class="glyphicon glyphicon-plus"></i> Assign Team Captain To A division</a>
                 {% for division in divisions %}
                     <h3>{{ division }}</h3>
                     <div class="list-group list-group-root well">
