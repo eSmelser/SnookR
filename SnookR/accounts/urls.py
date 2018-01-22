@@ -8,7 +8,7 @@ import accounts.views
 urlpatterns = [
     url(r'^login/$', accounts.views.LoginView.as_view(), name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
-    url(r'^signup/$', accounts.views.signup, name='signup'),
+    url(r'^signup/$', accounts.views.SignUpView.as_view(), name='signup'),
     url(r'^account/$', accounts.views.AccountView.as_view(), name='account'),
     url(r'^account/change/$', accounts.views.AccountChangeView.as_view(), name='account_change'),
     url(r'^account/delete/$', accounts.views.DeleteAccountView.as_view(), name='account_delete'),

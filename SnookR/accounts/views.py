@@ -88,6 +88,10 @@ class PasswordChangeView(auth_views.PasswordChangeView):
     success_url = reverse_lazy('account')
 
 
+
+class SignUpView(TemplateView):
+    template_name = 'accounts/signup.html'
+
 def signup(request):
     if request.method == 'POST':
         form = CustomUserForm(request.POST)
@@ -114,4 +118,4 @@ def signup(request):
         import pdb;pdb.set_trace()
     else:
         form = CustomUserForm()
-    return render(request, 'accounts/signup.html', {'form': form})
+    return render(request, 'accounts/signup_form.html', {'form': form})
