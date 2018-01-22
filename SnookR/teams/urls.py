@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^delete/team/(?P<pk>\d+)/$', views.DeleteTeamView.as_view(), name='delete-team-confirmation'),
     url(r'^assign-team-captain/$', views.AssignTeamCaptainView.as_view(), name='assign-team-captain'),
     url(r'^assign-team-captain/success/$', views.AssignTeamCaptainSuccessView.as_view(), name='assign-team-captain-success'),
+    url(r'^captain-requests/$', views.CaptainRequestView.as_view(),  name='captain-requests')
 ]

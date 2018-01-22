@@ -116,12 +116,12 @@ class Command(BaseCommand):
         self.stdout.write('Creating profiles...')
         profiles = []
         for i, user in enumerate(users):
-            profile = UserProfile.objects.create(user=user, phone_number='1231231234')
+            profile, created = UserProfile.objects.get_or_create(user=user, phone_number='1231231234')
             name = 'profile_{}.jpeg'.format(i)
             with open(os.path.join(DATA_DIR, name), 'rb') as f:
                 file = File(f)
                 profile.thumbnail.save(name, file, save=True)
-
+            profile.save()
             profiles.append(profile)
 
         self.stdout.write('Creating divisions...')

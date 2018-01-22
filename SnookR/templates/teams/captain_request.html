@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Captain Requests{% endblock %}
+{% block content %}
+    <div class="content">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>Captain Requests</h3>
+                <div>
+                    {% for d in data %}
+                        <div>{{ d.division }}</div>
+                        <div>
+                            {% for captain_request in d.requests %}
+                                {% include 'accounts/player_panel.html' with player=captain_request.user captain_request=captain_request division=captain_request.division %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

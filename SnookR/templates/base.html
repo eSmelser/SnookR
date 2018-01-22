@@ -71,8 +71,9 @@
                     <!-- Collect the nav links, forms, and other content for toggling -->
                     <div class="collapse navbar-collapse">
                         <ul class="nav navbar-nav navbar-right">
-                            {% if perms.divisions.add_division %}
+                            {% if request.user.is_division_rep %}
                                 <li><a href="{% url 'divisions:div-rep-divisions-list' %}">Your Divisions</a></li>
+                                <li><a href="{% url 'captain-requests' %}">Captain Requests</a></li>
                             {% endif %}
                             {% if user.is_authenticated %}
                                 <li><a data-turbolinks="false" href="{% url 'messaging:messaging' %}">Messages</a></li>

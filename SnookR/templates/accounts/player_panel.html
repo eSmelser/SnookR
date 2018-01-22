@@ -11,10 +11,35 @@
             <a href="{{ player.get_absolute_url }}"
                style="text-decoration:none;"><strong>{{ player.get_full_name|title }}</strong></a>
 
-            <!-- Show invitation status if this player has a pending invite-->
+            {#  If this player has a pending invite then show invitation status #}
             {% if invite %}
                 <small>{{ invite.human_readable_status|title }}</small>
             {% endif %}
         </h4>
+
+        {# If a request is defined, then show Approve and Decline buttons #}
+        {% if captain_request %}
+            {% if captain_request.is_pending %}
+                <form class='pull-right text-right' action="." method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="approve" value="true">
+                    <input type="hidden" name="request_id" value="{{ request.id }}">
+                    <input type="hidden" name="division_id" value="{{ division.id }}">
+                    <input class="pull-right text-right btn btn-default" type="submit" value="Approve">
+                </form>
+                <form class='pull-right text-right' action="." method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="decline" value="true">
+                    <input type="hidden" name="request_id" value="{{ request.id }}">
+                    <input type="hidden" name="division_id" value="{{ division.id }}">
+                    <input class="pull-right text-right btn btn-default" type="submit" value="Decline">
+                </form>
+            {% elif captain_request.is_approved %}
+                <span class="text-right pull-right">Approved</span>
+            {% elif captain_request.is_declined %}
+                <span class="text-right pull-right">Declined</span>
+            {% endif %}
+
+        {% endif %}
     </div>
 </div>

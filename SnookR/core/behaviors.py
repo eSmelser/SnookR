@@ -16,7 +16,6 @@ class Statusable(models.Model):
     class Meta:
         abstract = True
 
-
     @property
     def is_closed(self):
         return self.status != Statusable.PENDING
@@ -30,6 +29,18 @@ class Statusable(models.Model):
         self.status = Statusable.APPROVED
         self.save()
 
+    def decline(self):
+        self.status = Statusable.DECLINED
+        self.save()
+
+    def is_approved(self):
+        return self.status == Statusable.APPROVED
+
+    def is_pending(self):
+        return self.status == Statusable.PENDING
+
+    def is_declined(self):
+        return self.status ==Statusable.DECLINED
 
 class StatusableQuerySet(models.QuerySet):
     def pending(self):

@@ -3,7 +3,7 @@ import json
 from collections import namedtuple
 from django.core import serializers
 from django.db.models import Q
-from django.http import QueryDict
+from django.http import QueryDict, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.urls import reverse, reverse_lazy
@@ -15,7 +15,7 @@ from divisions.models import Division
 from teams.forms import TeamForm, CaptainForm
 from accounts.models import User
 from invites.models import TeamInvite
-from teams.models import Team, NonUserPlayer, Captain
+from teams.models import Team, NonUserPlayer, Captain, CaptainRequest
 from api.serializers import TeamInviteSerializer, TeamSerializer, CustomUserSerializer
 from rest_framework.renderers import JSONRenderer
 
@@ -149,4 +149,34 @@ class AssignTeamCaptainSuccessView(LoginRequiredMixin, TemplateView):
         context['division'] = division
         context['users'] = user
 
+        return context
+
+
+class CaptainRequestView(TemplateView):
+    template_name = 'teams/captain_request.html'
+
+    def post(self, request, *args, **kwargs):
+        pk = request.POST.get('request_id', False)
+        division_pk = request.POST.get('division_id', False)
+        print(request.POST)
+        if pk and division_pk:
+            captain_request = CaptainRequest.objects.get(id=pk)
+            division = Division.objects.get(pk=division_pk)
+            if 'approve' in request.POST:
+                user = captain_request.user
+                Captain.objects.create(user=user, division=division)
+                captain_request.approve()
+            elif 'decline' in request.POST:
+                captain_request.decline()
+
+            return self.render_to_response(context=self.get_context_data())
+
+        return HttpResponse('POST data in wrong format', status=400)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        requests = CaptainRequest.objects.filter(division__representative=self.request.user)
+        divisions = [r.division for r in requests]
+        divisions = [{'division': d, 'requests': requests.filter(division=d)} for d in divisions]
+        context['data'] = divisions
         return context

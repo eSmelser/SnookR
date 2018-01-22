@@ -107,6 +107,8 @@ class PlayerSignUpView(FormView):
         raw_password = form.cleaned_data.get('password1')
         user = authenticate(username=username, password=raw_password)
         login(self.request, user)
+        profile = UserProfile.objects.create(user=user)
+        profile.send_confirmation_email()
         return super().form_valid(form)
 
 
