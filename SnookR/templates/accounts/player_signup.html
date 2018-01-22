@@ -1,0 +1,19 @@
+<!-- 
+     Copyright &copy; 2017 Evan Smelser
+      This software is Licensed under the MIT license. For more info please see SnookR/COPYING
+-->
+{% extends 'accounts/signup_base.html' %}
+{% load bootstrap3 %}
+{% block heading_subtext %}<strong>(Player)</strong>{% endblock %}
+{% block panel_body %}
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="text-left">
+                {% bootstrap_form form %}
+                <div class="form-group text-center">
+                    <input class="btn btn-default btn-lg" type="submit" value="Submit">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

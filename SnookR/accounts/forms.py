@@ -78,7 +78,7 @@ class CustomUserChangeForm(UserChangeForm):
         return ''
 
 
-class CustomUserForm(UserCreationForm):
+class CustomUserCreationForm(UserCreationForm):
     phone_number = forms.CharField(required=False, validators=[phone_regex], widget=text, label=_("Phone Number"))
     email = forms.EmailField(required=True, widget=text)
 

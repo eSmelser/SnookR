@@ -1,36 +1,18 @@
-<!-- 
-     Copyright &copy; 2017 Evan Smelser
-      This software is Licensed under the MIT license. For more info please see SnookR/COPYING
--->
-{% extends 'base.html' %}
-{% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-8 col-md-offset-2">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="text-center">Sign Up</h3>
-                    </div>
-                    <div class="panel-body text-center">
-                        <hr>
-                        <p>
-                            <a class="btn btn-default">Player</a>
-                            <a class="btn btn-default">Captain</a>
-                            <a class="btn btn-default">Division Rep.</a>
-                        </p>
+{% extends 'accounts/signup_base.html' %}
 
-                        <h3 style="padding-top:15px">Player, captain, or division representative?</h3>
-                        <hr>
-                        <p>Choose <strong>Player</strong> if ... </p>
-                        <p>Choose <strong>Captain</strong> if ...</p>
-                        <p>Choose <strong>Division Rep</strong> if ...</p>
-
-                    </div>
-                    <div class="panel-footer">
-
-                    </div>
-                </div>
-            </div>
-        </div>
+{% block panel_body %}
+    <div style="margin-top: 25px; margin-bottom: 35px">
+        <p>
+            <a href="{% url 'player-signup' %}" class="btn btn-default">Player</a>
+            <a class="btn btn-default">Captain</a>
+            <a class="btn btn-default">Division Rep.</a>
+        </p>
+        <h3 style="padding-top:15px">Player, captain, or division representative?</h3>
+    </div>
+    <hr>
+    <div class="text-left" style="margin-left:25px">
+        <p>Choose <strong>Player</strong> if ... </p>
+        <p>Choose <strong>Captain</strong> if ...</p>
+        <p>Choose <strong>Division Rep</strong> if ...</p>
     </div>
 {% endblock %}

@@ -1,11 +1,12 @@
-from django.contrib.auth import views as auth_views, authenticate, login
+from django.contrib.auth import views as auth_views, authenticate, login, get_user_model
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse_lazy, reverse
 from django.views.generic import FormView, TemplateView, RedirectView
 
-from accounts.forms import CustomUserLoginForm, CustomUserChangeForm, CustomUserForm, UploadThumbnailForm
+from accounts.forms import CustomUserLoginForm, CustomUserChangeForm, CustomUserCreationForm, UploadThumbnailForm
 from accounts.models import User, UserProfile
 from accounts.emails import send_confirmation_email
 
@@ -88,13 +89,27 @@ class PasswordChangeView(auth_views.PasswordChangeView):
     success_url = reverse_lazy('account')
 
 
-
 class SignUpView(TemplateView):
     template_name = 'accounts/signup.html'
 
+
+class PlayerSignUpView(FormView):
+    template_name = 'accounts/player_signup.html'
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy('home')
+
+    def form_valid(self, form):
+        form.save()
+        username = form.cleaned_data.get('username')
+        raw_password = form.cleaned_data.get('password1')
+        user = authenticate(username=username, password=raw_password)
+        login(self.request, user)
+        return super().form_valid(form)
+
+
 def signup(request):
     if request.method == 'POST':
-        form = CustomUserForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             print('form valid')
             form.save()
@@ -113,9 +128,6 @@ def signup(request):
                 login(request, user)
 
             return redirect('home')
-
-        print('invalid')
-        import pdb;pdb.set_trace()
     else:
-        form = CustomUserForm()
+        form = CustomUserCreationForm()
     return render(request, 'accounts/signup_form.html', {'form': form})
