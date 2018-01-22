@@ -16,6 +16,9 @@ class Captain(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='captain_set')
     division = models.ForeignKey('divisions.Division', related_name='captain_set')
 
+    class Meta:
+        unique_together = ('user', 'division')
+
     def __str__(self):
         return 'Captain: %s' % self.user
 

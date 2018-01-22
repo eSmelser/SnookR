@@ -92,6 +92,7 @@ def signup(request):
     if request.method == 'POST':
         form = CustomUserForm(request.POST)
         if form.is_valid():
+            print('form valid')
             form.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
@@ -108,6 +109,9 @@ def signup(request):
                 login(request, user)
 
             return redirect('home')
+
+        print('invalid')
+        import pdb;pdb.set_trace()
     else:
         form = CustomUserForm()
     return render(request, 'accounts/signup.html', {'form': form})

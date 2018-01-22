@@ -20,7 +20,7 @@ from api.serializers import TeamInviteSerializer, TeamSerializer, CustomUserSeri
 from rest_framework.renderers import JSONRenderer
 
 
-class TeamView(PermissionRequiredMixin, LoginRequiredMixin, TemplateView):
+class TeamView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     template_name = 'teams/team.html'
 
     def get_context_data(self, **kwargs):
@@ -64,7 +64,7 @@ class TeamView(PermissionRequiredMixin, LoginRequiredMixin, TemplateView):
         return context
 
     def has_permission(self):
-        return self.request.user.is_captain()
+        return self.request.user.is_authenticated() and self.request.user.is_captain()
 
 
 class CreateTeamView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -97,7 +97,7 @@ class CreateTeamView(LoginRequiredMixin, PermissionRequiredMixin, View):
         )
 
 
-class DeleteTeamView(TemplateView, ProcessFormView):
+class DeleteTeamView(LoginRequiredMixin, TemplateView, ProcessFormView):
     template_name = 'teams/delete_team.html'
 
     def get_context_data(self, **kwargs):
