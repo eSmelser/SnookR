@@ -4,6 +4,7 @@
 -->
 {% extends 'accounts/signup_base.html' %}
 {% load bootstrap3 %}
+{% load render_bundle from webpack_loader %}
 {% block heading_subtext %}
     <small><strong>(Player)</strong></small>{% endblock %}
 {% block panel_body %}
@@ -16,8 +17,13 @@
                     <div class="form-group text-center">
                         <input class="btn btn-default btn-lg" type="submit" value="Submit">
                     </div>
+                    {% include 'accounts/google_button.html' %}
+                    {% include 'accounts/facebook_button.html' %}
                 </form>
             </div>
         </div>
     </div>
+{% endblock %}
+{% block footer_scripts %}
+    {% render_bundle 'facebook' %}
 {% endblock %}

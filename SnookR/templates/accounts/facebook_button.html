@@ -1,0 +1,24 @@
+{# This template must be loaded with the facebook webpack module.  Otherwise you will just see the spinner. #}
+<div class="fb-login-button" style="display:none" data-max-rows="1" data-scope="public_profile,email" data-size="medium"
+     data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="true"
+     data-use-continue-as="false">
+</div>
+<span id="loader" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
+
+<!-- This form template is used by jQuery to login or register a user via Facebook OAuth2 -->
+{% verbatim %}
+<script id="facebook-form-template" type="text/template">
+    {% endverbatim %}
+    <form method="post" action="{% url 'socialauth:facebook' %}">
+        {% csrf_token %}
+        {% verbatim %}
+        <input type="hidden" name="first_name" value="{{ first_name }}">
+        <input type="hidden" name="last_name" value="{{ last_name }}">
+        <input type="hidden" name="email" value="{{ email }}">
+        <input type="hidden" name="image_url" value="{{ image_url }}">
+        <input type="hidden" name="facebook_id" value="{{ facebook_id }}">
+    </form>
+</script>
+{% endverbatim %}
+<script id="facebook-jssdk"
+        src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.11&appId=500234237042833"></script>
