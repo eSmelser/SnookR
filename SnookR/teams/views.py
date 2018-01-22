@@ -128,7 +128,7 @@ class AssignTeamCaptainView(LoginRequiredMixin, FormView):
         division = form.cleaned_data['division']
         users = form.cleaned_data['users']
         for user in users:
-            user.groups.add(division.team_captain_group)
+            Captain.objects.create(division=division, user=user)
 
         division = serializers.serialize('json', [division])
         users = serializers.serialize('json', users)

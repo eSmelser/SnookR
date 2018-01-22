@@ -18,7 +18,7 @@ class CaptainForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['division'].queryset = self.initial['user'].divisions_set.all()
+        self.fields['division'].queryset = self.initial['user'].represented_divisions_set.all()
 
     def clean(self):
         super().clean()

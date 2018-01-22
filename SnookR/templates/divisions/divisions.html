@@ -12,7 +12,7 @@
             <h3>Divisions</h3>
             <hr>
             {% for division in divisions %}
-                <h4><a href="{{ division.get_absolute_url }}">{{ division.name }}</a> <small>Representative: {{ division.division_rep.get_full_name }}</small></h4>
+                <h4><a href="{{ division.get_absolute_url }}">{{ division.name }}</a> <small>Representative: {{ division.representative.get_full_name|title }}</small></h4>
                 <ul>
                     {% for session in division.session_set.all %}
                         <li><a href="{{ session.get_absolute_url }}">{{ session.name }}</a></li>

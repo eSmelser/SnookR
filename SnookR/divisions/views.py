@@ -336,15 +336,15 @@ class DivRepCreateSessionView(DivRepPermissionMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['division'] = self.get_division()
+        context['division'] = self.division
         return context
 
     def form_valid(self, form):
-        division = self.get_division()
-        Session.objects.create(division=division, **form.cleaned_data)
+        Session.objects.create(division=self.division, **form.cleaned_data)
         return super().form_valid(form)
 
-    def get_division(self):
+    @cached_property
+    def division(self):
         return get_object_or_404(Division, pk=self.kwargs.get('pk'))
 
 
@@ -359,7 +359,6 @@ class DivRepCreateSessionEventView(DivRepPermissionMixin, FormView):
 
     def form_valid(self, form):
         session = self.get_session()
-        print(form.cleaned_data)
         SessionEvent.objects.create_repeated(session=session, **form.cleaned_data)
         return super().form_valid(form)
 
