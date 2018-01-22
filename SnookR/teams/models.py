@@ -6,6 +6,7 @@ from autoslug import AutoSlugField
 
 from invites.models import SessionEventInvite, TeamInvite
 from substitutes.models import Sub
+from core.behaviors import Statusable, StatusableQuerySet
 
 
 class Captain(models.Model):
@@ -21,6 +22,27 @@ class Captain(models.Model):
 
     def __str__(self):
         return 'Captain: %s' % self.user
+
+
+class CaptainRequest(Statusable, models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='captainrequest_set', null=False)
+    division = models.ForeignKey('divisions.Division', related_name='captainrequest_set', null=False)
+
+    objects = StatusableQuerySet.as_manager()
+
+    def send_notification(self):
+        """TODO: Implement a real email notification"""
+        subject = 'Captain Request for division %s' % self.division
+        message = 'Hey you have a request'
+        from_email = settings.EMAIL_HOST_USER
+        self.user.email_user(subject, message, from_email)
+
+    class Meta:
+        unique_together = ('user', 'division')
+
+    def __str__(self):
+        return 'Captain: %s' % self.user
+
 
 class TeamManager(models.Manager):
     def create_team(self, name, captain, players):

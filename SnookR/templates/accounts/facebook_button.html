@@ -9,7 +9,7 @@
 {% verbatim %}
 <script id="facebook-form-template" type="text/template">
     {% endverbatim %}
-    <form method="post" action="{% url 'socialauth:facebook' %}">
+    <form method="post" action="{% url 'socialauth:facebook' %}?next={{ view.success_url }}">
         {% csrf_token %}
         {% verbatim %}
         <input type="hidden" name="first_name" value="{{ first_name }}">

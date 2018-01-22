@@ -1,53 +1,14 @@
 from django.conf import settings
 from django.db import models
 
-
-class AbstractInvite(models.Model):
-    PENDING = 'P'
-    APPROVED = 'A'
-    DECLINED = 'D'
-    STATUS_CHOICES = (
-        (PENDING, 'Pending'),
-        (APPROVED, 'Approved'),
-        (DECLINED, 'Declined')
-    )
-
-    status = models.CharField(default=PENDING, max_length=1, choices=STATUS_CHOICES)
-
-    class Meta:
-        abstract = True
+from core.behaviors import Statusable, StatusableQuerySet
 
 
-    @property
-    def is_closed(self):
-        return self.status != AbstractInvite.PENDING
-
-    def human_readable_status(self):
-        for k, v in AbstractInvite.STATUS_CHOICES:
-            if self.status == k:
-                return v
-
-    def approve(self):
-        self.status = AbstractInvite.APPROVED
-        self.save()
-
-
-class InviteQuerySet(models.QuerySet):
-    def pending(self):
-        return self.filter(status=AbstractInvite.PENDING)
-
-    def approved(self):
-        return self.filter(status=AbstractInvite.APPROVED)
-
-    def declined(self):
-        return self.filter(status=AbstractInvite.DECLINED)
-
-
-class TeamInvite(AbstractInvite, models.Model):
+class TeamInvite(Statusable, models.Model):
     invitee = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='teaminvite_set')
     team = models.ForeignKey('teams.Team', on_delete=models.CASCADE, related_name='teaminvite_set')
 
-    objects = InviteQuerySet.as_manager()
+    objects = StatusableQuerySet.as_manager()
 
     def __str__(self):
         return 'Invite from {} to {}'.format(self.team, self.invitee)
@@ -59,11 +20,11 @@ class TeamInvite(AbstractInvite, models.Model):
             self.team.players.add(self.invitee)
 
 
-class SessionEventInvite(AbstractInvite, models.Model):
+class SessionEventInvite(Statusable, models.Model):
     sub = models.ForeignKey('substitutes.Sub', on_delete=models.CASCADE, related_name='sessioneventinvite_set')
     team = models.ForeignKey('teams.Team', on_delete=models.CASCADE)
 
-    objects = InviteQuerySet.as_manager()
+    objects = StatusableQuerySet.as_manager()
 
     class Meta:
         unique_together = ('sub', 'team')

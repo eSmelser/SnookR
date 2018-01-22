@@ -9,6 +9,7 @@ from django.core import validators
 from django.utils.translation import gettext_lazy as _
 
 from accounts.models import User, UserProfile
+from divisions.models import Division
 
 phone_regex = validators.RegexValidator(regex=r'^\d{9,15}$',
                                         message="Phone number must be entered in the format: '999999999'. Up to 15 digits allowed.")
@@ -125,3 +126,7 @@ class UploadThumbnailForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['thumbnail'].label = 'Upload thumbnail'
+
+
+class ChooseDivisionForm(forms.Form):
+    division = forms.ModelChoiceField(queryset=Division.objects.all())

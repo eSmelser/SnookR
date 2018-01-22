@@ -1,0 +1,13 @@
+{% extends 'accounts/signup_frame.html' %}
+{% load bootstrap3 %}
+{% block heading_subtext %}
+    <small><strong>(Captain)</strong></small>
+{% endblock %}
+{% block panel_body %}
+    <h3>Choose division</h3>
+    <form action="." method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <input class="btn btn-default" type="submit">
+    </form>
+{% endblock %}

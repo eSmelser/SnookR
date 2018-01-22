@@ -1,1 +1,1 @@
-<a href="{% url 'social:begin' 'google-oauth2' %}?next={% url 'home' %}">Login with Google</a>
+<a href="{% url 'social:begin' 'google-oauth2' %}?next={{ view.success_url }}">Login with Google</a>

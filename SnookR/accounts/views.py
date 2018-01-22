@@ -1,14 +1,17 @@
 from django.contrib.auth import views as auth_views, authenticate, login, get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse_lazy, reverse
 from django.views.generic import FormView, TemplateView, RedirectView
 
-from accounts.forms import CustomUserLoginForm, CustomUserChangeForm, CustomUserCreationForm, UploadThumbnailForm
+from accounts.forms import CustomUserLoginForm, CustomUserChangeForm, CustomUserCreationForm, UploadThumbnailForm, \
+    ChooseDivisionForm
 from accounts.models import User, UserProfile
 from accounts.emails import send_confirmation_email
+from teams.models import CaptainRequest
 
 
 class LoginView(auth_views.LoginView):
@@ -94,7 +97,7 @@ class SignUpView(TemplateView):
 
 
 class PlayerSignUpView(FormView):
-    template_name = 'accounts/player_signup.html'
+    template_name = 'accounts/signup_player.html'
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('home')
 
@@ -107,27 +110,27 @@ class PlayerSignUpView(FormView):
         return super().form_valid(form)
 
 
-def signup(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            print('form valid')
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            email = form.cleaned_data.get('email')
-            first_name = form.cleaned_data.get('first_name')
-            last_name = form.cleaned_data.get('last_name')
-            phone_number = form.cleaned_data.get('phone_number') or None
-            user = authenticate(username=username, password=raw_password, email=email, first_name=first_name,
-                                last_name=last_name)
-            profile = UserProfile.objects.create(user=user, phone_number=phone_number)
-            profile.send_confirmation_email()
+class CaptainSignUpView(PlayerSignUpView):
+    template_name = 'accounts/signup_captain.html'
+    success_url = reverse_lazy('signup-captain-choose-division')
 
-            if settings.DEBUG:
-                login(request, user)
 
-            return redirect('home')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'accounts/signup_form.html', {'form': form})
+class CaptainChooseDivisionView(LoginRequiredMixin, FormView):
+    template_name = 'accounts/signup_captain_choose_division.html'
+    form_class = ChooseDivisionForm
+    success_url = reverse_lazy('signup-captain-success')
+
+    def form_valid(self, form):
+        # Retrieve chosen division
+        division = form.cleaned_data['division']
+
+        # Create a team captain status request
+        request = CaptainRequest.objects.create(division=division, user=self.request.user)
+
+        # Send a team captain status request notification to division representative
+        request.send_notification()
+        return super().form_valid(form)
+
+
+class CaptainSignUpSuccessView(TemplateView):
+    template_name = 'accounts/signup_captain_success.html'

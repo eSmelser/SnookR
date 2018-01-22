@@ -1,10 +1,10 @@
-{% extends 'accounts/signup_base.html' %}
+{% extends 'accounts/signup_frame.html' %}
 
 {% block panel_body %}
     <div style="margin-top: 25px; margin-bottom: 35px">
         <p>
             <a href="{% url 'player-signup' %}" class="btn btn-default">Player</a>
-            <a class="btn btn-default">Captain</a>
+            <a href="{% url 'captain-signup' %}" class="btn btn-default">Captain</a>
             <a class="btn btn-default">Division Rep.</a>
         </p>
         <h3 style="padding-top:15px">Player, captain, or division representative?</h3>

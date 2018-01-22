@@ -11,6 +11,7 @@ from socialauth.forms import FacebookAuthForm
 class FacebookAuthView(View):
     def post(self, request, *args, **kwargs):
         if self.forms_are_valid():
+            import pdb;pdb.set_trace()
             obj, created = FacebookAuth.objects.get_or_create_user(**self.get_forms_data())
             login(request, obj.user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('home')

@@ -10,12 +10,20 @@ urlpatterns = [
     url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
     url(r'^signup/$', accounts.views.SignUpView.as_view(), name='signup'),
     url(r'^signup/player/$', accounts.views.PlayerSignUpView.as_view(), name='player-signup'),
+    url(r'^signup/captain/$', accounts.views.CaptainSignUpView.as_view(), name='captain-signup'),
+    url(
+        r'^signup/captain/choose-division/$',
+        accounts.views.CaptainChooseDivisionView.as_view(),
+        name='signup-captain-choose-division'
+    ),
+    url(r'^signup/captain/success/$', accounts.views.CaptainSignUpSuccessView.as_view(), name='signup-captain-success'),
     url(r'^account/$', accounts.views.AccountView.as_view(), name='account'),
     url(r'^account/change/$', accounts.views.AccountChangeView.as_view(), name='account_change'),
     url(r'^account/delete/$', accounts.views.DeleteAccountView.as_view(), name='account_delete'),
-    url(r'^account/delete-redirect/$', accounts.views.DeleteAccountRedirectView.as_view(), name='account_delete_redirect'),
+    url(r'^account/delete-redirect/$', accounts.views.DeleteAccountRedirectView.as_view(),
+        name='account_delete_redirect'),
     url(r'^account/delete-success/$', accounts.views.DeleteAccountSuccessView.as_view(), name='account_delete_success'),
     url(r'^password_change/$', accounts.views.PasswordChangeView.as_view(), name='password_change'),
     url(r'^profile/(?P<username>.+)/$', accounts.views.ProfileView.as_view(), name='profile'),
     url(r'^delete_thumbnail/$', accounts.views.DeleteThumbnail.as_view(), name='delete_thumbnail'),
- ]
+]
