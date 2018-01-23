@@ -11,6 +11,8 @@ from accounts.forms import CustomUserLoginForm, CustomUserChangeForm, CustomUser
     ChooseDivisionForm
 from accounts.models import User, UserProfile
 from accounts.emails import send_confirmation_email
+from divisions.forms import CreateDivisionForm
+from divisions.models import DivRepRequest
 from teams.models import CaptainRequest
 
 
@@ -96,25 +98,39 @@ class SignUpView(TemplateView):
     template_name = 'accounts/signup.html'
 
 
-class PlayerSignUpView(FormView):
-    template_name = 'accounts/signup_player.html'
+class SignUpBaseView(FormView):
+    """This view is a base view.  It should not be used on its own because it does not have anny template or success_url"""
     form_class = CustomUserCreationForm
-    success_url = reverse_lazy('home')
 
     def form_valid(self, form):
+        # Create the user model from the valid form
         form.save()
+
+        # Authenticate  and login the user
         username = form.cleaned_data.get('username')
         raw_password = form.cleaned_data.get('password1')
         user = authenticate(username=username, password=raw_password)
         login(self.request, user)
+
+        # Create the user's profile and send them a confirmation email
         profile = UserProfile.objects.create(user=user)
         profile.send_confirmation_email()
         return super().form_valid(form)
 
 
-class CaptainSignUpView(PlayerSignUpView):
+class PlayerSignUpView(SignUpBaseView):
+    template_name = 'accounts/signup_player.html'
+    success_url = reverse_lazy('home')
+
+
+class CaptainSignUpView(SignUpBaseView):
     template_name = 'accounts/signup_captain.html'
     success_url = reverse_lazy('signup-captain-choose-division')
+
+
+class RepresentativeSignUpView(SignUpBaseView):
+    template_name = 'accounts/signup_representative.html'
+    success_url = reverse_lazy('signup-representative-create-division')
 
 
 class CaptainChooseDivisionView(LoginRequiredMixin, FormView):
@@ -136,3 +152,24 @@ class CaptainChooseDivisionView(LoginRequiredMixin, FormView):
 
 class CaptainSignUpSuccessView(TemplateView):
     template_name = 'accounts/signup_captain_success.html'
+
+
+class RepresentativeCreateDivisionSignUpView(LoginRequiredMixin, FormView):
+    template_name = 'accounts/signup_representative_create_division.html'
+    form_class = CreateDivisionForm
+    success_url = reverse_lazy('signup-representative-success')
+
+    def form_valid(self, form):
+        # Retrieve the division's name
+        name = form.cleaned_data.get('name')
+
+        # Create a request for this user to be a representative
+        request = DivRepRequest.objects.create(division_name=name, user=self.request.user)
+
+        # Notify the admin that this request has come in.
+        request.send_admin_notification()
+        return super().form_valid(form)
+
+
+class RepresentativeSuccessSignUpView(LoginRequiredMixin, TemplateView):
+    template_name = 'accounts/signup_representative_success.html'

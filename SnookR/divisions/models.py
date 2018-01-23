@@ -107,6 +107,11 @@ class SessionEvent(models.Model):
 class DivRepRequest(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    division_name = models.CharField(max_length=50, blank=True)
 
     def __str__(self):
         return 'Div rep request for ' + str(self.user)
+
+    def send_admin_notification(self):
+        """Send an email to the admin that there is a request for representative status"""
+        #  TODO: Implement this
