@@ -48,13 +48,44 @@ pip install -r requirements.txt
 
 ## How to Setup your local instance
 
-### Use Python and manage.py to make database migrations
+### Define the local settings module
 
-In order to use your local settings, put the following in your virtualenv postactivate script (found in /.virtualenv/SnookR/bin/postactivate):
+In order to use your local settings, put the following in your virtualenv postactivate script (found in /.virtualenv/SnookR/bin/postactivate, or whichever virtualenv you named):
 
 ```
+
 export DJANGO_SETTINGS_MODULE='SnookR.settings.local'
+
 ```
+
+### Install and use webpack
+
+Our front-end assets are bundled with Webpack.  Download NPM [here](https://www.npmjs.com/get-npm).
+
+In the root directory (the one with package.json in it):
+
+```
+
+$ npm install
+
+```
+
+After everything is installed, also install Webpack globally:
+
+```
+
+$ npm install -g webpack
+
+```
+
+Once Webpack is installed, in the root directory use Webpack to bundle and watch for changes in our JS files:
+
+```
+
+$ webpack --watch
+
+```
+
 
 ### Use Python and manage.py to make database migrations
 
@@ -72,6 +103,11 @@ python manage.py db_populate
 
 ```
 python manage.py runserver
+
+# If you are modifying JS files, also run webpack --watch in another terminal:
+
+webpack --watch
+
 ```
 
 Then simply navigate to the home page of the specified URL by the runserver output ex. `http://127.0.0.1:8000/home`
