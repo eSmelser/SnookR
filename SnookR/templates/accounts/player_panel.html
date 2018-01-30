@@ -23,14 +23,14 @@
                 <form class='pull-right text-right' action="." method="post">
                     {% csrf_token %}
                     <input type="hidden" name="approve" value="true">
-                    <input type="hidden" name="request_id" value="{{ request.id }}">
+                    <input type="hidden" name="request_id" value="{{ captain_request.id }}">
                     <input type="hidden" name="division_id" value="{{ division.id }}">
                     <input class="pull-right text-right btn btn-default" type="submit" value="Approve">
                 </form>
                 <form class='pull-right text-right' action="." method="post">
                     {% csrf_token %}
                     <input type="hidden" name="decline" value="true">
-                    <input type="hidden" name="request_id" value="{{ request.id }}">
+                    <input type="hidden" name="request_id" value="{{ captain_request.id }}">
                     <input type="hidden" name="division_id" value="{{ division.id }}">
                     <input class="pull-right text-right btn btn-default" type="submit" value="Decline">
                 </form>
